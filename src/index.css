@@ -144,7 +144,7 @@
   }
 }
 
-@layer base {
+/* @layer base {
   * {
     @apply border-border;
   }
@@ -162,7 +162,7 @@
   h6 {
     font-family: "Space Grotesk", sans-serif;
   }
-}
+} */
 
 @layer utilities {
   .text-gradient {
