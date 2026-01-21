@@ -27,6 +27,11 @@ Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS 
 ### Roteamento & Data
 - **React Router DOM v7** - Roteamento para SPAs
 - **TanStack React Query** - Gerenciamento de estado e cache de dados
+- **date-fns** - Manipulação de datas com locale pt-BR
+
+### APIs & Integração
+- **GitHub API** - Integração com repositórios e dados do GitHub
+- **Octokit** - Client para GitHub API
 
 ### Development
 - **ESLint** - Análise estática e linting de código
@@ -34,16 +39,41 @@ Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS 
 
 ## 🎨 Design System
 
-### Componentes UI
-O projeto inclui componentes Shadcn/UI baseados em Radix UI:
-- **Button** - Botão com variantes customizáveis
-- **Toast/Toaster** - Sistema nativo de notificações via Radix UI
-- **Sonner** - Alternativa moderna para toast notifications
-- **Tooltip** - Dicas acessíveis com Radix UI
+### Componentes Principais
+
+#### Seções de Conteúdo
+- **Hero** - Apresentação inicial com animações e CTA
+- **About** - Grid de skills e tecnologias com badges coloridos categorizados
+- **Projects** - Galeria de repositórios GitHub com filtros por linguagem, stats e links
+- **Certificates** - Cards em glassmorphism com informações de cursos e formações
+- **Contact** - Formulário de contato com validação e notificações
+- **GitHubActivity** - Widget de atividade recente do GitHub
+
+#### Navegação & Tema
+- **Navbar** - Menu responsivo com links âncora suave
+- **NavLink** - Componente reutilizável para links de navegação
+- **ThemeToggle** - Alternador entre dark/light mode com ícone animado
+
+#### Componentes UI Reutilizáveis
+O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
+- Button, Input, Textarea, Card, Badge, Tooltip
+- Dialog, Drawer, Sheet, Popover, Hover Card
+- Avatar, Skeleton, Badge, Alert, Progress
+- Tabs, Carousel, Accordion, Select, Checkbox, Radio
+- E muitos outros...
+
+### Padrões de Design
+- **Layout glassmorphism** - Cards com efeito vidro translúcido
+- **Animações Framer Motion** - Fade, scale, y-offset, rotate, hover effects
+- **Responsividade** - Tailwind breakpoints (mobile-first)
+- **Acessibilidade** - Radix UI primitivos acessíveis, labels, ARIA
+- **Temas** - Dark/light mode com next-themes
 
 ### Hooks Customizados
 - **useToast()** - Hook para disparar notificações toast
 - **useTheme()** - Hook para gerenciar tema dark/light (next-themes)
+- **useGitHubRepos()** - Hook para buscar repositórios com React Query, filtros por linguagem
+- **useIsMobile()** - Hook para detecção de dispositivos móveis com media queries
 
 ### Tipografia
 - **Sora** - Fonte principal (sans-serif)
@@ -101,25 +131,41 @@ npm run lint
 src/
 ├── assets/              # Imagens, ícones e arquivos estáticos
 ├── components/
-│   ├── Navbar.tsx       # Componente de navegação
-│   ├── ThemeToggle.tsx  # Seletor de tema dark/light
-│   └── ui/              # Componentes UI reutilizáveis
-│       ├── button.tsx   # Componente Button (Shadcn/Radix)
-│       ├── toast.tsx    # Sistema de notificações
-│       ├── toaster.tsx  # Container das notificações
-│       ├── tooltip.tsx  # Tooltips acessíveis
-│       └── sonner.tsx   # Integração Sonner
+│   ├── Navbar.tsx           # Barra de navegação responsiva com logo e menu
+│   ├── NavLink.tsx          # Link de navegação reutilizável com scroll suave
+│   ├── Hero.tsx             # Seção hero inicial com apresentação e CTA
+│   ├── About.tsx            # Grid de skills categorizados (frontend, backend, tools, etc)
+│   ├── Projects.tsx         # Seção de projetos com integração GitHub API
+│   ├── Certificates.tsx     # Cards em glassmorphism com certificados/formações
+│   ├── Contact.tsx          # Formulário de contato com validação
+│   ├── GitHubActivity.tsx   # Widget de atividade recente do GitHub
+│   ├── ThemeToggle.tsx      # Alternador entre dark/light mode
+│   └── ui/                  # 25+ Componentes UI reutilizáveis (Shadcn/Radix)
+│       ├── button.tsx       # Botão estilizado com variantes
+│       ├── input.tsx        # Input de formulário
+│       ├── textarea.tsx     # Textarea para mensagens
+│       ├── toast.tsx        # Sistema de notificações (Radix UI)
+│       ├── toaster.tsx      # Container das notificações
+│       ├── tooltip.tsx      # Tooltips acessíveis
+│       ├── sonner.tsx       # Integração Sonner para toasts
+│       ├── card.tsx         # Card base para layout
+│       ├── badge.tsx        # Badge para tags/labels
+│       ├── avatar.tsx       # Avatar para imagens de perfil
+│       ├── separator.tsx    # Separador visual
+│       └── [outros...].tsx  # Accordion, Alert, Dialog, Drawer, Select, etc.
 ├── hooks/
-│   └── use-toast.ts     # Hook customizado para toast notifications
+│   ├── use-toast.ts         # Hook para disparo de notificações
+│   ├── use-github.ts        # Hook para integração com GitHub API (React Query)
+│   └── use-mobile.tsx       # Hook para detecção de dispositivos móveis
 ├── lib/
-│   └── utils.ts         # Funções utilitárias (cn, etc.)
+│   └── utils.ts             # Funções utilitárias (cn para merge de classes)
 ├── pages/
-│   ├── Index.tsx        # Página principal
-│   └── NotFound.tsx     # Página 404
-├── App.tsx              # Componente raiz com routing
-├── App.css              # Estilos específicos do App
-├── index.css            # Estilos globais e CSS variables
-└── main.tsx             # Entry point da aplicação
+│   ├── Index.tsx            # Página principal com todas as seções
+│   └── NotFound.tsx         # Página 404 customizada
+├── App.tsx                  # Componente raiz com providers e routing
+├── App.css                  # Estilos específicos do App
+├── index.css                # Estilos globais e CSS variables (HSL)
+└── main.tsx                 # Entry point da aplicação
 ```
 
 ## ⚙️ Configuração
@@ -165,13 +211,23 @@ src/
 ✅ Roteamento (React Router v7)  
 ✅ Gerenciamento de dados (TanStack Query)  
 ✅ Linting e análise de código  
+✅ **Integração com GitHub API** (repositórios, atividade)  
+✅ **Seções completas** (Hero, About, Projects, Certificates, Contact)  
+✅ **Layout glassmorphism** com cards estilizados  
+✅ **Animações suaves** (Framer Motion) com hover effects  
+✅ **Formulário de contato** com validação  
+✅ **Responsividade** mobile-first em todos os componentes  
 
 ## 🎯 Próximos Passos Sugeridos
 
-- [ ] Criar página de home com hero section
-- [ ] Implementar seção de projetos/portfolio
-- [ ] Adicionar formulário de contato
-- [ ] Integrar com CMS ou backend
-- [ ] Implementar analytics
-- [ ] Otimizar SEO
-- [ ] Adicionar testes unitários
+- [ ] Integrar formulário de contato com backend para receber emails (EmailJS, SendGrid, etc)
+- [ ] Adicionar seção de footer com links sociais
+- [ ] Implementar analytics (Google Analytics ou Plausible)
+- [ ] Otimizar SEO (meta tags, sitemap.xml, robots.txt)
+- [ ] Adicionar testes unitários (Vitest + React Testing Library)
+- [ ] Adicionar testes E2E (Playwright ou Cypress)
+- [ ] Melhorar performance (lazy loading de imagens, code splitting)
+- [ ] Adicionar seção de blog/artigos com MDX
+- [ ] Implementar scroll smooth entre seções
+- [ ] Deploy em plataforma (Vercel, Netlify, etc)
+- [ ] Adicionar suporte a múltiplos idiomas (i18n)
