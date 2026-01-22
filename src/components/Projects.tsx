@@ -119,7 +119,7 @@ const ProjectCard = ({ repo, index }: { repo: GitHubRepo; index: number }) => (
         {/* Language and Topics */}
         <div className="flex flex-wrap gap-2">
             {repo.language && (
-                <span className="flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full bg-secondary text-foreground">
+                <span className="flex items-center gap-1.5 text-xs sm:text-sm font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full bg-secondary text-foreground whitespace-nowrap">
                     <span
                         className={`w-2 h-2 rounded-full ${languageColors[repo.language] || "bg-gray-400"}`}
                     />
@@ -129,7 +129,7 @@ const ProjectCard = ({ repo, index }: { repo: GitHubRepo; index: number }) => (
             {repo.topics?.slice(0, 2).map((topic) => (
                 <span
                     key={topic}
-                    className="text-xs font-medium px-3 py-1 rounded-full bg-secondary text-muted-foreground"
+                    className="text-xs sm:text-sm font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full bg-secondary text-muted-foreground whitespace-nowrap"
                 >
                     {topic}
                 </span>
