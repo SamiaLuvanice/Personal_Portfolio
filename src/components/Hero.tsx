@@ -1,9 +1,9 @@
-import { Github, Linkedin, Mail, ArrowDown, MapPin, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useTheme } from "next-themes";
 import profilePhotoDark from "@/assets/profile-photo-b.jpeg";
 import profilePhotoLight from "@/assets/profile-photo-w.png";
+import { Button } from "@/components/ui/button";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowDown, Download, Github, Linkedin, Mail, MapPin } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const Hero = () => {
   const { theme } = useTheme();
@@ -20,21 +20,21 @@ const Hero = () => {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background decorations with parallax */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div 
+        <motion.div
           style={{ y: y1 }}
           className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl"
         />
-        <motion.div 
+        <motion.div
           style={{ y: y2 }}
           className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl"
         />
-        <motion.div 
+        <motion.div
           style={{ y: y1, opacity }}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-hero opacity-5 rounded-full blur-3xl"
         />
       </div>
 
-      <motion.div 
+      <motion.div
         style={{ opacity }}
         className="container mx-auto px-6 relative z-10"
       >
@@ -47,8 +47,8 @@ const Hero = () => {
             style={{ y: y2 }}
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-hero blur-2xl opacity-30 scale-110" 
-                   style={{ borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%" }} 
+              <div className="absolute inset-0 bg-gradient-hero blur-2xl opacity-30 scale-110"
+                   style={{ borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%" }}
               />
               <div className="relative w-72 h-72 md:w-96 md:h-96 overflow-hidden border-4 border-card shadow-glow animate-blob"
                    style={{ borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%" }}
@@ -60,7 +60,7 @@ const Hero = () => {
                 />
               </div>
               {/* Floating badge */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.8 }}
@@ -82,7 +82,7 @@ const Hero = () => {
             >
               Sâmia <span className="text-gradient">Luvanice</span>
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
@@ -90,18 +90,17 @@ const Hero = () => {
             >
               Desenvolvedora Fullstack
             </motion.p>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
               className="text-muted-foreground mb-8 leading-relaxed"
             >
-              Movida por aprendizado contínuo, colaboração em equipe e pela vontade de 
-              construir soluções que gerem impacto positivo e real para as pessoas e os negócios.
+              Desenvolvedora Full Stack formada pelo Capacita Brasil e Grupo Boticário, em formação contínua com DiverseDEV/ADA. Focada em criar aplicações web escaláveis com código limpo e boas práticas de engenharia de software.
             </motion.p>
 
             {/* Action Buttons */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.7 }}
@@ -125,13 +124,12 @@ const Hero = () => {
                   Email
                 </a>
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                asChild 
-                className="gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              <Button
+                size="lg"
+                asChild
+                className="gap-2 bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all"
               >
-                <a href="/cv-samia-luvanice.pdf" download>
+                <a href="/curriculo.pdf" download="Curriculo-Samia-Luvanice.pdf">
                   <Download className="w-5 h-5" />
                   Download CV
                 </a>
