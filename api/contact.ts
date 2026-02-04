@@ -66,7 +66,7 @@ export default async function handler(
     if (resendApiKey && contactToEmail) {
       try {
         const resend = new Resend(resendApiKey);
-        await resend.emails.send({
+        const emailResult = await resend.emails.send({
           from: contactFromEmail,
           to: contactToEmail,
           replyTo: email,
@@ -80,10 +80,12 @@ export default async function handler(
             </div>
           `,
         });
+        console.log("Email sent:", emailResult);
       } catch (emailError) {
         console.error("Email error:", emailError);
-        // Don't fail the response, message was saved
       }
+    } else {
+      console.warn("Resend not configured:", { hasApiKey: !!resendApiKey, hasEmail: !!contactToEmail });
     }
 
     res.status(200).json({ ok: true, message: "Contact message saved successfully" });
