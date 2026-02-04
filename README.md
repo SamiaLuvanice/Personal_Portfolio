@@ -365,7 +365,6 @@ Ou use o atributo nativo HTML:
 - [ ] Otimizar SEO (meta tags, sitemap.xml, robots.txt)
 - [ ] Adicionar testes unitários (Vitest + React Testing Library)
 - [ ] Adicionar testes E2E (Playwright ou Cypress)
-- [x] Deploy na Vercel (frontend + serverless) ✅
 - [ ] Adicionar suporte a múltiplos idiomas (i18n)
 - [ ] Melhorar tratamento de erros no backend
 - [ ] Adicionar validação mais robusta no servidor
