@@ -53,6 +53,7 @@ Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS 
 - **Navbar** - Menu responsivo com links âncora suave
 - **NavLink** - Componente reutilizável para links de navegação
 - **ThemeToggle** - Alternador entre dark/light mode com ícone animado
+- **Footer** - Rodapé com links sociais, rápidos e informações de copyright
 
 #### Componentes UI Reutilizáveis
 O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
@@ -105,9 +106,15 @@ O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
 npm install
 ```
 
-### Desenvolvimento
+### Desenvolvimento (Frontend + Backend)
 ```bash
-npm run dev
+npm run dev:all
+```
+
+Ou separadamente:
+```bash
+npm run dev        # Frontend (Vite) - porta 5173
+npm run dev:server # Backend (Express) - porta 3001
 ```
 
 ### Build de Produção
@@ -138,6 +145,7 @@ src/
 │   ├── Projects.tsx         # Seção de projetos com integração GitHub API
 │   ├── Certificates.tsx     # Cards em glassmorphism com certificados/formações
 │   ├── Contact.tsx          # Formulário de contato com validação
+│   ├── Footer.tsx           # Rodapé com links sociais e rápidos
 │   ├── GitHubActivity.tsx   # Widget de atividade recente do GitHub
 │   ├── ThemeToggle.tsx      # Alternador entre dark/light mode
 │   └── ui/                  # 25+ Componentes UI reutilizáveis (Shadcn/Radix)
@@ -158,7 +166,8 @@ src/
 │   ├── use-github.ts        # Hook para integração com GitHub API (React Query)
 │   └── use-mobile.tsx       # Hook para detecção de dispositivos móveis
 ├── lib/
-│   └── utils.ts             # Funções utilitárias (cn para merge de classes)
+│   ├── utils.ts             # Funções utilitárias (cn para merge de classes)
+│   └── contactService.ts    # Serviço para envio de mensagens de contato
 ├── pages/
 │   ├── Index.tsx            # Página principal com todas as seções
 │   └── NotFound.tsx         # Página 404 customizada
@@ -170,9 +179,63 @@ src/
 
 ## ⚙️ Configuração
 
+### Backend do formulário de contato
+O projeto inclui um backend Node.js/Express que gerencia mensagens de contato, salva no Supabase e envia emails via Resend.
+
+#### Setup Inicial
+1) Crie um projeto no [Supabase](https://supabase.com) (gratuito)
+2) Configure as variáveis de ambiente:
+   - Copie [.env.example](.env.example) → `.env`
+   - Preencha as credenciais do Supabase:
+     - `VITE_SUPABASE_URL`
+     - `VITE_SUPABASE_ANON_KEY`
+     - `SUPABASE_SERVICE_ROLE_KEY` (obtenha em Project Settings → API)
+
+3) Crie a tabela de contatos no Supabase (SQL Editor):
+```sql
+create table if not exists contact_messages (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  email text not null,
+  message text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table contact_messages enable row level security;
+
+create policy "public insert contact messages"
+on contact_messages for insert
+to public
+with check (true);
+```
+
+#### Email (Opcional)
+Para enviar emails automaticamente:
+1) Gere uma API key no [Resend](https://resend.com)
+2) Configure no `.env`:
+   - `RESEND_API_KEY`
+   - `CONTACT_TO_EMAIL` (seu email)
+   - `CONTACT_FROM_EMAIL` (opcional)
+
+#### Execução
+```bash
+npm run dev:all
+```
+
+Ou em terminais separados:
+```bash
+npm run dev        # Frontend (Vite) porta 5173
+npm run dev:server # Backend (Express) porta 3001
+```
+
+#### Estrutura
+- [server/index.js](server/index.js) - Express server:
+  - `POST /api/contact` - Salva mensagem, envia email (se configurado)
+  - `GET /health` - Status do servidor
+
 ### Vite
 - Path alias `@` apontando para `src/`
-- Dev server na porta 8080
+- Dev server na porta 5173 (frontend)
 - Suporte a Hot Module Replacement (HMR)
 
 ### TypeScript
@@ -198,8 +261,45 @@ src/
 - `tsconfig.app.json` - Configuração específica da aplicação
 - `tsconfig.node.json` - Configuração para ferramentas de build
 
+## ⚡ Otimizações de Performance
+
+### Code Splitting
+O projeto usa `React.lazy()` para carregar componentes pesados sob demanda:
+- **Certificates** - Carregado apenas quando próximo de ser visualizado
+- **Projects** - Lazy loading com integração GitHub
+- **Contact** - Componente carregado sob demanda
+
+Cada seção tem um `Suspense` com fallback de skeleton para melhor UX.
+
+**Arquivo:** [src/pages/Index.tsx](src/pages/Index.tsx)
+
+### Lazy Loading de Imagens
+Use o componente `LazyImage` para carregar imagens apenas quando visíveis:
+
+```tsx
+import { LazyImage } from "@/components/LazyImage";
+
+export default function MyComponent() {
+  return (
+    <LazyImage
+      src="/my-image.jpg"
+      alt="Descrição"
+      className="w-full h-auto"
+    />
+  );
+}
+```
+
+Ou use o atributo nativo HTML:
+```tsx
+<img src="/image.jpg" alt="..." loading="lazy" decoding="async" />
+```
+
+**Arquivo:** [src/components/LazyImage.tsx](src/components/LazyImage.tsx)
+
 ## 📊 Status do Setup
 
+### Frontend
 ✅ Vite + React 19 + TypeScript  
 ✅ Tailwind CSS v4.1  
 ✅ Componentes UI (Radix + Shadcn)  
@@ -211,23 +311,38 @@ src/
 ✅ Roteamento (React Router v7)  
 ✅ Gerenciamento de dados (TanStack Query)  
 ✅ Linting e análise de código  
+✅ **Code splitting** (React.lazy + Suspense)  
+✅ **Lazy loading de imagens** (native HTML loading="lazy")  
+
+### Funcionalidades
 ✅ **Integração com GitHub API** (repositórios, atividade)  
-✅ **Seções completas** (Hero, About, Projects, Certificates, Contact)  
+✅ **Seções completas** (Hero, About, Projects, Certificates, Contact, Footer)  
 ✅ **Layout glassmorphism** com cards estilizados  
 ✅ **Animações suaves** (Framer Motion) com hover effects  
-✅ **Formulário de contato** com validação  
+✅ **Formulário de contato** com backend Express + Supabase + Resend  
+✅ **Footer com links sociais** (GitHub, LinkedIn, Email)  
 ✅ **Responsividade** mobile-first em todos os componentes  
+✅ **Scroll smooth** entre seções  
+
+### Backend
+✅ Express.js server  
+✅ Supabase (banco de dados)  
+✅ Integração com Resend (envio de emails)  
+
+### Performance
+✅ **Code splitting** - Componentes pesados (Certificates, Projects, Contact) carregam sob demanda
+✅ **Lazy loading de imagens** - Imagens carregam apenas quando visíveis na viewport
+✅ **Loading skeletons** - Fallback visual durante carregamento de componentes
+✅ **Vite otimizado** - Build ultra-rápido com chunking automático  
 
 ## 🎯 Próximos Passos Sugeridos
 
-- [ ] Integrar formulário de contato com backend para receber emails (EmailJS, SendGrid, etc)
-- [ ] Adicionar seção de footer com links sociais
 - [ ] Implementar analytics (Google Analytics ou Plausible)
 - [ ] Otimizar SEO (meta tags, sitemap.xml, robots.txt)
 - [ ] Adicionar testes unitários (Vitest + React Testing Library)
 - [ ] Adicionar testes E2E (Playwright ou Cypress)
-- [ ] Melhorar performance (lazy loading de imagens, code splitting)
-- [ ] Adicionar seção de blog/artigos com MDX
-- [ ] Implementar scroll smooth entre seções
-- [ ] Deploy em plataforma (Vercel, Netlify, etc)
+- [ ] Deploy em plataforma (Vercel para frontend, Render/Railway para backend)
 - [ ] Adicionar suporte a múltiplos idiomas (i18n)
+- [ ] Melhorar tratamento de erros no backend
+- [ ] Adicionar validação mais robusta no servidor
+- [ ] Implementar PWA (Progressive Web App) com Service Workers

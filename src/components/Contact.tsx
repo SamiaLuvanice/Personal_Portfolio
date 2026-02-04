@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { toast } from "sonner";
+import { submitContactForm } from "@/lib/contactService";
 
 const Contact = () => {
     const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -16,16 +17,19 @@ const Contact = () => {
         { href: "mailto:samia.luvanice.dev@gmail.com", icon: Mail, label: "Email", color: "hover:text-primary" },
     ];
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-
-        // Simulating form submission - in production, connect to a backend
-        setTimeout(() => {
+        try {
+            await submitContactForm(formData);
             toast.success("Mensagem enviada com sucesso! Entrarei em contato em breve.");
             setFormData({ name: "", email: "", message: "" });
+        } catch (error) {
+            console.error(error);
+            toast.error("Não foi possível enviar sua mensagem. Tente novamente em instantes.");
+        } finally {
             setIsSubmitting(false);
-        }, 1000);
+        }
     };
 
     return (
@@ -199,21 +203,6 @@ const Contact = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Footer */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                viewport={{ once: true }}
-                className="mt-24 pt-8 border-t border-border"
-            >
-                <div className="container mx-auto px-6">
-                    <p className="text-center text-muted-foreground text-sm flex items-center justify-center gap-2">
-                        Designed & Developed with passion by Sâmia Luvanice © {new Date().getFullYear()}
-                    </p>
-                </div>
-            </motion.div>
         </section>
     );
 };

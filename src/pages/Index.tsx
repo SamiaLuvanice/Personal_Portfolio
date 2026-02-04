@@ -1,9 +1,21 @@
+import { lazy, Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
-import Certificates from "@/components/Certificates";
-import Projects from "@/components/Projects";
-import Contact from "@/components/Contact";
+import Footer from "@/components/Footer";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Code splitting: componentes carregados sob demanda
+const Certificates = lazy(() => import("@/components/Certificates"));
+const Projects = lazy(() => import("@/components/Projects"));
+const Contact = lazy(() => import("@/components/Contact"));
+
+const LoadingFallback = () => (
+  <div className="space-y-4 py-24">
+    <Skeleton className="h-12 w-full" />
+    <Skeleton className="h-64 w-full" />
+  </div>
+);
 
 const Index = () => {
     return (
@@ -11,9 +23,20 @@ const Index = () => {
             <Navbar />
             <Hero />
             <About />
-            <Certificates />
-            <Projects />
-            <Contact />
+            
+            <Suspense fallback={<LoadingFallback />}>
+                <Certificates />
+            </Suspense>
+            
+            <Suspense fallback={<LoadingFallback />}>
+                <Projects />
+            </Suspense>
+            
+            <Suspense fallback={<LoadingFallback />}>
+                <Contact />
+            </Suspense>
+
+            <Footer />
         </div>
     );
 };
