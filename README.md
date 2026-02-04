@@ -213,7 +213,9 @@ Para enviar emails automaticamente:
 2) Configure no `.env.local`:
    - `RESEND_API_KEY`
    - `CONTACT_TO_EMAIL` (seu email)
-   - `CONTACT_FROM_EMAIL` (opcional)
+   - `CONTACT_FROM_EMAIL` (opcional - padrão: `Portfolio <onboarding@resend.dev>`)
+
+**Nota:** O email padrão `onboarding@resend.dev` já está verificado e funciona imediatamente. Para usar um domínio customizado (ex: `noreply@seudominio.com`), você precisa verificá-lo no painel do Resend adicionando registros DNS.
 
 #### Desenvolvimento Local
 Para rodar o frontend + APIs serverless localmente:
@@ -235,12 +237,13 @@ e configure `VITE_API_URL` com a URL de produção do Vercel.
 
 2) **Configurar variáveis de ambiente:**
    - Em `Settings → Environment Variables`, adicionar:
-     - `VITE_SUPABASE_URL`
-     - `VITE_SUPABASE_ANON_KEY`
-     - `SUPABASE_SERVICE_ROLE_KEY`
-     - `RESEND_API_KEY`
-     - `CONTACT_TO_EMAIL`
-     - `CONTACT_FROM_EMAIL`
+     - `SUPABASE_URL` (URL do projeto Supabase)
+     - `SUPABASE_SERVICE_ROLE_KEY` (chave de serviço do Supabase)
+     - `RESEND_API_KEY` (API key do Resend)
+     - `CONTACT_TO_EMAIL` (seu email para receber mensagens)
+     - `CONTACT_FROM_EMAIL` (opcional - padrão: `Portfolio <onboarding@resend.dev>`)
+     - `VITE_SUPABASE_URL` (mesma URL do Supabase - para frontend)
+     - `VITE_SUPABASE_ANON_KEY` (chave pública do Supabase - para frontend)
 
 3) **Deploy automático:**
    - Cada push em `main` faz deploy automático
@@ -348,6 +351,7 @@ Ou use o atributo nativo HTML:
 ✅ Supabase (banco de dados)  
 ✅ Integração com Resend (envio de emails)  
 ✅ Deploy automático via GitHub  
+✅ **Deploy em produção** (https://samialuvanicedev.vercel.app)  
 
 ### Performance
 ✅ **Code splitting** - Componentes pesados (Certificates, Projects, Contact) carregam sob demanda
@@ -361,7 +365,7 @@ Ou use o atributo nativo HTML:
 - [ ] Otimizar SEO (meta tags, sitemap.xml, robots.txt)
 - [ ] Adicionar testes unitários (Vitest + React Testing Library)
 - [ ] Adicionar testes E2E (Playwright ou Cypress)
-- [ ] Deploy na Vercel (frontend + serverless)
+- [x] Deploy na Vercel (frontend + serverless) ✅
 - [ ] Adicionar suporte a múltiplos idiomas (i18n)
 - [ ] Melhorar tratamento de erros no backend
 - [ ] Adicionar validação mais robusta no servidor
