@@ -106,16 +106,12 @@ O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
 npm install
 ```
 
-### Desenvolvimento (Frontend + Backend)
+### Desenvolvimento (Frontend)
 ```bash
-npm run dev:all
+npm run dev
 ```
 
-Ou separadamente:
-```bash
-npm run dev        # Frontend (Vite) - porta 5173
-npm run dev:server # Backend (Express) - porta 3001
-```
+Frontend roda na porta 5173. APIs serverless estão em `/api/*`.
 
 ### Build de Produção
 ```bash
@@ -180,12 +176,12 @@ src/
 ## ⚙️ Configuração
 
 ### Backend do formulário de contato
-O projeto inclui um backend Node.js/Express que gerencia mensagens de contato, salva no Supabase e envia emails via Resend.
+O projeto usa Vercel Serverless Functions para o backend (sem servidor separado). A função `api/contact.ts` salva mensagens no Supabase e envia emails via Resend.
 
-#### Setup Inicial
+#### Setup Local
 1) Crie um projeto no [Supabase](https://supabase.com) (gratuito)
 2) Configure as variáveis de ambiente:
-   - Copie [.env.example](.env.example) → `.env`
+   - Copie [.env.example](.env.example) → `.env.local`
    - Preencha as credenciais do Supabase:
      - `VITE_SUPABASE_URL`
      - `VITE_SUPABASE_ANON_KEY`
@@ -212,26 +208,41 @@ with check (true);
 #### Email (Opcional)
 Para enviar emails automaticamente:
 1) Gere uma API key no [Resend](https://resend.com)
-2) Configure no `.env`:
+2) Configure no `.env.local`:
    - `RESEND_API_KEY`
    - `CONTACT_TO_EMAIL` (seu email)
    - `CONTACT_FROM_EMAIL` (opcional)
 
-#### Execução
+#### Desenvolvimento Local
 ```bash
-npm run dev:all
+npm run dev
 ```
+O servidor dev roda na porta 5173 e a serverless function em `/api/contact`.
 
-Ou em terminais separados:
-```bash
-npm run dev        # Frontend (Vite) porta 5173
-npm run dev:server # Backend (Express) porta 3001
-```
+#### Deployment na Vercel
 
-#### Estrutura
-- [server/index.js](server/index.js) - Express server:
-  - `POST /api/contact` - Salva mensagem, envia email (se configurado)
-  - `GET /health` - Status do servidor
+1) **Conectar GitHub:**
+   - Ir para [vercel.com](https://vercel.com)
+   - Conectar repositório
+
+2) **Configurar variáveis de ambiente:**
+   - Em `Settings → Environment Variables`, adicionar:
+     - `VITE_SUPABASE_URL`
+     - `VITE_SUPABASE_ANON_KEY`
+     - `SUPABASE_SERVICE_ROLE_KEY`
+     - `RESEND_API_KEY`
+     - `CONTACT_TO_EMAIL`
+     - `CONTACT_FROM_EMAIL`
+
+3) **Deploy automático:**
+   - Cada push em `main` faz deploy automático
+   - Frontend + Backend (Serverless) em um único lugar
+
+#### Estrutura do Backend
+- [api/contact.ts](api/contact.ts) - Serverless function:
+  - `POST /api/contact` - Salva mensagem no Supabase, envia email
+  - Timeout: 10s
+  - Cold start: ~1-2s
 
 ### Vite
 - Path alias `@` apontando para `src/`
@@ -325,9 +336,10 @@ Ou use o atributo nativo HTML:
 ✅ **Scroll smooth** entre seções  
 
 ### Backend
-✅ Express.js server  
+✅ Vercel Serverless Functions  
 ✅ Supabase (banco de dados)  
 ✅ Integração com Resend (envio de emails)  
+✅ Deploy automático via GitHub  
 
 ### Performance
 ✅ **Code splitting** - Componentes pesados (Certificates, Projects, Contact) carregam sob demanda
