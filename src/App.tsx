@@ -8,7 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
-const basename = import.meta.env.PROD ? "/Personal_Portfolio" : "/";
+const basename = import.meta.env.VITE_BASE_PATH ?? "/";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
