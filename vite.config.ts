@@ -9,8 +9,8 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  // Use repo name for GitHub Pages; root when developing locally
-  base: mode === "development" ? "/" : "/Personal_Portfolio/",
+  // Base path defaults to root; can be overridden with VITE_BASE_PATH env var
+  base: "/",
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {
