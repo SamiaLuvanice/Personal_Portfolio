@@ -111,7 +111,7 @@ npm install
 npm run dev
 ```
 
-Frontend roda na porta 5173. APIs serverless estão em `/api/*`.
+Frontend roda na porta 5173. Para testar `/api/*` localmente, use `vercel dev`.
 
 ### Build de Produção
 ```bash
@@ -131,6 +131,8 @@ npm run lint
 ## 📁 Estrutura do Projeto
 
 ```
+api/
+└── contact.ts           # Serverless function (Vercel)
 src/
 ├── assets/              # Imagens, ícones e arquivos estáticos
 ├── components/
@@ -214,10 +216,16 @@ Para enviar emails automaticamente:
    - `CONTACT_FROM_EMAIL` (opcional)
 
 #### Desenvolvimento Local
+Para rodar o frontend + APIs serverless localmente:
+```bash
+vercel dev
+```
+
+Se preferir apenas o frontend, rode:
 ```bash
 npm run dev
 ```
-O servidor dev roda na porta 5173 e a serverless function em `/api/contact`.
+e configure `VITE_API_URL` com a URL de produção do Vercel.
 
 #### Deployment na Vercel
 
@@ -330,7 +338,7 @@ Ou use o atributo nativo HTML:
 ✅ **Seções completas** (Hero, About, Projects, Certificates, Contact, Footer)  
 ✅ **Layout glassmorphism** com cards estilizados  
 ✅ **Animações suaves** (Framer Motion) com hover effects  
-✅ **Formulário de contato** com backend Express + Supabase + Resend  
+✅ **Formulário de contato** com Vercel Serverless + Supabase + Resend  
 ✅ **Footer com links sociais** (GitHub, LinkedIn, Email)  
 ✅ **Responsividade** mobile-first em todos os componentes  
 ✅ **Scroll smooth** entre seções  
@@ -353,7 +361,7 @@ Ou use o atributo nativo HTML:
 - [ ] Otimizar SEO (meta tags, sitemap.xml, robots.txt)
 - [ ] Adicionar testes unitários (Vitest + React Testing Library)
 - [ ] Adicionar testes E2E (Playwright ou Cypress)
-- [ ] Deploy em plataforma (Vercel para frontend, Render/Railway para backend)
+- [ ] Deploy na Vercel (frontend + serverless)
 - [ ] Adicionar suporte a múltiplos idiomas (i18n)
 - [ ] Melhorar tratamento de erros no backend
 - [ ] Adicionar validação mais robusta no servidor
