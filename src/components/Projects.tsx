@@ -1,11 +1,19 @@
-import { ExternalLink, Github, Folder, Star, GitFork, Clock, Loader2, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useMemo } from "react";
-import { useGitHubRepos, GitHubRepo } from "@/hooks/use-github";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import GitHubActivity from "./GitHubActivity";
+import { GitHubRepo, useGitHubRepos } from "@/hooks/use-github";
+import { AnimatePresence, motion } from "framer-motion";
+import { Filter, Github } from "lucide-react";
+import { useMemo, useState } from "react";
+
+// Interface para projetos em destaque (Vercel, etc)
+interface FeaturedProject {
+    name: string;
+    description: string;
+    url: string;
+    image?: string;
+    language?: string;
+    tags?: string[];
+    status?: "live" | "building" | "archived";
+}
 
 // Language to color mapping
 const languageColors: Record<string, string> = {
@@ -29,22 +37,6 @@ const languageColors: Record<string, string> = {
     Swift: "bg-orange-400",
 };
 
-// Language icons mapping
-const languageIcons: Record<string, string> = {
-    TypeScript: "TS",
-    JavaScript: "JS",
-    Python: "PY",
-    Java: "JV",
-    HTML: "H5",
-    CSS: "CS",
-    "C#": "C#",
-    Go: "GO",
-    Rust: "RS",
-    Ruby: "RB",
-    PHP: "PH",
-    Shell: "SH",
-};
-
 const ProjectCard = ({ repo, index }: { repo: GitHubRepo; index: number }) => (
     <motion.div
         layout
@@ -52,90 +44,113 @@ const ProjectCard = ({ repo, index }: { repo: GitHubRepo; index: number }) => (
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.3, delay: index * 0.05 }}
-        whileHover={{ y: -8, scale: 1.02 }}
-        className="group relative glass rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-smooth hover:glass-strong"
+        whileHover={{ y: -4 }}
+        className="group relative glass rounded-xl p-5 shadow-card hover:shadow-card-hover transition-smooth"
     >
-        {/* Icon and Links */}
-        <div className="flex items-start justify-between mb-6">
-            <motion.div
-                whileHover={{ rotate: 10 }}
-                className="p-3 rounded-xl bg-primary/10 text-primary"
-            >
-                <Folder className="w-6 h-6" />
-            </motion.div>
-            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-smooth">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+            <h3 className="font-display text-lg font-semibold group-hover:text-primary transition-smooth flex-1">
+                {repo.name.replace(/-/g, " ").replace(/_/g, " ")}
+            </h3>
+            {repo.html_url && (
                 <a
                     href={repo.html_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-secondary transition-smooth"
+                    className="p-1.5 rounded-lg hover:bg-secondary transition-smooth opacity-60 hover:opacity-100"
                 >
-                    <Github className="w-5 h-5 text-muted-foreground hover:text-primary" />
+                    <Github className="w-4 h-4" />
                 </a>
-                {repo.homepage && (
-                    <a
-                        href={repo.homepage}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-lg hover:bg-secondary transition-smooth"
-                    >
-                        <ExternalLink className="w-5 h-5 text-muted-foreground hover:text-primary" />
-                    </a>
-                )}
-            </div>
+            )}
         </div>
 
-        {/* Content */}
-        <h3 className="font-display text-xl font-semibold mb-3 group-hover:text-primary transition-smooth">
-            {repo.name.replace(/-/g, " ").replace(/_/g, " ")}
-        </h3>
-        <p className="text-muted-foreground text-sm mb-4 leading-relaxed line-clamp-2">
-            {repo.description || "Sem descrição disponível"}
+        {/* Description */}
+        <p className="text-muted-foreground text-sm mb-3 leading-relaxed line-clamp-2">
+            {repo.description || "Sem descrição"}
         </p>
 
-        {/* Stats */}
-        <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
-            {repo.stargazers_count > 0 && (
-                <span className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5" />
-                    {repo.stargazers_count}
-                </span>
-            )}
-            {repo.forks_count > 0 && (
-                <span className="flex items-center gap-1">
-                    <GitFork className="w-3.5 h-3.5" />
-                    {repo.forks_count}
-                </span>
-            )}
-            <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" />
-                {formatDistanceToNow(new Date(repo.pushed_at), {
-                    addSuffix: true,
-                    locale: ptBR,
-                })}
-            </span>
-        </div>
-
-        {/* Language and Topics */}
+        {/* Tags */}
         <div className="flex flex-wrap gap-2">
             {repo.language && (
-                <span className="flex items-center gap-1.5 text-xs sm:text-sm font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full bg-secondary text-foreground whitespace-nowrap">
-                    <span
-                        className={`w-2 h-2 rounded-full ${languageColors[repo.language] || "bg-gray-400"}`}
-                    />
+                <span className="text-xs font-medium px-2 py-1 rounded-full bg-secondary text-foreground">
                     {repo.language}
                 </span>
             )}
-            {repo.topics?.slice(0, 2).map((topic) => (
+            {repo.topics?.slice(0, 1).map((topic) => (
                 <span
                     key={topic}
-                    className="text-xs sm:text-sm font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full bg-secondary text-muted-foreground whitespace-nowrap"
+                    className="text-xs font-medium px-2 py-1 rounded-full bg-secondary text-muted-foreground"
                 >
                     {topic}
                 </span>
             ))}
         </div>
     </motion.div>
+);
+
+const FeaturedProjectCard = ({ project, index }: { project: FeaturedProject; index: number }) => (
+    <motion.a
+        href={project.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        layout
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.3, delay: index * 0.05 }}
+        whileHover={{ y: -4 }}
+        className="group relative glass rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-smooth"
+    >
+        {/* Image */}
+        {project.image && (
+            <div className="relative h-40 overflow-hidden">
+                <motion.img
+                    src={project.image}
+                    alt={project.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            </div>
+        )}
+
+        {/* Content */}
+        <div className="p-5">
+            <div className="flex items-start justify-between gap-2 mb-2">
+                <h3 className="font-display text-lg font-semibold">
+                    {project.name}
+                </h3>
+                {project.status === "live" && (
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/20 text-green-500 text-xs font-medium whitespace-nowrap">
+                        <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+                        Ao vivo
+                    </div>
+                )}
+            </div>
+
+            <p className="text-muted-foreground text-sm mb-3 leading-relaxed line-clamp-2">
+                {project.description}
+            </p>
+
+            {/* Tags */}
+            {(project.tags || project.language) && (
+                <div className="flex flex-wrap gap-2">
+                    {project.language && (
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-secondary text-foreground">
+                            {project.language}
+                        </span>
+                    )}
+                    {project.tags?.slice(0, 1).map((tag) => (
+                        <span
+                            key={tag}
+                            className="text-xs font-medium px-2 py-1 rounded-full bg-secondary text-muted-foreground"
+                        >
+                            {tag}
+                        </span>
+                    ))}
+                </div>
+            )}
+        </div>
+    </motion.a>
 );
 
 const LoadingCard = ({ index }: { index: number }) => (
@@ -159,6 +174,20 @@ const LoadingCard = ({ index }: { index: number }) => (
 );
 
 const ITEMS_PER_PAGE = 4;
+
+// Projetos em destaque (adicione seus projetos Vercel aqui)
+const FEATURED_PROJECTS: FeaturedProject[] = [
+    {
+        name: "StudyNice",
+        description: "Acompanhe suas metas de estudo, crie hábitos consistentes e veja seu progresso crescer com nosso sistema de sequências motivador.",
+        url: "https://studynice.vercel.app/",
+        image: "/projects/studynice-hero.png",
+        language: "TypeScript",
+        tags: ["Vercel", "Production"],
+        status: "live",
+    },
+    // Adicione mais projetos em destaque conforme necessário
+];
 
 const Projects = () => {
     const { repos, loading, error } = useGitHubRepos();
@@ -210,26 +239,33 @@ const Projects = () => {
                         </p>
                     </motion.div>
 
-                    <div className="grid lg:grid-cols-4 gap-8">
-                        {/* Activity Sidebar */}
-                        <motion.div
-                            initial={{ opacity: 0, x: -30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6 }}
-                            viewport={{ once: true }}
-                            className="lg:col-span-1"
-                        >
-                            <div className="sticky top-24 glass-strong rounded-2xl p-6 shadow-card">
-                                <h3 className="font-display font-semibold mb-4 flex items-center gap-2">
-                                    <Github className="w-5 h-5 text-primary" />
-                                    Atividade Recente
-                                </h3>
-                                <GitHubActivity />
-                            </div>
-                        </motion.div>
-
+                    <div className="grid lg:grid-cols-1 gap-8">
                         {/* Main Content */}
-                        <div className="lg:col-span-3">
+                        <div className="lg:col-span-1">
+                            {/* Featured Projects */}
+                            {FEATURED_PROJECTS.length > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.1 }}
+                                    viewport={{ once: true }}
+                                    className="mb-12"
+                                >
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <span className="text-sm text-cyan-500 font-bold">DESTAQUE</span>
+                                    </div>
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        {FEATURED_PROJECTS.map((project, index) => (
+                                            <FeaturedProjectCard
+                                                key={project.url}
+                                                project={project}
+                                                index={index}
+                                            />
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+
                             {/* Filter */}
                             {!loading && allLanguages.length > 0 && (
                                 <motion.div
