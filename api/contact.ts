@@ -12,6 +12,10 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    res.setHeader(key, value);
+  });
+
   // Handle CORS
   if (req.method === "OPTIONS") {
     return res.status(200).json({ ok: true });
@@ -30,7 +34,7 @@ export default async function handler(
     }
 
     // Initialize Supabase
-    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
@@ -53,8 +57,17 @@ export default async function handler(
       ]);
 
     if (dbError) {
-      console.error("Database error:", dbError);
-      return res.status(500).json({ error: "Failed to save message" });
+      console.error("Database error:", {
+        message: dbError.message,
+        code: dbError.code,
+        details: dbError.details,
+        hint: dbError.hint,
+      });
+
+      return res.status(500).json({
+        error: "Failed to save message",
+        details: dbError.message,
+      });
     }
 
     // Send email if Resend is configured
