@@ -53,10 +53,10 @@ const Contact = () => {
                         <h2 className="font-display text-3xl md:text-4xl font-bold mb-6">
                             Vamos <span className="text-gradient">Conversar</span>?
                         </h2>
-                        <p className="text-muted-foreground max-w-xl mx-auto">
+                        {/*<p className="text-muted-foreground max-w-xl mx-auto">
                             Estou aberta a novas oportunidades e sempre feliz em conhecer pessoas
                             interessantes. Entre em contato!
-                        </p>
+                        </p>*/}
                     </motion.div>
 
                     <div className="grid lg:grid-cols-2 gap-12">
@@ -78,6 +78,7 @@ const Contact = () => {
                                 <form onSubmit={handleSubmit} className="space-y-5">
                                     <div>
                                         <Input
+                                            id="contact-name"
                                             placeholder="Seu nome"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -166,8 +167,8 @@ const Contact = () => {
                                     <div>
                                         <p className="text-sm text-muted-foreground">Currículo</p>
                                         <a
-                                            href="/cv-samia-luvanice.pdf"
-                                            download
+                                            href="/curriculo.pdf"
+                                            download="Curriculo-Samia-Luvanice.pdf"
                                             className="font-medium hover:text-primary transition-smooth"
                                         >
                                             Download CV (PDF)

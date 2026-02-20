@@ -1,6 +1,6 @@
 # 🚀 Personal Portfolio
 
-Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS v4, com animações suaves, componentes acessíveis e design responsivo.
+Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS, com animações suaves, componentes acessíveis e design responsivo.
 
 ## ✨ Stack de Tecnologia
 
@@ -10,7 +10,7 @@ Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS 
 - **Vite** - Build tool e dev server ultra-rápido
 
 ### Styling & Animation
-- **Tailwind CSS v4** - Framework CSS utility-first
+- **Tailwind CSS** - Framework CSS utility-first
 - **Framer Motion** - Biblioteca de animações para React
 - **Tailwind Merge** - Utilitário para merge de classes Tailwind
 - **CLSX** - Utilitário para gerenciamento condicional de classes
@@ -22,16 +22,16 @@ Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS 
   - `@radix-ui/react-slot` - Primitivo de composição
 - **Sonner** - Toast notifications com animações
 - **Lucide React** - Ícones SVG limpos e consistentes
+- **React Icons** - Logos de tecnologias e ferramentas no About
 - **Next Themes** - Gerenciamento de tema dark/light mode
 
 ### Roteamento & Data
-- **React Router DOM v7** - Roteamento para SPAs
+- **React Router DOM v6** - Roteamento para SPAs
 - **TanStack React Query** - Gerenciamento de estado e cache de dados
 - **date-fns** - Manipulação de datas com locale pt-BR
 
 ### APIs & Integração
 - **GitHub API** - Integração com repositórios e dados do GitHub
-- **Octokit** - Client para GitHub API
 
 ### Development
 - **ESLint** - Análise estática e linting de código
@@ -43,7 +43,7 @@ Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS 
 
 #### Seções de Conteúdo
 - **Hero** - Apresentação inicial com animações e CTA
-- **About** - Grid de skills e tecnologias com badges coloridos categorizados
+- **About** - Grid de skills e tecnologias com badges coloridos, logos e categorias
 - **Projects** - Galeria de repositórios GitHub com filtros por linguagem, stats e links
 - **Certificates** - Cards em glassmorphism com informações de cursos e formações
 - **Contact** - Formulário de contato com validação e notificações
@@ -94,6 +94,7 @@ O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
 - Sistema de cores HSL configurável
 - Gradientes personalizados
 - Efeitos glassmorphism
+- Logos de tecnologias no About (`react-icons` + SVGs customizados)
 - Animações customizadas (float, fade, slide, scale)
 - Sombras suaves e glow effects
 - Transições smooth e bounce
@@ -133,6 +134,11 @@ npm run lint
 ```
 api/
 └── contact.ts           # Serverless function (Vercel)
+public/
+├── icons/
+│   ├── manychat.svg     # Logo customizada do ManyChat usada no About
+│   └── vscode.svg       # Logo customizada do VS Code usada no About
+└── ...                  # Arquivos públicos (robots, certificados, projetos, etc.)
 src/
 ├── assets/              # Imagens, ícones e arquivos estáticos
 ├── components/
@@ -323,14 +329,15 @@ Ou use o atributo nativo HTML:
 
 ### Frontend
 ✅ Vite + React 19 + TypeScript  
-✅ Tailwind CSS v4.1  
+✅ Tailwind CSS  
 ✅ Componentes UI (Radix + Shadcn)  
 ✅ Tema dark/light (next-themes)  
 ✅ Toast notifications (Radix + Sonner)  
 ✅ Tooltips acessíveis  
 ✅ Animações (Framer Motion)  
 ✅ Ícones (Lucide React)  
-✅ Roteamento (React Router v7)  
+✅ Logos de tecnologias (React Icons + SVG custom)  
+✅ Roteamento (React Router v6)  
 ✅ Gerenciamento de dados (TanStack Query)  
 ✅ Linting e análise de código  
 ✅ **Code splitting** (React.lazy + Suspense)  

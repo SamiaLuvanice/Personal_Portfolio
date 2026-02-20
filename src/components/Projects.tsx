@@ -234,9 +234,9 @@ const Projects = () => {
                         <h2 className="font-display text-3xl md:text-4xl font-bold mb-6">
                             Meus <span className="text-gradient">Projetos</span>
                         </h2>
-                        <p className="text-muted-foreground max-w-2xl mx-auto">
+                        {/*<p className="text-muted-foreground max-w-2xl mx-auto">
                             Repositórios carregados diretamente do GitHub em tempo real.
-                        </p>
+                        </p>*/}
                     </motion.div>
 
                     <div className="grid lg:grid-cols-1 gap-8">

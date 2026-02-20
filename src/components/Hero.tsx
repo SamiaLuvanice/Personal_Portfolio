@@ -16,6 +16,15 @@ const Hero = () => {
     document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const scrollToContact = () => {
+    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+
+    window.setTimeout(() => {
+      const firstField = document.getElementById("contact-name") as HTMLInputElement | null;
+      firstField?.focus();
+    }, 500);
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background decorations with parallax */}
@@ -118,11 +127,9 @@ const Hero = () => {
                   LinkedIn
                 </a>
               </Button>
-              <Button variant="outline" size="lg" asChild className="gap-2">
-                <a href="mailto:samia.luvanice.dev@gmail.com">
+              <Button variant="outline" size="lg" className="gap-2" onClick={scrollToContact}>
                   <Mail className="w-5 h-5" />
                   Email
-                </a>
               </Button>
               <Button
                 size="lg"
