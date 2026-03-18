@@ -5,6 +5,7 @@ import {
   SiBitbucket,
   SiBootstrap,
   SiCss3,
+  SiDocker,
   SiExpress,
   SiFigma,
   SiGit,
@@ -13,6 +14,7 @@ import {
   SiJavascript,
   SiNextdotjs,
   SiNodedotjs,
+  SiPython,
   SiPostgresql,
   SiPrisma,
   SiReact,
@@ -35,11 +37,11 @@ type Skill = {
 
 const skills = {
   frontend: [
-    { name: "HTML5", color: "hsl(14, 79%, 50%)", icon: SiHtml5 },
-    { name: "CSS3", color: "hsl(214, 82%, 51%)", icon: SiCss3 },
-    { name: "JavaScript", color: "hsl(50, 94%, 50%)", icon: SiJavascript },
-    { name: "TypeScript", color: "hsl(211, 60%, 48%)", icon: SiTypescript },
-    { name: "React", color: "hsl(193, 95%, 68%)", icon: SiReact },
+    { name: "HTML5", color: "#E34F26", icon: SiHtml5 },
+    { name: "CSS3", color: "#1572B6", icon: SiCss3 },
+    { name: "JavaScript", color: "#F7DF1E", icon: SiJavascript },
+    { name: "TypeScript", color: "#3178C6", icon: SiTypescript },
+    { name: "React", color: "#61DAFB", icon: SiReact },
     {
       name: "Next.js",
       color: "hsl(0, 0%, 20%)",
@@ -49,12 +51,13 @@ const skills = {
     },
   ] as Skill[],
   styling: [
-    { name: "Tailwind", color: "hsl(198, 93%, 60%)", icon: SiTailwindcss },
-    { name: "Sass", color: "hsl(330, 50%, 60%)", icon: SiSass },
-    { name: "Bootstrap", color: "hsl(261, 51%, 51%)", icon: SiBootstrap },
+    { name: "Tailwind", color: "#06B6D4", icon: SiTailwindcss },
+    { name: "Sass", color: "#CC6699", icon: SiSass },
+    { name: "Bootstrap", color: "#7952B3", icon: SiBootstrap },
   ] as Skill[],
   backend: [
-    { name: "Node.js", color: "hsl(120, 40%, 45%)", icon: SiNodedotjs },
+    { name: "Node.js", color: "#339933", icon: SiNodedotjs },
+    { name: "Python", color: "#3776AB", icon: SiPython },
     {
       name: "Express",
       color: "hsl(0, 0%, 45%)",
@@ -64,11 +67,11 @@ const skills = {
     },
   ] as Skill[],
   database: [
-    { name: "PostgreSQL", color: "hsl(210, 50%, 45%)", icon: SiPostgresql },
-    { name: "Prisma ORM", color: "hsl(250, 70%, 60%)", icon: SiPrisma },
+    { name: "PostgreSQL", color: "#4169E1", icon: SiPostgresql },
+    { name: "Prisma ORM", color: "#2D3748", icon: SiPrisma },
   ] as Skill[],
   tools: [
-    { name: "Git", color: "hsl(10, 75%, 50%)", icon: SiGit },
+    { name: "Git", color: "#F05032", icon: SiGit },
     {
       name: "GitHub",
       color: "hsl(0, 0%, 30%)",
@@ -76,17 +79,18 @@ const skills = {
         "text-neutral-800 border-neutral-700/35 dark:text-neutral-300 dark:border-neutral-400/35",
       icon: SiGithub,
     },
-    { name: "Bitbucket", color: "hsl(214, 82%, 51%)", icon: SiBitbucket },
-    { name: "VS Code", color: "hsl(210, 70%, 50%)", iconSrc: "/icons/vscode.svg" },
-    { name: "Figma", color: "hsl(330, 70%, 55%)", icon: SiFigma },
-    { name: "Trello", color: "hsl(210, 90%, 50%)", icon: SiTrello },
+    { name: "Bitbucket", color: "#0052CC", icon: SiBitbucket },
+    { name: "VS Code", color: "#007ACC", iconSrc: "/icons/vscode.svg" },
+    { name: "Docker", color: "#2496ED", icon: SiDocker },
+    { name: "Figma", color: "#F24E1E", icon: SiFigma },
+    { name: "Trello", color: "#0052CC", icon: SiTrello },
   ] as Skill[],
   aiTools: [
-    { name: "Supabase", color: "hsl(153, 60%, 50%)", icon: SiSupabase },
-    { name: "Make", color: "hsl(280, 70%, 55%)", icon: SiMake },
-    { name: "n8n", color: "hsl(10, 80%, 55%)", icon: SiN8N },
-    { name: "Airtable", color: "hsl(210, 70%, 55%)", icon: SiAirtable },
-    { name: "ManyChat", color: "hsl(210, 90%, 55%)", iconSrc: "/icons/manychat.svg" },
+    { name: "Supabase", color: "#3ECF8E", icon: SiSupabase },
+    { name: "Make", color: "#6D5BD0", icon: SiMake },
+    { name: "n8n", color: "#EA4B71", icon: SiN8N },
+    { name: "Airtable", color: "#18BFFF", icon: SiAirtable },
+    { name: "ManyChat", color: "#00A5FF", iconSrc: "/icons/manychat.svg" },
   ] as Skill[],
 };
 
