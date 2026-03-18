@@ -76,7 +76,7 @@ export function useGitHubRepos() {
 
             try {
                 const response = await fetch(
-                    `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=12`
+                    `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=50`
                 );
 
                 if (!response.ok) {

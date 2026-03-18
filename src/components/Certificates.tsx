@@ -13,6 +13,14 @@ interface Certificate {
 const certificates: Certificate[] = [
     {
         id: 1,
+        title: "Programa Residência em TIC-20 - Capacita Brasil/C-Jovem",
+        issuer: "Instituto Atlântico + Universidade Estadual do Ceará (UECE)",
+        date: "Janeiro de 2025",
+        hours: "480h",
+        pdfUrl: "/certificates/residencia-em-tic.pdf",
+    },
+    {
+        id: 2,
         title: "Jornada de Especialização em Desenvolvimento de Software",
         issuer: "Koru + Grupo Boticário",
         date: "Março de 2025",
@@ -20,12 +28,12 @@ const certificates: Certificate[] = [
         pdfUrl: "/certificates/programa-desenvolve-fase-2.pdf",
     },
     {
-        id: 2,
-        title: "Programa Residência em TIC-20 - Capacita Brasil/C-Jovem",
-        issuer: "Instituto Atlântico + Universidade Estadual do Ceará (UECE)",
-        date: "Janeiro de 2025",
-        hours: "480h",
-        pdfUrl: "/certificates/residencia-em-tic.pdf",
+        id: 3,
+        title: "DiverseDEV 2025",
+        issuer: "Ada Tech + Mercado Eletrônico",
+        date: "Novembro de 2025",
+        hours: "360 horas",
+        pdfUrl: "/certificates/diverse_dev.pdf",
     }
 ];
 

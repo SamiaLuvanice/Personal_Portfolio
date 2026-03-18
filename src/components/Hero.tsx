@@ -105,7 +105,9 @@ const Hero = () => {
               transition={{ duration: 0.5, delay: 0.6 }}
               className="text-muted-foreground mb-8 leading-relaxed"
             >
-              Desenvolvedora Full Stack formada pelo Capacita Brasil e Grupo Boticário, em formação contínua com DiverseDEV/ADA. Focada em criar aplicações web escaláveis com código limpo e boas práticas de engenharia de software.
+              Desenvolvedora Full Stack formada pelo Programa de Residência em TIC e 
+              Programa Desenvolve do Grupo Boticário. Dedico-me a criar aplicações
+               web robustas, escaláveis e com padrões de qualidade em engenharia de software.
             </motion.p>
 
             {/* Action Buttons */}
