@@ -26,7 +26,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden py-20 lg:py-28">
       {/* Background decorations with parallax */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -47,13 +47,14 @@ const Hero = () => {
         style={{ opacity }}
         className="container mx-auto px-6 relative z-10"
       >
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+        <div className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-12 lg:gap-24 w-full">
           {/* Photo with parallax */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             style={{ y: y2 }}
+            className="flex-shrink-0 order-2 lg:order-1"
           >
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-hero blur-2xl opacity-30 scale-110"
@@ -82,12 +83,12 @@ const Hero = () => {
           </motion.div>
 
           {/* Content */}
-          <div className="text-center lg:text-left max-w-xl">
+          <div className="text-center lg:text-left w-full max-w-2xl order-1 lg:order-2 flex flex-col items-center lg:items-start">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
+              className="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-tight"
             >
               Sâmia <span className="text-gradient">Luvanice</span>
             </motion.h1>
@@ -95,48 +96,38 @@ const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="text-xl md:text-2xl text-muted-foreground mb-6"
+              className="text-xl md:text-2xl text-muted-foreground mt-4 max-w-xl"
             >
               Desenvolvedora Fullstack
-            </motion.p>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              className="text-muted-foreground mb-8 leading-relaxed"
-            >
-              Desenvolvedora Full Stack formada pelo Programa de Residência em TIC e 
-              Programa Desenvolve do Grupo Boticário. Dedico-me a criar aplicações
-               web robustas, escaláveis e com padrões de qualidade em engenharia de software.
             </motion.p>
 
             {/* Action Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.7 }}
-              className="flex flex-wrap lg:flex-nowrap gap-2 justify-center lg:justify-start"
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="mt-10 flex flex-nowrap items-center gap-3 w-full max-w-2xl overflow-x-auto pb-2"
             >
-              <Button variant="outline" size="lg" asChild className="gap-2">
+              <Button variant="outline" size="lg" asChild className="gap-2 shrink-0">
                 <a href="https://github.com/SamiaLuvanice" target="_blank" rel="noopener noreferrer">
                   <Github className="w-5 h-5" />
                   GitHub
                 </a>
               </Button>
-              <Button variant="outline" size="lg" asChild className="gap-2">
+              <Button variant="outline" size="lg" asChild className="gap-2 shrink-0">
                 <a href="https://linkedin.com/in/samialuvanice" target="_blank" rel="noopener noreferrer">
                   <Linkedin className="w-5 h-5" />
                   LinkedIn
                 </a>
               </Button>
-              <Button variant="outline" size="lg" className="gap-2" onClick={scrollToContact}>
+              <Button variant="outline" size="lg" className="gap-2 shrink-0" onClick={scrollToContact}>
                   <Mail className="w-5 h-5" />
                   Email
               </Button>
               <Button
                 size="lg"
                 asChild
-                className="gap-2 bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all"
+                className="gap-2 shrink-0 bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all"
               >
                 <a href="/curriculo.pdf" download="Curriculo-Samia-Luvanice.pdf">
                   <Download className="w-5 h-5" />
@@ -153,7 +144,7 @@ const Hero = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 1 }}
           onClick={scrollToAbout}
-          className="absolute -bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-smooth"
+          className="absolute -bottom-16 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-smooth"
         >
           <span className="text-sm">Scroll</span>
           <ArrowDown className="w-5 h-5 animate-bounce" />
