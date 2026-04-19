@@ -1,6 +1,6 @@
-import { Github, Linkedin, Mail, Heart } from "lucide-react";
-import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
+import { motion } from "framer-motion";
+import { Github, Linkedin, Mail } from "lucide-react";
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
@@ -39,7 +39,7 @@ const Footer = () => {
                             Sâmia Luvanice
                         </h3>
                         <p className="text-muted-foreground text-sm">
-                            Desenvolvedora Full Stack (React/Node) | APIs • Deploy • Boas práticas
+                            Desenvolvedora Full Stack
                         </p>
                     </motion.div>
 
