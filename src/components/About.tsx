@@ -1,8 +1,5 @@
 import { motion } from "framer-motion";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { IconType } from "react-icons";
-import { useLayoutEffect, useRef } from "react";
 import {
   SiAirtable,
   SiBitbucket,
@@ -69,7 +66,7 @@ const skills = {
   tools: [
     { name: "Git", color: "#F05032", icon: SiGit },
     {
-      name: "GitHub",
+      name: "GitHub", 
       color: "hsl(0, 0%, 30%)",
       className:
         "text-neutral-800 border-neutral-700/35 dark:text-neutral-300 dark:border-neutral-400/35",
@@ -88,30 +85,30 @@ const skills = {
   ] as Skill[],
 };
 
-gsap.registerPlugin(ScrollTrigger);
+const techGroups = [
+  { label: "Front-end", color: "bg-primary", items: skills.frontend },
+  { label: "Back-end", color: "bg-accent", items: skills.backend },
+  { label: "Banco de Dados", color: "bg-blue-500", items: skills.database },
+  { label: "DevOps", color: "bg-cyan-500", items: skills.devops },
+  { label: "Tools & Design", color: "bg-muted-foreground", items: skills.tools },
+  { label: "Automation & AI", color: "bg-violet-500", items: skills.aiTools },
+];
 
 const SkillBadge = ({
   name,
   color,
-  index,
   className,
   icon: Icon,
   iconSrc,
 }: {
   name: string;
   color: string;
-  index: number;
   className?: string;
   icon?: IconType;
   iconSrc?: string;
 }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.8 }}
-    whileInView={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.3, delay: index * 0.05 }}
-    viewport={{ once: true }}
-    whileHover={{ scale: 1.1 }}
-    className={`px-4 py-2 rounded-full text-sm font-medium cursor-default border flex items-center gap-2 ${className ?? ""}`}
+  <div
+    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium ${className ?? ""}`}
     style={
       className
         ? undefined
@@ -122,270 +119,67 @@ const SkillBadge = ({
           }
     }
   >
-    {Icon ? <Icon className="w-4 h-4 shrink-0" aria-hidden="true" /> : null}
-    {!Icon && iconSrc ? (
-      <img src={iconSrc} alt="" aria-hidden="true" className="w-4 h-4 shrink-0" />
-    ) : null}
-    {name}
-  </motion.div>
+    {Icon ? <Icon className="h-4 w-4 shrink-0" aria-hidden="true" /> : null}
+    {!Icon && iconSrc ? <img src={iconSrc} alt="" aria-hidden="true" className="h-4 w-4 shrink-0" /> : null}
+    <span>{name}</span>
+  </div>
 );
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5 },
-  },
-};
-
-const TECH_SEGMENT_COUNT = 6;
-const DESKTOP_PIN_TOP_OFFSET = 96;
-
 const About = () => {
-  const pinSectionRef = useRef<HTMLDivElement | null>(null);
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const segmentRefs = useRef<Array<HTMLDivElement | null>>([]);
-
-  useLayoutEffect(() => {
-    const pinEl = pinSectionRef.current;
-    const trackEl = trackRef.current;
-
-    if (!pinEl || !trackEl) {
-      return;
-    }
-
-    const mm = gsap.matchMedia();
-
-    mm.add("(min-width: 768px)", () => {
-      const getDistance = () => Math.max(0, trackEl.scrollWidth - pinEl.clientWidth);
-      gsap.set(trackEl, { x: 0 });
-      gsap.set(segmentRefs.current, { scaleX: 0, transformOrigin: "left center" });
-
-      const tween = gsap.to(trackEl, {
-        x: () => -getDistance(),
-        ease: "none",
-        scrollTrigger: {
-          trigger: pinEl,
-          start: `top top+=${DESKTOP_PIN_TOP_OFFSET}`,
-          end: () => `+=${getDistance()}`,
-          pin: true,
-          scrub: 1,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            const totalProgress = self.progress * TECH_SEGMENT_COUNT;
-            segmentRefs.current.forEach((segment, index) => {
-              if (!segment) {
-                return;
-              }
-
-              const fill = Math.max(0, Math.min(1, totalProgress - index));
-              gsap.set(segment, { scaleX: fill });
-            });
-          },
-        },
-      });
-
-      return () => {
-        tween.scrollTrigger?.kill();
-        tween.kill();
-      };
-    });
-
-    mm.add("(max-width: 767px)", () => {
-      gsap.set(trackEl, { x: 0 });
-      gsap.set(segmentRefs.current, { scaleX: 0 });
-      const cards = trackEl.querySelectorAll("[data-tech-card]");
-
-      if (!cards.length) {
-        return;
-      }
-
-      const tween = gsap.fromTo(
-        cards,
-        { opacity: 0, y: 24 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.45,
-          stagger: 0.08,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: pinEl,
-            start: "top 80%",
-            once: true,
-          },
-        }
-      );
-
-      return () => {
-        tween.scrollTrigger?.kill();
-        tween.kill();
-      };
-    });
-
-    return () => {
-      mm.revert();
-    };
-  }, []);
-
   return (
-    <section id="about" className="py-24 bg-secondary/30">
+    <section id="about" className="py-24">
       <div className="container mx-auto px-6">
-        <div className="max-w-6xl mx-auto">
-          {/* Section header */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+        <div className="mx-auto max-w-6xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="text-center mb-10 md:hidden"
+            className="mb-10"
           >
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-6">
-              Tecnologias & <span className="text-gradient">Ferramentas</span>
+            <h2 className="font-display text-4xl font-bold uppercase tracking-tight md:text-6xl">
+              <span className="text-gradient">Tecnologias</span>
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              No desktop, a rolagem vira uma trilha horizontal para explorar meu stack.
-            </p>
+            <div className="mt-5 h-px w-full bg-border/80" />
           </motion.div>
 
-          <div
-            ref={pinSectionRef}
-            className="relative overflow-visible md:overflow-hidden md:h-[56vh] lg:h-[60vh] rounded-2xl"
-          >
-            <div className="hidden md:block absolute top-0 inset-x-0 z-20 text-center pointer-events-none">
-              <h2 className="font-display text-3xl md:text-4xl font-bold mb-6">
-                Tecnologias & <span className="text-gradient">Ferramentas</span>
-              </h2>
-              <div className="mx-auto w-full max-w-2xl grid grid-cols-6 gap-1.5">
-                {Array.from({ length: TECH_SEGMENT_COUNT }).map((_, index) => (
-                  <div key={index} className="h-1 rounded-full bg-border/70 overflow-hidden">
-                    <div
-                      ref={(element) => {
-                        segmentRefs.current[index] = element;
-                      }}
-                      className="h-full w-full bg-gradient-to-r from-primary via-accent to-pink-500 origin-left scale-x-0"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
+          <div className="grid gap-16 md:grid-cols-[0.85fr_1.15fr] md:gap-20">
             <motion.div
-              ref={trackRef}
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.05 }}
               viewport={{ once: true }}
-              className="grid grid-cols-1 gap-6 md:absolute md:top-28 lg:top-32 md:left-0 md:flex md:items-start md:gap-8 md:px-2 will-change-transform"
+              className="space-y-6 md:sticky md:top-24 md:self-start"
             >
-              <motion.div
-                data-tech-card
-                variants={itemVariants}
-                className="w-full md:w-[52vw] lg:w-[40vw] xl:w-[34vw] md:h-fit md:shrink-0 glass rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-smooth hover:glass-strong"
-              >
-                <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-primary rounded-full" />
-                  Front-end
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {skills.frontend.map((skill, index) => (
-                    <SkillBadge key={skill.name} {...skill} index={index} />
-                  ))}
-                </div>
-              </motion.div>
-
-              <motion.div
-                data-tech-card
-                variants={itemVariants}
-                className="w-full md:w-[52vw] lg:w-[40vw] xl:w-[34vw] md:h-fit md:shrink-0 glass rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-smooth hover:glass-strong"
-              >
-                <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-accent rounded-full" />
-                  Back-end
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {skills.backend.map((skill, index) => (
-                    <SkillBadge key={skill.name} {...skill} index={index} />
-                  ))}
-                </div>
-              </motion.div>
-
-              <motion.div
-                data-tech-card
-                variants={itemVariants}
-                className="w-full md:w-[52vw] lg:w-[40vw] xl:w-[34vw] md:h-fit md:shrink-0 glass rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-smooth hover:glass-strong"
-              >
-                <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-blue-500 rounded-full" />
-                  Banco de Dados
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {skills.database.map((skill, index) => (
-                    <SkillBadge key={skill.name} {...skill} index={index} />
-                  ))}
-                </div>
-              </motion.div>
-
-              <motion.div
-                data-tech-card
-                variants={itemVariants}
-                className="w-full md:w-[52vw] lg:w-[40vw] xl:w-[34vw] md:h-fit md:shrink-0 glass rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-smooth hover:glass-strong"
-              >
-                <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-cyan-500 rounded-full" />
-                  DevOps
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {skills.devops.map((skill, index) => (
-                    <SkillBadge key={skill.name} {...skill} index={index} />
-                  ))}
-                </div>
-              </motion.div>
-
-              <motion.div
-                data-tech-card
-                variants={itemVariants}
-                className="w-full md:w-[52vw] lg:w-[40vw] xl:w-[34vw] md:h-fit md:shrink-0 glass rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-smooth hover:glass-strong"
-              >
-                <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-muted-foreground rounded-full" />
-                  Tools & Design
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {skills.tools.map((skill, index) => (
-                    <SkillBadge key={skill.name} {...skill} index={index} />
-                  ))}
-                </div>
-              </motion.div>
-
-              <motion.div
-                data-tech-card
-                variants={itemVariants}
-                className="w-full md:w-[52vw] lg:w-[40vw] xl:w-[34vw] md:h-fit md:shrink-0 glass rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-smooth hover:glass-strong"
-              >
-                <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-violet-500 rounded-full" />
-                  Automation & AI
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {skills.aiTools.map((skill, index) => (
-                    <SkillBadge key={skill.name} {...skill} index={index} />
-                  ))}
-                </div>
-              </motion.div>
+              <p className="text-sm uppercase tracking-[0.28em] text-muted-foreground">
+                Stack
+              </p>
             </motion.div>
+
+            <div className="space-y-0">
+              {techGroups.map((group, index) => (
+                <motion.div
+                  key={group.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, delay: index * 0.08 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  className="border-b border-border/70 py-6 first:pt-0"
+                >
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className={`h-2.5 w-2.5 rounded-full ${group.color}`} />
+                    <h3 className="text-lg font-semibold tracking-tight md:text-xl">
+                      {group.label}
+                    </h3>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {group.items.map((skill) => (
+                      <SkillBadge key={skill.name} {...skill} />
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

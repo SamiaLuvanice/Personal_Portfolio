@@ -1,204 +1,96 @@
-import { Github, Linkedin, Mail, Send, MessageCircle, MapPin, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-import { toast } from "sonner";
-import { submitContactForm } from "@/lib/contactService";
+import { Github, Linkedin } from "lucide-react";
 
 const Contact = () => {
-    const [formData, setFormData] = useState({ name: "", email: "", message: "" });
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const socialLinks = [
         { href: "https://github.com/SamiaLuvanice", icon: Github, label: "GitHub", color: "hover:text-foreground" },
         { href: "https://linkedin.com/in/samialuvanice", icon: Linkedin, label: "LinkedIn", color: "hover:text-[hsl(201,100%,35%)]" },
-        { href: "mailto:samia.luvanice.dev@gmail.com", icon: Mail, label: "Email", color: "hover:text-primary" },
     ];
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        try {
-            await submitContactForm(formData);
-            toast.success("Mensagem enviada com sucesso! Entrarei em contato em breve.");
-            setFormData({ name: "", email: "", message: "" });
-        } catch (error) {
-            console.error(error);
-            toast.error("Não foi possível enviar sua mensagem. Tente novamente em instantes.");
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
     return (
-        <section id="contact" className="py-24 relative overflow-hidden">
-            {/* Background decorations */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
-            </div>
-
-            <div className="container mx-auto px-6 relative z-10">
-                <div className="max-w-5xl mx-auto">
-                    {/* Section header */}
+        <section id="contact" className="py-24">
+            <div className="container mx-auto px-6">
+                <div className="mx-auto max-w-6xl">
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
+                        transition={{ duration: 0.5 }}
                         viewport={{ once: true }}
-                        className="text-center mb-16"
+                        className="mb-10"
                     >
-                        <h2 className="font-display text-3xl md:text-4xl font-bold mb-6">
-                            Vamos <span className="text-gradient">Conversar</span>?
+                        <h2 className="font-display text-4xl font-bold uppercase tracking-tight md:text-6xl">
+                            <span className="text-gradient">Contato</span>
                         </h2>
-                        {/*<p className="text-muted-foreground max-w-xl mx-auto">
-                            Estou aberta a novas oportunidades e sempre feliz em conhecer pessoas
-                            interessantes. Entre em contato!
-                        </p>*/}
+                        <div className="mt-5 h-px w-full bg-border/80" />
                     </motion.div>
 
-                    <div className="grid lg:grid-cols-2 gap-12">
-                        {/* Contact Form */}
+                    <div className="grid gap-16 md:grid-cols-2 md:gap-20">
                         <motion.div
-                            initial={{ opacity: 0, x: -30 }}
+                            initial={{ opacity: 0, x: -18 }}
                             whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
+                            transition={{ duration: 0.5, delay: 0.1 }}
                             viewport={{ once: true }}
+                            className="space-y-8"
                         >
-                            <div className="bg-card rounded-2xl p-8 shadow-card">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-3 rounded-xl bg-primary/10 text-primary">
-                                        <MessageCircle className="w-6 h-6" />
-                                    </div>
-                                    <h3 className="font-display text-xl font-semibold">Envie uma mensagem</h3>
-                                </div>
-
-                                <form onSubmit={handleSubmit} className="space-y-5">
-                                    <div>
-                                        <Input
-                                            id="contact-name"
-                                            placeholder="Seu nome"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            required
-                                            className="bg-secondary border-border focus:border-primary"
-                                        />
-                                    </div>
-                                    <div>
-                                        <Input
-                                            type="email"
-                                            placeholder="Seu email"
-                                            value={formData.email}
-                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            required
-                                            className="bg-secondary border-border focus:border-primary"
-                                        />
-                                    </div>
-                                    <div>
-                                        <Textarea
-                                            placeholder="Sua mensagem..."
-                                            value={formData.message}
-                                            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                            required
-                                            rows={5}
-                                            className="bg-secondary border-border focus:border-primary resize-none"
-                                        />
-                                    </div>
-                                    <Button
-                                        type="submit"
-                                        size="lg"
-                                        className="w-full gap-2"
-                                        disabled={isSubmitting}
-                                    >
-                                        {isSubmitting ? (
-                                            <>Enviando...</>
-                                        ) : (
-                                            <>
-                                                <Send className="w-5 h-5" />
-                                                Enviar Mensagem
-                                            </>
-                                        )}
-                                    </Button>
-                                </form>
+                            <div>
+                                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                    E-mail
+                                </p>
+                                <a
+                                    href="mailto:samia.luvanice.dev@gmail.com"
+                                    className="mt-3 inline-flex items-center gap-3 text-2xl font-medium tracking-tight transition-smooth hover:text-primary md:text-3xl"
+                                >
+                                    <span>samia.luvanice.dev@gmail.com</span>
+                                    <span aria-hidden="true">↗</span>
+                                </a>
                             </div>
                         </motion.div>
 
-                        {/* Contact Info */}
                         <motion.div
-                            initial={{ opacity: 0, x: 30 }}
+                            initial={{ opacity: 0, x: 18 }}
                             whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6, delay: 0.3 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
                             viewport={{ once: true }}
-                            className="flex flex-col gap-6"
+                            className="space-y-10 md:border-l md:border-border/80 md:pl-10"
                         >
-                            {/* Info Cards */}
-                            <div className="bg-card rounded-2xl p-8 shadow-card">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-3 rounded-xl bg-accent/10 text-accent">
-                                        <Mail className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">Email</p>
-                                        <a
-                                            href="mailto:samia.luvanice.dev@gmail.com"
-                                            className="font-medium hover:text-primary transition-smooth"
-                                        >
-                                            samia.luvanice.dev@gmail.com
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-3 rounded-xl bg-[hsl(188,88%,48%)]/10 text-[hsl(188,88%,48%)]">
-                                        <MapPin className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">Localização</p>
-                                        <p className="font-medium">Sobral, CE - Brasil</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <div className="p-3 rounded-xl bg-primary/10 text-primary">
-                                        <Download className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">Currículo</p>
-                                        <a
-                                            href="/curriculo.pdf"
-                                            download="Curriculo-Samia-Luvanice.pdf"
-                                            className="font-medium hover:text-primary transition-smooth"
-                                        >
-                                            Download CV (PDF)
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Social Links */}
-                            <div className="bg-card rounded-2xl p-8 shadow-card">
-                                <h3 className="font-display text-lg font-semibold mb-6">Me encontre nas redes</h3>
-                                <div className="flex gap-4">
+                            <div>
+                                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                    Redes sociais
+                                </p>
+                                <div className="mt-4 space-y-3">
                                     {socialLinks.map((social, index) => (
                                         <motion.a
                                             key={social.label}
                                             href={social.href}
                                             target={social.href.startsWith("mailto") ? undefined : "_blank"}
                                             rel={social.href.startsWith("mailto") ? undefined : "noopener noreferrer"}
-                                            initial={{ opacity: 0, y: 20 }}
+                                            initial={{ opacity: 0, y: 10 }}
                                             whileInView={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+                                            transition={{ duration: 0.35, delay: 0.22 + index * 0.08 }}
                                             viewport={{ once: true }}
-                                            whileHover={{ y: -5, scale: 1.1 }}
-                                            className={`p-4 rounded-xl bg-secondary shadow-sm hover:shadow-card-hover transition-smooth ${social.color}`}
+                                            whileHover={{ x: 4 }}
+                                            className={`flex items-center gap-3 text-lg font-medium tracking-tight transition-smooth ${social.color}`}
                                             title={social.label}
                                         >
-                                            <social.icon className="w-6 h-6" />
+                                            <span aria-hidden="true">↗</span>
+                                            <span>{social.label.toLowerCase()}</span>
                                         </motion.a>
                                     ))}
                                 </div>
+                            </div>
+
+                            <div>
+                                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                    Currículo
+                                </p>
+                                <a
+                                    href="/curriculo.pdf"
+                                    download="Curriculo-Samia-Luvanice.pdf"
+                                    className="mt-3 inline-flex items-center gap-3 text-lg font-medium tracking-tight transition-smooth hover:text-primary"
+                                >
+                                    <span>download cv (pdf)</span>
+                                    <span aria-hidden="true">↗</span>
+                                </a>
                             </div>
                         </motion.div>
                     </div>

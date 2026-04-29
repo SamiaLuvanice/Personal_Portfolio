@@ -18,11 +18,6 @@ const Hero = () => {
 
   const scrollToContact = () => {
     document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-
-    window.setTimeout(() => {
-      const firstField = document.getElementById("contact-name") as HTMLInputElement | null;
-      firstField?.focus();
-    }, 500);
   };
 
   return (
