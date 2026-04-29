@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail, Heart, Send, MessageCircle, MapPin, Download } from "lucide-react";
+import { Github, Linkedin, Mail, Send, MessageCircle, MapPin, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
