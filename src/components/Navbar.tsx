@@ -39,17 +39,17 @@ const Navbar = () => {
         }`}
     >
       <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="grid grid-cols-3 items-center h-16 md:h-20">
           {/* Logo */}
           <button
             onClick={() => scrollTo("#")}
-            className="font-display text-xl font-bold text-gradient"
+            className="justify-self-start font-display text-xl font-bold text-gradient"
           >
             SL
           </button>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center justify-center gap-8 justify-self-center">
             {navItems.map((item) => (
               <button
                 key={item.name}
@@ -59,11 +59,10 @@ const Navbar = () => {
                 {item.name}
               </button>
             ))}
-            <ThemeToggle />
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center justify-self-end gap-2 md:hidden">
             <ThemeToggle />
             <Button
               variant="ghost"
@@ -72,6 +71,10 @@ const Navbar = () => {
             >
               {isMobileMenuOpen ? <X /> : <Menu />}
             </Button>
+          </div>
+
+          <div className="hidden md:flex items-center justify-self-end">
+            <ThemeToggle />
           </div>
         </div>
 

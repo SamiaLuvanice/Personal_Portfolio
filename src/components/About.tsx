@@ -20,7 +20,6 @@ import {
   SiPostgresql,
   SiReact,
   SiN8N,
-  SiSupabase,
   SiTailwindcss,
   SiTrello,
   SiTypescript,
@@ -77,7 +76,6 @@ const skills = {
     { name: "Trello", color: "#0052CC", icon: SiTrello },
   ] as Skill[],
   aiTools: [
-    { name: "Supabase", color: "#3ECF8E", icon: SiSupabase },
     { name: "Make", color: "#6D5BD0", icon: SiMake },
     { name: "n8n", color: "#EA4B71", icon: SiN8N },
     { name: "Airtable", color: "#18BFFF", icon: SiAirtable },

@@ -7,6 +7,12 @@ const Contact = () => {
         { href: "https://linkedin.com/in/samialuvanice", icon: Linkedin, label: "LinkedIn", color: "hover:text-[hsl(201,100%,35%)]" },
     ];
 
+    const emailSubject = encodeURIComponent("Contato pelo portfólio");
+    const emailBody = encodeURIComponent(
+        "Olá, Sâmia!\n\nVi seu portfólio e gostaria de falar sobre uma oportunidade."
+    );
+    const emailHref = `mailto:samia.luvanice.dev@gmail.com?subject=${emailSubject}&body=${emailBody}`;
+
     return (
         <section id="contact" className="py-24">
             <div className="container mx-auto px-6">
@@ -37,7 +43,7 @@ const Contact = () => {
                                     E-mail
                                 </p>
                                 <a
-                                    href="mailto:samia.luvanice.dev@gmail.com"
+                                    href={emailHref}
                                     className="mt-3 inline-flex items-center gap-3 text-2xl font-medium tracking-tight transition-smooth hover:text-primary md:text-3xl"
                                 >
                                     <span>samia.luvanice.dev@gmail.com</span>
@@ -62,8 +68,8 @@ const Contact = () => {
                                         <motion.a
                                             key={social.label}
                                             href={social.href}
-                                            target={social.href.startsWith("mailto") ? undefined : "_blank"}
-                                            rel={social.href.startsWith("mailto") ? undefined : "noopener noreferrer"}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                             initial={{ opacity: 0, y: 10 }}
                                             whileInView={{ opacity: 1, y: 0 }}
                                             transition={{ duration: 0.35, delay: 0.22 + index * 0.08 }}
@@ -73,7 +79,7 @@ const Contact = () => {
                                             title={social.label}
                                         >
                                             <span aria-hidden="true">↗</span>
-                                            <span>{social.label.toLowerCase()}</span>
+                                            <span>{social.label}</span>
                                         </motion.a>
                                     ))}
                                 </div>
@@ -88,7 +94,7 @@ const Contact = () => {
                                     download="Curriculo-Samia-Luvanice.pdf"
                                     className="mt-3 inline-flex items-center gap-3 text-lg font-medium tracking-tight transition-smooth hover:text-primary"
                                 >
-                                    <span>download cv (pdf)</span>
+                                    <span>download pdf</span>
                                     <span aria-hidden="true">↗</span>
                                 </a>
                             </div>

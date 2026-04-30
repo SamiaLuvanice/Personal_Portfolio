@@ -184,34 +184,11 @@ src/
 ## ⚙️ Configuração
 
 ### Backend do formulário de contato
-O projeto usa Vercel Serverless Functions para o backend (sem servidor separado). A função `api/contact.ts` salva mensagens no Supabase e envia emails via Resend.
+O projeto usa Vercel Serverless Functions para o backend (sem servidor separado). A função `api/contact.ts` recebe as mensagens do formulário e envia emails via Resend.
 
 #### Setup Local
-1) Crie um projeto no [Supabase](https://supabase.com) (gratuito)
-2) Configure as variáveis de ambiente:
+1) Configure as variáveis de ambiente:
    - Copie [.env.example](.env.example) → `.env.local`
-   - Preencha as credenciais do Supabase:
-     - `VITE_SUPABASE_URL`
-     - `VITE_SUPABASE_ANON_KEY`
-     - `SUPABASE_SERVICE_ROLE_KEY` (obtenha em Project Settings → API)
-
-3) Crie a tabela de contatos no Supabase (SQL Editor):
-```sql
-create table if not exists contact_messages (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  email text not null,
-  message text not null,
-  created_at timestamptz not null default now()
-);
-
-alter table contact_messages enable row level security;
-
-create policy "public insert contact messages"
-on contact_messages for insert
-to public
-with check (true);
-```
 
 #### Email (Opcional)
 Para enviar emails automaticamente:
@@ -243,13 +220,9 @@ e configure `VITE_API_URL` com a URL de produção do Vercel.
 
 2) **Configurar variáveis de ambiente:**
    - Em `Settings → Environment Variables`, adicionar:
-     - `SUPABASE_URL` (URL do projeto Supabase)
-     - `SUPABASE_SERVICE_ROLE_KEY` (chave de serviço do Supabase)
      - `RESEND_API_KEY` (API key do Resend)
      - `CONTACT_TO_EMAIL` (seu email para receber mensagens)
      - `CONTACT_FROM_EMAIL` (opcional - padrão: `Portfolio <onboarding@resend.dev>`)
-     - `VITE_SUPABASE_URL` (mesma URL do Supabase - para frontend)
-     - `VITE_SUPABASE_ANON_KEY` (chave pública do Supabase - para frontend)
 
 3) **Deploy automático:**
    - Cada push em `main` faz deploy automático
@@ -257,7 +230,7 @@ e configure `VITE_API_URL` com a URL de produção do Vercel.
 
 #### Estrutura do Backend
 - [api/contact.ts](api/contact.ts) - Serverless function:
-  - `POST /api/contact` - Salva mensagem no Supabase, envia email
+  - `POST /api/contact` - Envia email com a mensagem do formulário
   - Timeout: 10s
   - Cold start: ~1-2s
 
@@ -348,14 +321,13 @@ Ou use o atributo nativo HTML:
 ✅ **Seções completas** (Hero, About, Projects, Certificates, Contact, Footer)  
 ✅ **Layout glassmorphism** com cards estilizados  
 ✅ **Animações suaves** (Framer Motion) com hover effects  
-✅ **Formulário de contato** com Vercel Serverless + Supabase + Resend  
+✅ **Formulário de contato** com Vercel Serverless + Resend  
 ✅ **Footer com links sociais** (GitHub, LinkedIn, Email)  
 ✅ **Responsividade** mobile-first em todos os componentes  
 ✅ **Scroll smooth** entre seções  
 
 ### Backend
 ✅ Vercel Serverless Functions  
-✅ Supabase (banco de dados)  
 ✅ Integração com Resend (envio de emails)  
 ✅ Deploy automático via GitHub  
 ✅ **Deploy em produção** (https://samialuvanicedev.vercel.app)  
