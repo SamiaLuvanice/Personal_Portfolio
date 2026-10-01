@@ -4,6 +4,7 @@ import {
   SiAirtable,
   SiBitbucket,
   SiBootstrap,
+  SiClaude,
   SiCss3,
   SiDjango,
   SiDocker,
@@ -16,9 +17,11 @@ import {
   SiNextdotjs,
   SiNodedotjs,
   SiMongodb,
+  SiOpenai,
   SiPython,
   SiPostgresql,
   SiReact,
+  SiKubernetes,
   SiN8N,
   SiTailwindcss,
   SiTrello,
@@ -61,7 +64,10 @@ const skills = {
     { name: "PostgreSQL", color: "#4169E1", icon: SiPostgresql },
     { name: "MongoDB", color: "#47A248", icon: SiMongodb },
   ] as Skill[],
-  devops: [{ name: "Docker", color: "#2496ED", icon: SiDocker }] as Skill[],
+  devops: [
+    { name: "Docker", color: "#2496ED", icon: SiDocker },
+    { name: "Kubernetes", color: "#326CE5", icon: SiKubernetes },
+  ] as Skill[],
   tools: [
     { name: "Git", color: "#F05032", icon: SiGit },
     {
@@ -76,6 +82,9 @@ const skills = {
     { name: "Trello", color: "#0052CC", icon: SiTrello },
   ] as Skill[],
   aiTools: [
+    { name: "Claude Code", color: "#D97757", icon: SiClaude },
+    { name: "Codex", color: "#10A37F", icon: SiOpenai },
+    { name: "Cursor", color: "#5C5C5C" },
     { name: "Make", color: "#6D5BD0", icon: SiMake },
     { name: "n8n", color: "#EA4B71", icon: SiN8N },
     { name: "Airtable", color: "#18BFFF", icon: SiAirtable },
