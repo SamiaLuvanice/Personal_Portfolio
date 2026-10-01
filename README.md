@@ -129,6 +129,28 @@ npm run preview
 npm run lint
 ```
 
+## Docker
+
+O ambiente Docker executa o frontend compilado com Nginx e o servidor Express da API em serviços separados. O Nginx encaminha `/api/*` para a API e mantém o fallback necessário para as rotas do React.
+
+### Subir o ambiente
+
+Com o Docker Desktop em execução:
+
+```bash
+docker compose up --build
+```
+
+O portfólio ficará disponível em `http://localhost:8080` e o endpoint de saúde da API em `http://localhost:8080/health`.
+
+Para configurar o envio de emails, defina `RESEND_API_KEY`, `CONTACT_TO_EMAIL` e, opcionalmente, `CONTACT_FROM_EMAIL` no ambiente ou em um arquivo `.env` local. Esses valores não devem ser adicionados ao controle de versão.
+
+Para encerrar os serviços:
+
+```bash
+docker compose down
+```
+
 ## 📁 Estrutura do Projeto
 
 ```
