@@ -31,7 +31,7 @@ diagnose:
   forbidden_refs: []
   ignore_paths: []
   # O núcleo (core em .agents/modules.yaml) não pode citar a stack: isso vai no perfil.
-  core_forbidden_terms: [React, Vite, Vercel, Tailwind, shadcn, Supabase, Resend, Vitest, Playwright, TypeScript]
+  core_forbidden_terms: [React, Vite, Vercel, Tailwind, shadcn, Resend, Docker, Vitest, Playwright, TypeScript]
 # Glob do arquivo alterado → documentos a conferir (.agents/scripts/docs-impact.mjs).
 docs_impact:
   "src/components/**": [README.md]
@@ -40,6 +40,10 @@ docs_impact:
   "package.json": [README.md, docs/architecture.md]
   ".env.example": [README.md, docs/architecture.md]
   "vercel.json": [docs/architecture.md]
+  "server/**": [docs/architecture.md, README.md]
+  "Dockerfile*": [docs/architecture.md, README.md]
+  "docker-compose.yml": [docs/architecture.md, README.md]
+  "nginx.conf": [docs/architecture.md]
   "vite.config.ts": [docs/architecture.md]
   "index.html": [docs/architecture.md]
   "public/robots.txt": [docs/architecture.md]

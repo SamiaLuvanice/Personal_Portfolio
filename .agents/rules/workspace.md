@@ -6,7 +6,7 @@ alwaysApply: true
 # Workspace
 
 Portfólio pessoal (pt-BR) em SPA React 18 + TypeScript + Vite, estilizado com Tailwind e shadcn/ui,
-com uma função serverless na Vercel para o formulário de contato. O público são recrutadores e
+com uma API de contato (função da Vercel; Docker como alternativa local). O público são recrutadores e
 pessoas da comunidade: primeira impressão, acessibilidade, desempenho e SEO são o produto.
 
 - Diagnóstico com evidência: `evidencia.md`. Conclusão: `task-done-criteria.md`.

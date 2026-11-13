@@ -10,6 +10,8 @@ description: Funções serverless da Vercel em api/.
   funções com dependências injetadas, testadas com Vitest.
 - Contrato: `POST` com JSON; `400` para entrada inválida (mensagem segura), `405` para método,
   `500` genérico para falha interna. Nunca devolva mensagem de erro do banco ou do provedor.
+- O deploy Docker (`server/index.js`) importa a mesma regra de `api/_lib/` (TypeScript executado pelo
+  Node 22.18+); use só sintaxe de tipos apagável ali (sem `enum`, `namespace` ou parâmetros de propriedade).
 - Variáveis de servidor sem prefixo `VITE_`. Em desenvolvimento, `npm run dev` serve `api/` pelo
   próprio Vite (plugin em `vite.config.ts`) com as variáveis de `.env`.
 

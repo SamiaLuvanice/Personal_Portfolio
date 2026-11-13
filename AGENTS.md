@@ -1,8 +1,8 @@
 # Harness do projeto
 
 Portfólio pessoal de Sâmia Luvanice: SPA React 18 + TypeScript + Vite + Tailwind/shadcn, com uma
-função serverless (`api/contact.ts`) para o formulário de contato (Supabase + Resend). Deploy na
-**Vercel**. Priorize simplicidade, acessibilidade, desempenho e SEO; explique o porquê das decisões.
+função serverless (`api/contact.ts`, envio via Resend; contato da interface por `mailto:`). Deploy na
+**Vercel** (Docker como alternativa local). Priorize simplicidade, acessibilidade, desempenho e SEO; explique o porquê das decisões.
 
 Toda configuração de agentes vive em `.agents/`, a fonte única de verdade (ver `.agents/AGENTS.md`).
 
