@@ -203,7 +203,8 @@ export function sync({ root = ROOT, check = false, withOpencode = false, withCur
   const canonicalPath = join(src, "mcp.json");
   if (existsSync(canonicalPath)) {
     log("MCP:");
-    const canonical = JSON.parse(readFileSync(canonicalPath, "utf8"));
+    const canonicalText = readFileSync(canonicalPath, "utf8").replace(/\r\n/g, "\n");
+    const canonical = JSON.parse(canonicalText);
     const projected = projectMcp(canonical);
     const options = { check, drift, log };
     writeGenerated(root, ".mcp.json", json(projected.claude), options);
@@ -211,7 +212,8 @@ export function sync({ root = ROOT, check = false, withOpencode = false, withCur
       writeGenerated(root, "opencode.json", json(projected.opencode), options);
     }
     if (cursor || existsSync(join(root, ".cursor", "mcp.json"))) {
-      writeGenerated(root, ".cursor/mcp.json", json(canonical), options);
+      // Cursor lê o formato agnóstico: cópia fiel da fonte, sem reformatar.
+      writeGenerated(root, ".cursor/mcp.json", canonicalText, options);
     }
   }
 

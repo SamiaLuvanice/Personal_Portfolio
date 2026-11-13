@@ -28,8 +28,8 @@ implementação.
 **Caminhos de erro ausentes.** O que acontece quando falha, quando o dado não existe,
 quando o usuário não tem permissão, quando duas requisições chegam juntas.
 
-**Contradição com as rules.** Confronte com `.agents/rules/`. Uma spec que pede segredo com prefixo `VITE_`
-ou validação só no frontend contradiz `security.md` — sinalize.
+**Contradição com as rules.** Confronte com `.agents/rules/`. Uma spec que expõe segredo ao cliente
+ou valida só no frontend contradiz `security.md` — sinalize.
 
 **Contrato ausente.** Se a spec muda a API, ela precisa dizer quais rotas e quais campos,
 mesmo sem o contrato detalhado.

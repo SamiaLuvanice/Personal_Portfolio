@@ -7,26 +7,26 @@ core:
     - debugger
     - doc-sync-onboarding
   rules:
-    - workspace.md
     - evidencia.md
     - task-done-criteria.md
     - git.md
-    - security.md
-    - naming.md
-    - testing.md
   skills:
     - spec-driven
     - tdd
     - quality-gates
     - learnings
     - bug-resolve
-    - doc-sync-onboarding
 profiles:
   react-vite-spa:
     rules:
+      - workspace.md
+      - security.md
+      - naming.md
+      - testing.md
       - frontend.md
       - serverless-api.md
     skills:
+      - doc-sync-onboarding
       - react-feature
       - react-vite-performance
       - frontend-design

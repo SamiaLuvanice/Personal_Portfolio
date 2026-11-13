@@ -14,5 +14,5 @@ Os comandos vivem em `harness.yaml` (seção `quality`), fonte única para uso l
 - Commits do PR: `node .agents/scripts/commit-msg.mjs --range origin/<base>..HEAD`.
 
 Confirme contagem de testes maior que zero. Não marque skip ou teste não executado como verde. Se uma
-ferramenta ou serviço não estiver disponível (ex.: navegador do Playwright), reporte a pendência
+ferramenta ou serviço não estiver disponível (ex.: navegador dos testes e2e), reporte a pendência
 concreta. No GitHub, o check agregador `CI` precisa passar para o merge.

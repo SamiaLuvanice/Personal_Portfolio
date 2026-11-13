@@ -16,4 +16,6 @@ pessoas da comunidade: primeira impressão, acessibilidade, desempenho e SEO sã
   `frontend-design`, `impeccable` e `shadcn` apoiam, sem autorizar redesign não pedido.
 
 Identificadores em inglês; documentação, commits e textos de interface em português. Segredos só por
-variável de ambiente (local em `.env`, produção na Vercel). Prefira serviços gratuitos quando adequados.
+variável de ambiente (local em `.env`, produção na Vercel).
+
+`main` é implantada na Vercel pela integração Git; cada PR ganha um preview, que deve ser conferido. Prefira serviços gratuitos quando adequados.
