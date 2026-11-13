@@ -14,3 +14,20 @@ varredura de segredos roda no pre-commit e no CI. Vazamento se resolve rotaciona
 achando que o histórico some.
 
 **Referências:** `.gitignore`, `.pre-commit-config.yaml`, `.github/workflows/ci.yml`.
+
+## 2026-11-13 — Medir acessibilidade só depois das animações
+
+**Contexto:** o axe acusava contraste de 2,2:1 em textos da página porque media durante o fade de
+entrada (Framer Motion/GSAP). Depois de rolar a página e esperar, sobraram violações reais: badges de
+tecnologia com a cor da marca sobre fundo escuro e um botão de menu sem nome acessível.
+
+**Princípio:** o teste e2e rola a página inteira e espera as animações assentarem antes do axe. Cor de
+marca em texto passa por `color-mix` com preto ou branco (classe `.tech-badge`), mantendo o matiz.
+
+**Anti-pattern:** desligar a regra `color-contrast` ou aumentar o timeout até o teste ficar verde.
+
+**Dívida aberta:** os cards fora de foco do carrossel de certificados (desktop) ficam com opacidade
+0,5 e brilho reduzido por decisão de design. Eles levam `data-inactive` e são excluídos do axe; o card
+ativo continua verificado. Revisar o design para manter AA também nesses cards.
+
+**Referências:** `e2e/portfolio.spec.ts`, `src/index.css` (`.tech-badge`), `src/components/Certificates.tsx`.
