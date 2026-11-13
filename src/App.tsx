@@ -9,7 +9,7 @@ import NotFound from "./pages/NotFound";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
-const basename = import.meta.env.VITE_BASE_PATH ?? "/";
+
 
 const App = () => (
   <ErrorBoundary>
@@ -18,7 +18,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter basename={basename}>
+          <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

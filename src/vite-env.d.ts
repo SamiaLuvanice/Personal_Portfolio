@@ -1,7 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_ENABLE_CONTACT_EMAILS?: string;
+  /** Base da API; vazio usa /api (mesma origem). */
+  readonly VITE_API_URL?: string;
 }
 
 interface ImportMeta {
