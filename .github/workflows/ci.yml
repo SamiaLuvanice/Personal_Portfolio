@@ -133,7 +133,7 @@ jobs:
           # Varre só os commits novos; o histórico anterior não é reavaliado a cada evento.
           if [ "$EVENT_NAME" = pull_request ]; then
             range="origin/$BASE_REF..$HEAD_SHA"
-          elif [ "$EVENT_NAME" = push ] && [ -n "$BEFORE" ] && [ "$BEFORE" != 0000000000000000000000000000000000000000 ]; then
+          elif [ "$EVENT_NAME" = push ] && [ -n "$BEFORE" ] && [ "$BEFORE" != 0000000000000000000000000000000000000000 ]             && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
             range="$BEFORE..$AFTER"
           else
             range="-1"
@@ -152,15 +152,19 @@ jobs:
     steps:
       - name: Exigir todos os gates
         env:
-          RESULTS: ${{ join(needs.*.result, ' ') }}
+          ALWAYS: >-
+            ${{ needs.quality.result }} ${{ needs.e2e.result }} ${{ needs.lighthouse.result }}
+            ${{ needs.harness.result }} ${{ needs.secrets.result }}
           COMMITS_RESULT: ${{ needs.commits.result }}
           EVENT_NAME: ${{ github.event_name }}
         run: |
-          echo "Resultados: $RESULTS"
-          for result in $RESULTS; do
-            if [ "$result" = success ]; then continue; fi
-            # Commit policy só roda em PR; em push o job fica "skipped".
-            if [ "$result" = skipped ] && [ "$EVENT_NAME" != pull_request ] && [ "$COMMITS_RESULT" = skipped ]; then continue; fi
-            echo "Gate falhou: $result"
-            exit 1
+          echo "Gates: $ALWAYS | commits: $COMMITS_RESULT"
+          for result in $ALWAYS; do
+            test "$result" = success || { echo "Gate falhou: $result"; exit 1; }
           done
+          # Commit policy só roda em PR; fora de PR o esperado é "skipped".
+          if [ "$EVENT_NAME" = pull_request ]; then
+            test "$COMMITS_RESULT" = success
+          else
+            test "$COMMITS_RESULT" = skipped
+          fi
