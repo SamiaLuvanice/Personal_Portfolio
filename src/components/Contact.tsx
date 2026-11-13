@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Github, Linkedin } from "lucide-react";
+import { buildMailtoHref } from "@/lib/contact";
 
 const Contact = () => {
     const socialLinks = [
@@ -7,11 +8,7 @@ const Contact = () => {
         { href: "https://linkedin.com/in/samialuvanice", icon: Linkedin, label: "LinkedIn", color: "hover:text-[hsl(201,100%,35%)]" },
     ];
 
-    const emailSubject = encodeURIComponent("Contato pelo portfólio");
-    const emailBody = encodeURIComponent(
-        "Olá, Sâmia!\n\nVi seu portfólio e gostaria de falar sobre uma oportunidade."
-    );
-    const emailHref = `mailto:samia.luvanice.dev@gmail.com?subject=${emailSubject}&body=${emailBody}`;
+    const emailHref = buildMailtoHref();
 
     return (
         <section id="contact" className="py-24">

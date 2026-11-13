@@ -1,0 +1,52 @@
+# Configuração do harness de agentes (lida por .agents/scripts/*.mjs).
+# Mantenha o subconjunto simples de YAML aceito por .agents/scripts/lib.mjs.
+version: 0.4.0
+project:
+  name: personal-portfolio
+  root: .
+tools:
+  claude: true
+  codex: true
+  opencode: false
+  cursor: false
+profile:
+  name: react-vite-spa
+  specs_dir: specs
+modules:
+  core: [evidence, spec-driven, quality-gates]
+  technical: [react-vite-spa]
+  integrations: [github, vercel]
+git:
+  protected_branches: [main]
+  default_base: main
+# Ordem de execução de .agents/scripts/gates.mjs. Chave: [<escopo>_]<etapa>_command.
+quality:
+  install_command: npm ci
+  lint_command: npm run lint
+  typecheck_command: npm run typecheck
+  test_command: npm test
+  build_command: npm run build
+  e2e_command: npm run test:e2e
+diagnose:
+  forbidden_refs: []
+  ignore_paths: []
+  # O núcleo (core em .agents/modules.yaml) não pode citar a stack: isso vai no perfil.
+  core_forbidden_terms: [React, Vite, Vercel, Tailwind, shadcn, Resend, Docker, Vitest, Playwright, TypeScript]
+# Glob do arquivo alterado → documentos a conferir (.agents/scripts/docs-impact.mjs).
+docs_impact:
+  "src/components/**": [README.md]
+  "src/pages/**": [README.md, docs/architecture.md]
+  "package.json": [README.md, docs/architecture.md]
+  ".env.example": [README.md, docs/architecture.md]
+  "vercel.json": [docs/architecture.md]
+  "Dockerfile*": [docs/architecture.md, README.md]
+  "docker-compose.yml": [docs/architecture.md, README.md]
+  "nginx.conf": [docs/architecture.md]
+  "vite.config.ts": [docs/architecture.md]
+  "index.html": [docs/architecture.md]
+  "public/robots.txt": [docs/architecture.md]
+  "public/sitemap.xml": [docs/architecture.md]
+  ".github/**": [docs/harness.md]
+  ".agents/**": [AGENTS.md, docs/harness.md]
+  "harness.yaml": [AGENTS.md, docs/harness.md]
+  ".pre-commit-config.yaml": [docs/harness.md]

@@ -1,0 +1,39 @@
+version: 0.4.0
+core:
+  agents:
+    - spec-reviewer
+    - code-reviewer
+    - qa
+    - debugger
+    - doc-sync-onboarding
+  rules:
+    - evidencia.md
+    - task-done-criteria.md
+    - git.md
+  skills:
+    - spec-driven
+    - tdd
+    - quality-gates
+    - learnings
+    - bug-resolve
+profiles:
+  react-vite-spa:
+    rules:
+      - workspace.md
+      - security.md
+      - naming.md
+      - testing.md
+      - frontend.md
+    skills:
+      - doc-sync-onboarding
+      - react-feature
+      - react-vite-performance
+      - frontend-design
+      - shadcn
+      - impeccable
+      - seo-audit
+integrations:
+  github:
+    documentation: docs/harness.md
+  vercel:
+    documentation: docs/architecture.md

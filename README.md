@@ -1,11 +1,13 @@
 # 🚀 Personal Portfolio
 
-Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS, com animações suaves, componentes acessíveis e design responsivo.
+Portfólio pessoal moderno desenvolvido com React 18, TypeScript e Tailwind CSS, com animações suaves, componentes acessíveis e design responsivo.
+
+**Produção:** https://samialuvanicedev.vercel.app (Vercel)
 
 ## ✨ Stack de Tecnologia
 
 ### Core
-- **React 19** - Biblioteca para interfaces de usuário
+- **React 18** - Biblioteca para interfaces de usuário
 - **TypeScript** - Superset tipado do JavaScript
 - **Vite** - Build tool e dev server ultra-rápido
 
@@ -30,12 +32,12 @@ Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS,
 - **TanStack React Query** - Gerenciamento de estado e cache de dados
 - **date-fns** - Manipulação de datas com locale pt-BR
 
-### APIs & Integração
-- **GitHub API** - Integração com repositórios e dados do GitHub
-
-### Development
-- **ESLint** - Análise estática e linting de código
-- **TypeScript** - Type checking e desenvolvimento type-safe
+### Development & Qualidade
+- **ESLint** (flat config, `--max-warnings=0`) e **TypeScript** em modo `strict`
+- **Vitest** - testes de unidade
+- **Playwright + axe-core** - testes E2E e de acessibilidade contra o build
+- **Lighthouse CI** - orçamento de acessibilidade, SEO, boas práticas e desempenho
+- **Harness de agentes** - `.agents/` como fonte única para Claude, Codex, OpenCode e Cursor ([docs/harness.md](docs/harness.md))
 
 ## 🎨 Design System
 
@@ -46,8 +48,7 @@ Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS,
 - **About** - Grid de skills e tecnologias com badges coloridos, logos e categorias
 - **Projects** - Galeria de repositórios GitHub com filtros por linguagem, stats e links
 - **Certificates** - Cards em glassmorphism com informações de cursos e formações
-- **Contact** - Formulário de contato com validação e notificações
-- **GitHubActivity** - Widget de atividade recente do GitHub
+- **Contact** - E-mail (`mailto:` com assunto pronto) e redes sociais
 
 #### Navegação & Tema
 - **Navbar** - Menu responsivo com links âncora suave
@@ -102,36 +103,27 @@ O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
 
 ## 🚀 Como Executar
 
-### Instalação
+Requer Node 22.18+ (`.nvmrc`).
+
 ```bash
-npm install
+npm ci                 # instala dependências
+npm run dev            # http://localhost:8080
 ```
 
-### Desenvolvimento (Frontend)
-```bash
-npm run dev
-```
+| Script | O que faz |
+|---|---|
+| `npm run dev` | Vite com HMR |
+| `npm run build` / `npm run preview` | Build de produção e preview local |
+| `npm run lint` | ESLint sem avisos tolerados |
+| `npm run typecheck` | TypeScript estrito para app e configs |
+| `npm test` | Vitest |
+| `npm run test:e2e` | Playwright + axe contra o build (instale antes: `npx playwright install chromium`) |
+| `npm run lighthouse` | Lighthouse CI sobre `dist/` (rode `npm run build` antes) |
+| `npm run check` | Todos os portões de `harness.yaml` |
 
-Frontend roda na porta 5173. Para testar `/api/*` localmente, use `vercel dev`.
+## Docker (alternativa local/self-host)
 
-### Build de Produção
-```bash
-npm run build
-```
-
-### Preview da Build
-```bash
-npm run preview
-```
-
-### Lint
-```bash
-npm run lint
-```
-
-## Docker
-
-O ambiente Docker executa o frontend compilado com Nginx e o servidor Express da API em serviços separados. O Nginx encaminha `/api/*` para a API e mantém o fallback necessário para as rotas do React.
+A produção é a Vercel; o Docker é uma alternativa para rodar o site localmente ou em servidor próprio: o build é servido por Nginx, com fallback para as rotas do React.
 
 ### Subir o ambiente
 
@@ -141,9 +133,7 @@ Com o Docker Desktop em execução:
 docker compose up --build
 ```
 
-O portfólio ficará disponível em `http://localhost:8080` e o endpoint de saúde da API em `http://localhost:8080/health`.
-
-Para configurar o envio de emails, defina `RESEND_API_KEY`, `CONTACT_TO_EMAIL` e, opcionalmente, `CONTACT_FROM_EMAIL` no ambiente ou em um arquivo `.env` local. Esses valores não devem ser adicionados ao controle de versão.
+O portfólio ficará disponível em `http://localhost:8080`.
 
 Para encerrar os serviços:
 
@@ -154,8 +144,10 @@ docker compose down
 ## 📁 Estrutura do Projeto
 
 ```
-api/
-└── contact.ts           # Serverless function (Vercel)
+.agents/                 # Harness de agentes (fonte única; ver docs/harness.md)
+e2e/                     # Testes Playwright + axe
+docs/                    # Arquitetura, harness e aprendizados
+specs/                   # Especificações numeradas (fluxo /spec → /verify)
 public/
 ├── icons/
 │   ├── manychat.svg     # Logo customizada do ManyChat usada no About
@@ -168,11 +160,10 @@ src/
 │   ├── NavLink.tsx          # Link de navegação reutilizável com scroll suave
 │   ├── Hero.tsx             # Seção hero inicial com apresentação e CTA
 │   ├── About.tsx            # Grid de skills categorizados (frontend, backend, tools, etc)
-│   ├── Projects.tsx         # Seção de projetos com integração GitHub API
+│   ├── Projects.tsx         # Seção de projetos
 │   ├── Certificates.tsx     # Cards em glassmorphism com certificados/formações
-│   ├── Contact.tsx          # Formulário de contato com validação
+│   ├── Contact.tsx          # Contato por e-mail e redes sociais
 │   ├── Footer.tsx           # Rodapé com links sociais e rápidos
-│   ├── GitHubActivity.tsx   # Widget de atividade recente do GitHub
 │   ├── ThemeToggle.tsx      # Alternador entre dark/light mode
 │   └── ui/                  # 25+ Componentes UI reutilizáveis (Shadcn/Radix)
 │       ├── button.tsx       # Botão estilizado com variantes
@@ -189,11 +180,9 @@ src/
 │       └── [outros...].tsx  # Accordion, Alert, Dialog, Drawer, Select, etc.
 ├── hooks/
 │   ├── use-toast.ts         # Hook para disparo de notificações
-│   ├── use-github.ts        # Hook para integração com GitHub API (React Query)
 │   └── use-mobile.tsx       # Hook para detecção de dispositivos móveis
 ├── lib/
 │   ├── utils.ts             # Funções utilitárias (cn para merge de classes)
-│   └── contactService.ts    # Serviço para envio de mensagens de contato
 ├── pages/
 │   ├── Index.tsx            # Página principal com todas as seções
 │   └── NotFound.tsx         # Página 404 customizada
@@ -205,34 +194,8 @@ src/
 
 ## ⚙️ Configuração
 
-### Backend do formulário de contato
-O projeto usa Vercel Serverless Functions para o backend (sem servidor separado). A função `api/contact.ts` recebe as mensagens do formulário e envia emails via Resend.
-
-#### Setup Local
-1) Configure as variáveis de ambiente:
-   - Copie [.env.example](.env.example) → `.env.local`
-
-#### Email (Opcional)
-Para enviar emails automaticamente:
-1) Gere uma API key no [Resend](https://resend.com)
-2) Configure no `.env.local`:
-   - `RESEND_API_KEY`
-   - `CONTACT_TO_EMAIL` (seu email)
-   - `CONTACT_FROM_EMAIL` (opcional - padrão: `Portfolio <onboarding@resend.dev>`)
-
-**Nota:** O email padrão `onboarding@resend.dev` já está verificado e funciona imediatamente. Para usar um domínio customizado (ex: `noreply@seudominio.com`), você precisa verificá-lo no painel do Resend adicionando registros DNS.
-
-#### Desenvolvimento Local
-Para rodar o frontend + APIs serverless localmente:
-```bash
-vercel dev
-```
-
-Se preferir apenas o frontend, rode:
-```bash
-npm run dev
-```
-e configure `VITE_API_URL` com a URL de produção do Vercel.
+### Contato
+Não há backend: a seção de contato usa um link `mailto:` montado por `src/lib/contact.ts` (testado com Vitest). O projeto não precisa de variáveis de ambiente.
 
 #### Deployment na Vercel
 
@@ -240,90 +203,52 @@ e configure `VITE_API_URL` com a URL de produção do Vercel.
    - Ir para [vercel.com](https://vercel.com)
    - Conectar repositório
 
-2) **Configurar variáveis de ambiente:**
-   - Em `Settings → Environment Variables`, adicionar:
-     - `RESEND_API_KEY` (API key do Resend)
-     - `CONTACT_TO_EMAIL` (seu email para receber mensagens)
-     - `CONTACT_FROM_EMAIL` (opcional - padrão: `Portfolio <onboarding@resend.dev>`)
-
-3) **Deploy automático:**
-   - Cada push em `main` faz deploy automático
-   - Frontend + Backend (Serverless) em um único lugar
-
-#### Estrutura do Backend
-- [api/contact.ts](api/contact.ts) - Serverless function:
-  - `POST /api/contact` - Envia email com a mensagem do formulário
-  - Timeout: 10s
-  - Cold start: ~1-2s
+2) **Deploy automático:**
+   - Cada PR ganha um preview; cada merge em `main` vai para produção
+   - O GitHub Actions (`.github/workflows/ci.yml`) só valida; quem publica é a Vercel
+   - `vercel.json` define o fallback da SPA e cabeçalhos de segurança/cache
 
 ### Vite
 - Path alias `@` apontando para `src/`
-- Dev server na porta 5173 (frontend)
+- Dev server na porta 8080
 - Suporte a Hot Module Replacement (HMR)
 
 ### TypeScript
-- Target: ES2020
-- Modo estrito desativado para flexibilidade
+- Modo `strict` em todos os projetos (`tsconfig.app.json`, `tsconfig.node.json`)
 - Path mapping configurado para aliases (`@/*` → `src/*`)
-- JSX: react-jsx (React 19)
-- Support para importação de extensões TypeScript
+- JSX: react-jsx (React 18)
 
 ### Tailwind CSS
-- Versão 4.1 com plugin Vite para otimização
-- Integração completa com PostCSS e Autoprefixer
+- Versão 3.4 via PostCSS e Autoprefixer
 - Suporte a animações customizadas (`tailwindcss-animate`)
 - Merge inteligente de classes com `tailwind-merge`
 
 ### ESLint
 - Configuração flat com ESLint v9
 - Suporte a React Hooks e React Refresh
-- TypeScript plugin integrado para análise de código seguro
+- TypeScript plugin integrado; zero avisos tolerados (`--max-warnings=0`)
 
 ### Estrutura de Configuração TypeScript
 - `tsconfig.json` - Configuração raiz com paths compartilhados
 - `tsconfig.app.json` - Configuração específica da aplicação
-- `tsconfig.node.json` - Configuração para ferramentas de build
+- `tsconfig.node.json` - Configuração para ferramentas de build e testes
 
 ## ⚡ Otimizações de Performance
 
 ### Code Splitting
 O projeto usa `React.lazy()` para carregar componentes pesados sob demanda:
 - **Certificates** - Carregado apenas quando próximo de ser visualizado
-- **Projects** - Lazy loading com integração GitHub
+- **Projects** - Carregado sob demanda
 - **Contact** - Componente carregado sob demanda
 
 Cada seção tem um `Suspense` com fallback de skeleton para melhor UX.
 
 **Arquivo:** [src/pages/Index.tsx](src/pages/Index.tsx)
 
-### Lazy Loading de Imagens
-Use o componente `LazyImage` para carregar imagens apenas quando visíveis:
-
-```tsx
-import { LazyImage } from "@/components/LazyImage";
-
-export default function MyComponent() {
-  return (
-    <LazyImage
-      src="/my-image.jpg"
-      alt="Descrição"
-      className="w-full h-auto"
-    />
-  );
-}
-```
-
-Ou use o atributo nativo HTML:
-```tsx
-<img src="/image.jpg" alt="..." loading="lazy" decoding="async" />
-```
-
-**Arquivo:** [src/components/LazyImage.tsx](src/components/LazyImage.tsx)
-
 ## 📊 Status do Setup
 
 ### Frontend
-✅ Vite + React 19 + TypeScript  
+✅ Vite + React 18 + TypeScript (strict)  
 ✅ Tailwind CSS  
 ✅ Componentes UI (Radix + Shadcn)  
 ✅ Tema dark/light (next-themes)  
@@ -336,37 +261,34 @@ Ou use o atributo nativo HTML:
 ✅ Gerenciamento de dados (TanStack Query)  
 ✅ Linting e análise de código  
 ✅ **Code splitting** (React.lazy + Suspense)  
-✅ **Lazy loading de imagens** (native HTML loading="lazy")  
 
 ### Funcionalidades
-✅ **Integração com GitHub API** (repositórios, atividade)  
 ✅ **Seções completas** (Hero, About, Projects, Certificates, Contact, Footer)  
 ✅ **Layout glassmorphism** com cards estilizados  
 ✅ **Animações suaves** (Framer Motion) com hover effects  
-✅ **Formulário de contato** com Vercel Serverless + Resend  
+✅ **Contato** por e-mail (`mailto:` com assunto pronto)  
 ✅ **Footer com links sociais** (GitHub, LinkedIn, Email)  
 ✅ **Responsividade** mobile-first em todos os componentes  
 ✅ **Scroll smooth** entre seções  
 
-### Backend
-✅ Vercel Serverless Functions  
-✅ Integração com Resend (envio de emails)  
-✅ Deploy automático via GitHub  
-✅ **Deploy em produção** (https://samialuvanicedev.vercel.app)  
+### Deploy
+✅ Vercel (preview por PR, produção em `main`)
+✅ **Deploy em produção** (https://samialuvanicedev.vercel.app)
+✅ Docker + Nginx como alternativa local
 
 ### Performance
 ✅ **Code splitting** - Componentes pesados (Certificates, Projects, Contact) carregam sob demanda
-✅ **Lazy loading de imagens** - Imagens carregam apenas quando visíveis na viewport
 ✅ **Loading skeletons** - Fallback visual durante carregamento de componentes
 ✅ **Vite otimizado** - Build ultra-rápido com chunking automático  
 
 ## 🎯 Próximos Passos Sugeridos
 
 - [ ] Implementar analytics (Google Analytics ou Plausible)
-- [ ] Otimizar SEO (meta tags, sitemap.xml, robots.txt)
-- [ ] Adicionar testes unitários (Vitest + React Testing Library)
-- [ ] Adicionar testes E2E (Playwright ou Cypress)
+- [x] Otimizar SEO (canonical, Open Graph, sitemap.xml, robots.txt)
+- [x] Adicionar testes unitários (Vitest)
+- [x] Adicionar testes E2E (Playwright + axe)
+- [ ] Imagem Open Graph (`og:image`) para prévias em redes sociais
 - [ ] Adicionar suporte a múltiplos idiomas (i18n)
-- [ ] Melhorar tratamento de erros no backend
-- [ ] Adicionar validação mais robusta no servidor
+- [x] Melhorar tratamento de erros no backend
+- [x] Adicionar validação mais robusta no servidor
 - [ ] Implementar PWA (Progressive Web App) com Service Workers
