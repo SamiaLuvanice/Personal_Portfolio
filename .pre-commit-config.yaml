@@ -2,6 +2,8 @@
 #   pip install pre-commit && pre-commit install --hook-type pre-commit --hook-type commit-msg
 # Lint, tipos, testes e build ficam nos portões (node .agents/scripts/gates.mjs) e no CI.
 default_install_hook_types: [pre-commit, commit-msg]
+# Sem isto, os hooks de arquivo rodariam de novo no estágio commit-msg.
+default_stages: [pre-commit]
 
 repos:
   - repo: local

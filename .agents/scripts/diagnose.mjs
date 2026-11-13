@@ -6,7 +6,7 @@
 //   - nenhuma referência proibida (harness.yaml → diagnose.forbidden_refs);
 //   - nenhum segredo aparente em arquivos versionáveis;
 //   - avisa worktrees cuja branch já foi integrada (limpeza pendente).
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { ROOT, asList, git, globToRegExp, loadHarness, parseYaml } from "./lib.mjs";
@@ -18,7 +18,8 @@ const ALWAYS_IGNORED = /(^|\/)(node_modules|\.venv|__pycache__|\.pytest_cache|di
 
 export const SECRET_PATTERNS = [
   { name: "chave privada PEM", regex: /-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/ },
-  { name: "senha literal", regex: /(?:password|passwd|senha)\s*[:=]\s*["'][^"'$\s{<][^"']{5,}["']/i },
+  // Valor literal na mesma linha; placeholders (${VAR}, {env}, <...>, [...]) não contam.
+  { name: "senha literal", regex: /(?:password|passwd|senha)\s*[:=]\s*["'][^"'$\s{<[][^"'\n]{5,}["']/i },
   // Valor com cara de token: sem espaços/colchetes, com ao menos um dígito.
   { name: "segredo literal", regex: /(?:secret|api[_-]?key|token)\s*[:=]\s*["'](?=[^"']*\d)[A-Za-z0-9_\-+/=.]{12,}["']/i },
   { name: "JWT", regex: /\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/ },
@@ -28,8 +29,22 @@ export const SECRET_PATTERNS = [
   { name: "chave OpenAI/Anthropic", regex: /\bsk-(ant-)?[A-Za-z0-9_-]{32,}\b/ },
 ];
 
+// Marcador por linha para valor fictício intencional (o mesmo aceito pelo gitleaks).
+const ALLOW_MARKER = /gitleaks:allow|harness:allow-secret/;
+
 export function findSecrets(content) {
-  return SECRET_PATTERNS.filter((pattern) => pattern.regex.test(content)).map((pattern) => pattern.name);
+  const lines = content.split(/\r?\n/).filter((line) => !ALLOW_MARKER.test(line));
+  return SECRET_PATTERNS.filter((pattern) => lines.some((line) => pattern.regex.test(line))).map(
+    (pattern) => pattern.name,
+  );
+}
+
+/** Termos como palavra inteira, sem diferenciar maiúsculas (ex.: "react" não casa "reactive"). */
+export function findTerms(content, terms) {
+  return terms.filter((term) => {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`(^|[^\\p{L}\\p{N}_])${escaped}($|[^\\p{L}\\p{N}_])`, "iu").test(content);
+  });
 }
 
 function claudeImports(root) {
@@ -37,9 +52,9 @@ function claudeImports(root) {
   return [...text.matchAll(/^@(\S+)\s*$/gm)].map((match) => match[1]);
 }
 
-function profileItems(root, harness) {
+function profileItems(root, harness, { coreOnly = false } = {}) {
   const modules = parseYaml(readFileSync(join(root, ".agents/modules.yaml"), "utf8"));
-  const profile = modules.profiles?.[harness.profile?.name] ?? {};
+  const profile = coreOnly ? {} : (modules.profiles?.[harness.profile?.name] ?? {});
   const pick = (kind) => [...asList(modules.core?.[kind]), ...asList(profile[kind])];
   return [
     ...pick("rules").map((name) => `.agents/rules/${name.endsWith(".md") ? name : `${name}.md`}`),
@@ -59,25 +74,41 @@ function versionableFiles(root, ignoreGlobs) {
     .filter((file) => existsSync(join(root, file)) && statSync(join(root, file)).isFile());
 }
 
-function staleWorktrees(root, base) {
+const normalizePath = (path) => path.replace(/\\/g, "/").replace(/\/$/, "").toLowerCase();
+
+/** Worktrees cuja branch já foi integrada e pastas em .worktrees/ sem worktree registrada. */
+function worktreeWarnings(root, base, keepBranches) {
   const output = git(["worktree", "list", "--porcelain"], { cwd: root, allowFailure: true }) ?? "";
   const merged = new Set(
     (git(["branch", "--merged", base, "--format=%(refname:short)"], { cwd: root, allowFailure: true }) ?? "")
       .split("\n")
       .filter(Boolean),
   );
-  const stale = [];
-  let path = null;
+  const entries = [];
   for (const line of output.split("\n")) {
-    if (line.startsWith("worktree ")) path = line.slice(9);
-    if (line.startsWith("branch ")) {
-      const branch = line.slice(7).replace("refs/heads/", "");
-      if (path && path.replace(/\\/g, "/") !== root.replace(/\\/g, "/") && merged.has(branch)) {
-        stale.push(`${branch} (${path})`);
+    if (line.startsWith("worktree ")) entries.push({ path: line.slice(9), branch: null });
+    if (line.startsWith("branch ") && entries.length > 0) {
+      entries.at(-1).branch = line.slice(7).replace("refs/heads/", "");
+    }
+  }
+  const [main, ...linked] = entries; // a primeira entrada é sempre o checkout principal
+  const warnings = [];
+  for (const { path, branch } of linked) {
+    if (branch && merged.has(branch) && !keepBranches.includes(branch)) {
+      warnings.push(`worktree com branch já integrada em ${base}: ${branch} (${path}) — aplicar task-cleanup`);
+    }
+  }
+  const container = main ? join(main.path, ".worktrees") : null;
+  if (container && existsSync(container)) {
+    const registered = new Set(linked.map(({ path }) => normalizePath(path)));
+    for (const name of readdirSync(container)) {
+      const path = join(container, name);
+      if (statSync(path).isDirectory() && !registered.has(normalizePath(path))) {
+        warnings.push(`pasta sem worktree registrada: ${normalizePath(path)} — conferir o conteúdo e remover manualmente`);
       }
     }
   }
-  return stale;
+  return warnings;
 }
 
 export function diagnose(root = ROOT) {
@@ -119,10 +150,20 @@ export function diagnose(root = ROOT) {
     for (const kind of findSecrets(content)) errors.push(`possível segredo (${kind}) em ${file}`);
   }
 
-  const base = `origin/${harness.git?.default_base ?? "main"}`;
-  for (const worktree of staleWorktrees(root, base)) {
-    warnings.push(`worktree com branch já integrada em ${base}: ${worktree} — aplicar task-cleanup`);
+  // Núcleo agnóstico: arquivos de `core` em modules.yaml não podem citar termos da stack.
+  const coreTerms = asList(config.core_forbidden_terms).map(String);
+  if (coreTerms.length > 0) {
+    for (const file of profileItems(root, harness, { coreOnly: true })) {
+      if (!existsSync(join(root, file))) continue;
+      const content = readFileSync(join(root, file), "utf8");
+      const hits = findTerms(content, coreTerms);
+      if (hits.length > 0) errors.push(`núcleo cita termo da stack (${hits.join(", ")}) em ${file}`);
+    }
   }
+
+  const base = `origin/${harness.git?.default_base ?? "main"}`;
+  const keepBranches = [harness.git?.default_base ?? "main", ...asList(harness.git?.protected_branches)];
+  warnings.push(...worktreeWarnings(root, base, keepBranches));
   return { errors, warnings };
 }
 

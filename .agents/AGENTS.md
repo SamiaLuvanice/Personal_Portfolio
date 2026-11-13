@@ -5,13 +5,14 @@ skills em `skills/`, comandos em `commands/` e a automação do harness em `scri
 
 ## Núcleo agnóstico × perfil
 
-- **Núcleo** (vale para qualquer stack): rules `workspace`, `evidencia`, `task-done-criteria`, `git`,
-  `security`, `naming`, `testing`; agents `spec-reviewer`, `code-reviewer`, `qa`, `debugger`,
-  `doc-sync-onboarding`; skills `spec-driven`, `tdd`, `quality-gates`, `learnings`, `bug-resolve`,
-  `doc-sync-onboarding`; e os scripts de `scripts/`. Os scripts não citam arquivo, rota ou comando do
-  projeto: o que é específico vem de `harness.yaml` ou das regras do perfil.
-- **Perfil `react-vite-spa`**: rules `frontend`, `serverless-api`; skills `react-feature`,
-  `react-vite-performance`, `frontend-design`, `shadcn`, `impeccable`, `seo-audit`.
+- **Núcleo** (vale para qualquer stack, copiável entre repositórios): rules `evidencia`,
+  `task-done-criteria`, `git`; agents `spec-reviewer`, `code-reviewer`, `qa`, `debugger`,
+  `doc-sync-onboarding`; skills `spec-driven`, `tdd`, `quality-gates`, `learnings`, `bug-resolve`; e os
+  scripts de `scripts/`. O núcleo não cita a stack: o que é específico vem de `harness.yaml` ou do
+  perfil, e `diagnose.mjs` barra os termos de `diagnose.core_forbidden_terms`.
+- **Perfil `react-vite-spa`**: rules `workspace`, `security`, `naming`, `testing`, `frontend`,
+  `serverless-api`; skills `doc-sync-onboarding`, `react-feature`, `react-vite-performance`,
+  `frontend-design`, `shadcn`, `impeccable`, `seo-audit`.
 
 O perfil ativo está em `modules.yaml`; use apenas o que estiver listado. Skills de terceiros têm origem e
 hash em `skills-lock.json` e referências em `sources.md`; a seção "Uso no portfólio" de cada uma é

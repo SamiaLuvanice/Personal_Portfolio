@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { cleanMessage, protectedBranchError, validateMessage } from "./commit-msg.mjs";
-import { findSecrets } from "./diagnose.mjs";
+import { findSecrets, findTerms } from "./diagnose.mjs";
 import { impactedDocs } from "./docs-impact.mjs";
 import { planGates } from "./gates.mjs";
 import { globToRegExp, parseYaml } from "./lib.mjs";
@@ -162,4 +162,19 @@ test("sync --check acusa projeção MCP desatualizada e sync a corrige", () => {
     mcpServers: { d: { type: "http", url: "https://x/mcp" } },
   });
   assert.deepEqual(sync({ root, check: true, log: () => {} }).drift, []);
+});
+
+test("findSecrets não atravessa linhas, ignora [placeholder] e respeita marcador por linha", () => {
+  assert.deepEqual(findSecrets('prompt("Confirme a senha: ")\nif password != confirmation:\n  x = "abc"'), []);
+  assert.deepEqual(findSecrets('BYPASS_TOKEN = "[bootstrap-guard]"'), []);
+  const fixture = ['DUMMY_PASSWORD = "senha-', 'ficticia"'].join("");
+  assert.deepEqual(findSecrets(fixture), ["senha literal"]);
+  assert.deepEqual(findSecrets(`${fixture}  # gitleaks:allow`), []);
+});
+
+test("findTerms casa palavra inteira sem diferenciar maiúsculas", () => {
+  const terms = ["react", "docker compose", "/api/health"];
+  assert.deepEqual(findTerms("Tela React com estado", terms), ["react"]);
+  assert.deepEqual(findTerms("interface reactive e reactor", terms), []);
+  assert.deepEqual(findTerms("suba com Docker Compose e teste /api/health.", terms), ["docker compose", "/api/health"]);
 });

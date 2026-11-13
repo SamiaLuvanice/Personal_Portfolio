@@ -30,6 +30,8 @@ quality:
 diagnose:
   forbidden_refs: []
   ignore_paths: []
+  # O núcleo (core em .agents/modules.yaml) não pode citar a stack: isso vai no perfil.
+  core_forbidden_terms: [React, Vite, Vercel, Tailwind, shadcn, Supabase, Resend, Vitest, Playwright, TypeScript]
 # Glob do arquivo alterado → documentos a conferir (.agents/scripts/docs-impact.mjs).
 docs_impact:
   "src/components/**": [README.md]
