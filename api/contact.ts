@@ -1,72 +1,39 @@
+// Função serverless da Vercel: POST /api/contact. Só adapta HTTP e monta o envio
+// de e-mail a partir das variáveis de ambiente; a regra fica em _lib/contact.ts.
 import { Resend } from "resend";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { handleContact, type ContactDeps } from "./_lib/contact.js";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
+const DEFAULT_FROM = "Portfolio <onboarding@resend.dev>";
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-) {
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    res.setHeader(key, value);
-  });
+function logError(message: string, error: unknown) {
+  const detail = error instanceof Error ? error.message : String(error);
+  console.error(message, detail);
+}
 
-  // Handle CORS
-  if (req.method === "OPTIONS") {
-    return res.status(200).json({ ok: true });
+function buildDeps(): ContactDeps | null {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const to = process.env.CONTACT_TO_EMAIL;
+  if (!resendApiKey || !to) return null;
+
+  const resend = new Resend(resendApiKey);
+  const from = process.env.CONTACT_FROM_EMAIL || DEFAULT_FROM;
+  return {
+    logError,
+    async sendEmail(email) {
+      const { error } = await resend.emails.send({ from, to, ...email });
+      if (error) throw new Error(error.message);
+    },
+  };
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const deps = buildDeps();
+  if (!deps) {
+    logError("Configuração ausente", "RESEND_API_KEY/CONTACT_TO_EMAIL");
+    return res.status(500).json({ error: "Não foi possível enviar a mensagem" });
   }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  try {
-    const { name, email, message } = req.body;
-
-    // Validate
-    if (!name || !email || !message) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const resendApiKey = process.env.RESEND_API_KEY;
-    const contactToEmail = process.env.CONTACT_TO_EMAIL;
-    const contactFromEmail =
-      process.env.CONTACT_FROM_EMAIL || "Portfolio <onboarding@resend.dev>";
-
-    if (!resendApiKey || !contactToEmail) {
-      console.error("Missing Resend config:", { hasApiKey: !!resendApiKey, hasEmail: !!contactToEmail });
-      return res.status(500).json({ error: "Missing email config" });
-    }
-
-    try {
-      const resend = new Resend(resendApiKey);
-      const emailResult = await resend.emails.send({
-        from: contactFromEmail,
-        to: contactToEmail,
-        replyTo: email,
-        subject: `Novo contato - ${name}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-            <h2>Novo contato pelo portfólio</h2>
-            <p><strong>Nome:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Mensagem:</strong><br />${message.replace(/\n/g, "<br />")}</p>
-          </div>
-        `,
-      });
-      console.log("Email sent:", emailResult);
-    } catch (emailError) {
-      console.error("Email error:", emailError);
-      return res.status(500).json({ error: "Failed to send message" });
-    }
-
-    res.status(200).json({ ok: true, message: "Contact message sent successfully" });
-  } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
+  const result = await handleContact(req.method, req.body, deps);
+  if (result.status === 405) res.setHeader("Allow", "POST");
+  return res.status(result.status).json(result.body);
 }
