@@ -224,6 +224,18 @@
 }
 
 @layer components {
+  /* Badge de tecnologia: mantém o matiz da marca (--tech-color) e garante contraste AA
+     misturando com preto no tema claro e com branco no escuro. */
+  .tech-badge {
+    color: color-mix(in srgb, var(--tech-color) 50%, black);
+    background-color: color-mix(in srgb, var(--tech-color) 8%, transparent);
+    border-color: color-mix(in srgb, var(--tech-color) 21%, transparent);
+  }
+
+  .dark .tech-badge {
+    color: color-mix(in srgb, var(--tech-color) 55%, white);
+  }
+
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
