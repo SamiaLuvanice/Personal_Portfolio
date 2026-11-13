@@ -1,11 +1,13 @@
 # 🚀 Personal Portfolio
 
-Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS, com animações suaves, componentes acessíveis e design responsivo.
+Portfólio pessoal moderno desenvolvido com React 18, TypeScript e Tailwind CSS, com animações suaves, componentes acessíveis e design responsivo.
+
+**Produção:** https://samialuvanicedev.vercel.app (Vercel)
 
 ## ✨ Stack de Tecnologia
 
 ### Core
-- **React 19** - Biblioteca para interfaces de usuário
+- **React 18** - Biblioteca para interfaces de usuário
 - **TypeScript** - Superset tipado do JavaScript
 - **Vite** - Build tool e dev server ultra-rápido
 
@@ -33,9 +35,12 @@ Portfólio pessoal moderno desenvolvido com React 19, TypeScript e Tailwind CSS,
 ### APIs & Integração
 - **GitHub API** - Integração com repositórios e dados do GitHub
 
-### Development
-- **ESLint** - Análise estática e linting de código
-- **TypeScript** - Type checking e desenvolvimento type-safe
+### Development & Qualidade
+- **ESLint** (flat config, `--max-warnings=0`) e **TypeScript** em modo `strict`
+- **Vitest + Testing Library** - testes de unidade e de componentes
+- **Playwright + axe-core** - testes E2E e de acessibilidade contra o build
+- **Lighthouse CI** - orçamento de acessibilidade, SEO, boas práticas e desempenho
+- **Harness de agentes** - `.agents/` como fonte única para Claude, Codex, OpenCode e Cursor ([docs/harness.md](docs/harness.md))
 
 ## 🎨 Design System
 
@@ -102,38 +107,35 @@ O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
 
 ## 🚀 Como Executar
 
-### Instalação
+Requer Node 22 (`.nvmrc`).
+
 ```bash
-npm install
+npm ci                 # instala dependências
+cp .env.example .env   # preencha as variáveis (o .env nunca é versionado)
+npm run dev            # SPA + /api/* em http://localhost:8080
 ```
 
-### Desenvolvimento (Frontend)
-```bash
-npm run dev
-```
-
-Frontend roda na porta 5173. Para testar `/api/*` localmente, use `vercel dev`.
-
-### Build de Produção
-```bash
-npm run build
-```
-
-### Preview da Build
-```bash
-npm run preview
-```
-
-### Lint
-```bash
-npm run lint
-```
+| Script | O que faz |
+|---|---|
+| `npm run dev` | Vite com HMR; serve também as funções de `api/` (mesmo código da Vercel) |
+| `npm run build` / `npm run preview` | Build de produção e preview local |
+| `npm run lint` | ESLint sem avisos tolerados |
+| `npm run typecheck` | TypeScript estrito para app, configs e `api/` |
+| `npm test` | Vitest (unidade e componentes) |
+| `npm run test:e2e` | Playwright + axe contra o build (instale antes: `npx playwright install chromium`) |
+| `npm run lighthouse` | Lighthouse CI sobre `dist/` (rode `npm run build` antes) |
+| `npm run check` | Todos os portões de `harness.yaml` |
 
 ## 📁 Estrutura do Projeto
 
 ```
+.agents/                 # Harness de agentes (fonte única; ver docs/harness.md)
 api/
-└── contact.ts           # Serverless function (Vercel)
+├── contact.ts           # Função serverless da Vercel (adaptador HTTP)
+└── _lib/contact.ts      # Regra do contato: validação, escape e envio (testada)
+e2e/                     # Testes Playwright + axe
+docs/                    # Arquitetura, harness e aprendizados
+specs/                   # Especificações numeradas (fluxo /spec → /verify)
 public/
 ├── icons/
 │   ├── manychat.svg     # Logo customizada do ManyChat usada no About
@@ -189,11 +191,9 @@ O projeto usa Vercel Serverless Functions para o backend (sem servidor separado)
 #### Setup Local
 1) Crie um projeto no [Supabase](https://supabase.com) (gratuito)
 2) Configure as variáveis de ambiente:
-   - Copie [.env.example](.env.example) → `.env.local`
-   - Preencha as credenciais do Supabase:
-     - `VITE_SUPABASE_URL`
-     - `VITE_SUPABASE_ANON_KEY`
-     - `SUPABASE_SERVICE_ROLE_KEY` (obtenha em Project Settings → API)
+   - Copie [.env.example](.env.example) → `.env` (ignorado pelo Git)
+   - Preencha `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` (Project Settings → API)
+   - Nunca use prefixo `VITE_` para chaves: ele publica o valor no bundle do navegador
 
 3) Crie a tabela de contatos no Supabase (SQL Editor):
 ```sql
@@ -216,7 +216,7 @@ with check (true);
 #### Email (Opcional)
 Para enviar emails automaticamente:
 1) Gere uma API key no [Resend](https://resend.com)
-2) Configure no `.env.local`:
+2) Configure no `.env`:
    - `RESEND_API_KEY`
    - `CONTACT_TO_EMAIL` (seu email)
    - `CONTACT_FROM_EMAIL` (opcional - padrão: `Portfolio <onboarding@resend.dev>`)
@@ -224,16 +224,7 @@ Para enviar emails automaticamente:
 **Nota:** O email padrão `onboarding@resend.dev` já está verificado e funciona imediatamente. Para usar um domínio customizado (ex: `noreply@seudominio.com`), você precisa verificá-lo no painel do Resend adicionando registros DNS.
 
 #### Desenvolvimento Local
-Para rodar o frontend + APIs serverless localmente:
-```bash
-vercel dev
-```
-
-Se preferir apenas o frontend, rode:
-```bash
-npm run dev
-```
-e configure `VITE_API_URL` com a URL de produção do Vercel.
+`npm run dev` já serve `POST /api/contact` pelo próprio Vite, carregando o `.env`. Não é preciso `vercel dev` nem servidor separado.
 
 #### Deployment na Vercel
 
@@ -248,46 +239,42 @@ e configure `VITE_API_URL` com a URL de produção do Vercel.
      - `RESEND_API_KEY` (API key do Resend)
      - `CONTACT_TO_EMAIL` (seu email para receber mensagens)
      - `CONTACT_FROM_EMAIL` (opcional - padrão: `Portfolio <onboarding@resend.dev>`)
-     - `VITE_SUPABASE_URL` (mesma URL do Supabase - para frontend)
-     - `VITE_SUPABASE_ANON_KEY` (chave pública do Supabase - para frontend)
 
 3) **Deploy automático:**
-   - Cada push em `main` faz deploy automático
-   - Frontend + Backend (Serverless) em um único lugar
+   - Cada PR ganha um preview; cada merge em `main` vai para produção
+   - O GitHub Actions (`.github/workflows/ci.yml`) só valida; quem publica é a Vercel
+   - `vercel.json` define o fallback da SPA e cabeçalhos de segurança/cache
 
 #### Estrutura do Backend
-- [api/contact.ts](api/contact.ts) - Serverless function:
-  - `POST /api/contact` - Salva mensagem no Supabase, envia email
-  - Timeout: 10s
-  - Cold start: ~1-2s
+- [api/contact.ts](api/contact.ts) - adaptador HTTP da função `POST /api/contact`
+- [api/_lib/contact.ts](api/_lib/contact.ts) - valida com Zod (limites de tamanho), escapa HTML do e-mail, salva no Supabase e notifica via Resend
+- Respostas: `200 { ok: true }`, `400` dados inválidos, `405` método, `500` genérico (sem detalhes internos)
 
 ### Vite
 - Path alias `@` apontando para `src/`
-- Dev server na porta 5173 (frontend)
+- Dev server na porta 8080, com plugin que serve `api/*.ts` localmente
 - Suporte a Hot Module Replacement (HMR)
 
 ### TypeScript
-- Target: ES2020
-- Modo estrito desativado para flexibilidade
+- Modo `strict` em todos os projetos (`tsconfig.app.json`, `tsconfig.node.json`, `tsconfig.api.json`)
 - Path mapping configurado para aliases (`@/*` → `src/*`)
-- JSX: react-jsx (React 19)
-- Support para importação de extensões TypeScript
+- JSX: react-jsx (React 18)
 
 ### Tailwind CSS
-- Versão 4.1 com plugin Vite para otimização
-- Integração completa com PostCSS e Autoprefixer
+- Versão 3.4 via PostCSS e Autoprefixer
 - Suporte a animações customizadas (`tailwindcss-animate`)
 - Merge inteligente de classes com `tailwind-merge`
 
 ### ESLint
 - Configuração flat com ESLint v9
 - Suporte a React Hooks e React Refresh
-- TypeScript plugin integrado para análise de código seguro
+- TypeScript plugin integrado; zero avisos tolerados (`--max-warnings=0`)
 
 ### Estrutura de Configuração TypeScript
 - `tsconfig.json` - Configuração raiz com paths compartilhados
 - `tsconfig.app.json` - Configuração específica da aplicação
-- `tsconfig.node.json` - Configuração para ferramentas de build
+- `tsconfig.node.json` - Configuração para ferramentas de build e testes
+- `tsconfig.api.json` - Funções serverless em `api/`
 
 ## ⚡ Otimizações de Performance
 
@@ -328,7 +315,7 @@ Ou use o atributo nativo HTML:
 ## 📊 Status do Setup
 
 ### Frontend
-✅ Vite + React 19 + TypeScript  
+✅ Vite + React 18 + TypeScript (strict)  
 ✅ Tailwind CSS  
 ✅ Componentes UI (Radix + Shadcn)  
 ✅ Tema dark/light (next-themes)  
@@ -369,10 +356,11 @@ Ou use o atributo nativo HTML:
 ## 🎯 Próximos Passos Sugeridos
 
 - [ ] Implementar analytics (Google Analytics ou Plausible)
-- [ ] Otimizar SEO (meta tags, sitemap.xml, robots.txt)
-- [ ] Adicionar testes unitários (Vitest + React Testing Library)
-- [ ] Adicionar testes E2E (Playwright ou Cypress)
+- [x] Otimizar SEO (canonical, Open Graph, sitemap.xml, robots.txt)
+- [x] Adicionar testes unitários (Vitest + React Testing Library)
+- [x] Adicionar testes E2E (Playwright + axe)
+- [ ] Imagem Open Graph (`og:image`) para prévias em redes sociais
 - [ ] Adicionar suporte a múltiplos idiomas (i18n)
-- [ ] Melhorar tratamento de erros no backend
-- [ ] Adicionar validação mais robusta no servidor
+- [x] Melhorar tratamento de erros no backend
+- [x] Adicionar validação mais robusta no servidor
 - [ ] Implementar PWA (Progressive Web App) com Service Workers
