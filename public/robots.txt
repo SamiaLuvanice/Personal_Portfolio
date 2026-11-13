@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://samialuvanicedev.vercel.app/sitemap.xml
