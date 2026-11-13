@@ -23,6 +23,7 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
         exclude: ^(\.agents/skills/(impeccable|shadcn|seo-audit|frontend-design|tdd)/|src/components/ui/)
       - id: end-of-file-fixer
         exclude: ^(\.agents/skills/(impeccable|shadcn|seo-audit|frontend-design|tdd)/|src/components/ui/|public/.*\.(svg|pdf))
