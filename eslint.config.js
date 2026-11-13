@@ -34,7 +34,7 @@ export default tseslint.config(
     rules: { "react-refresh/only-export-components": "off" },
   },
   {
-    files: ["api/**/*.ts", "*.config.ts", "e2e/**/*.ts"],
+    files: ["*.config.ts", "e2e/**/*.ts"],
     languageOptions: { globals: globals.node },
   },
 );
