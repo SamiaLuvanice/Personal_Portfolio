@@ -26,6 +26,18 @@ export interface GitHubCommit {
     html_url: string;
 }
 
+export interface GitHubEvent {
+    id: string;
+    type: string;
+    created_at: string;
+    repo: { name: string };
+    payload?: {
+        action?: string;
+        ref_type?: string;
+        commits?: unknown[];
+    };
+}
+
 const GITHUB_USERNAME = "SamiaLuvanice";
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
@@ -146,14 +158,14 @@ export function useGitHubCommits(repoName?: string) {
 }
 
 export function useGitHubActivity() {
-    const [events, setEvents] = useState<any[]>([]);
+    const [events, setEvents] = useState<GitHubEvent[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchEvents = async () => {
             const cacheKey = `github_events_${GITHUB_USERNAME}`;
-            const cached = getFromCache<any[]>(cacheKey);
+            const cached = getFromCache<GitHubEvent[]>(cacheKey);
 
             if (cached) {
                 setEvents(cached);
@@ -170,8 +182,11 @@ export function useGitHubActivity() {
                     throw new Error("Failed to fetch activity");
                 }
 
-                const data = await response.json();
-                setEvents(data);
+                const data: unknown = await response.json();
+                if (!Array.isArray(data)) {
+                    throw new Error("Unexpected activity response");
+                }
+                setEvents(data as GitHubEvent[]);
                 setToCache(cacheKey, data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : "Unknown error");

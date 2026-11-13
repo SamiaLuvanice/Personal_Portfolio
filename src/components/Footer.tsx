@@ -11,11 +11,6 @@ const Footer = () => {
         { href: "mailto:samia.luvanice.dev@gmail.com", icon: Mail, label: "Email" },
     ];
 
-    const footerLinks = [
-        { label: "GitHub", href: "https://github.com/SamiaLuvanice" },
-        { label: "LinkedIn", href: "https://linkedin.com/in/samialuvanice" },
-        { label: "Email", href: "mailto:samia.luvanice.dev@gmail.com" },
-    ];
 
     return (
         <footer className="relative bg-background border-t border-border">

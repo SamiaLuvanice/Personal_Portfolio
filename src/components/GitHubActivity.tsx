@@ -1,14 +1,15 @@
 import { motion } from "framer-motion";
 import { GitCommit, Clock, RefreshCw } from "lucide-react";
-import { useGitHubActivity } from "@/hooks/use-github";
+import { useGitHubActivity, type GitHubEvent } from "@/hooks/use-github";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-const getEventDescription = (event: any): string => {
+const getEventDescription = (event: GitHubEvent): string => {
     switch (event.type) {
-        case "PushEvent":
+        case "PushEvent": {
             const commits = event.payload?.commits?.length || 0;
             return `Fez ${commits} commit${commits > 1 ? "s" : ""} em ${event.repo.name.split("/")[1]}`;
+        }
         case "CreateEvent":
             return `Criou ${event.payload?.ref_type} em ${event.repo.name.split("/")[1]}`;
         case "WatchEvent":
