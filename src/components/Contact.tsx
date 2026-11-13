@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail, Heart, Send, MessageCircle, MapPin, Download } from "lucide-react";
+import { Github, Linkedin, Mail, Send, MessageCircle, MapPin, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -79,6 +79,10 @@ const Contact = () => {
                                     <div>
                                         <Input
                                             id="contact-name"
+                                            name="name"
+                                            aria-label="Seu nome"
+                                            autoComplete="name"
+                                            maxLength={120}
                                             placeholder="Seu nome"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -88,7 +92,12 @@ const Contact = () => {
                                     </div>
                                     <div>
                                         <Input
+                                            id="contact-email"
+                                            name="email"
                                             type="email"
+                                            aria-label="Seu email"
+                                            autoComplete="email"
+                                            maxLength={254}
                                             placeholder="Seu email"
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -98,6 +107,10 @@ const Contact = () => {
                                     </div>
                                     <div>
                                         <Textarea
+                                            id="contact-message"
+                                            name="message"
+                                            aria-label="Sua mensagem"
+                                            maxLength={5000}
                                             placeholder="Sua mensagem..."
                                             value={formData.message}
                                             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
