@@ -63,7 +63,14 @@ function parseBody(body: unknown): unknown {
 export async function handleContact(method: string | undefined, body: unknown, deps: ContactDeps): Promise<ContactResult> {
   if (method !== "POST") return { status: 405, body: { error: "Método não permitido" } };
 
-  const parsed = contactSchema.safeParse(parseBody(body));
+  const raw = parseBody(body);
+  // Honeypot: campo invisível para pessoas. Se veio preenchido, é robô; responde
+  // sucesso para não ensinar o robô a contornar, e não salva nada.
+  if (typeof raw === "object" && raw !== null && "website" in raw && typeof raw.website === "string" && raw.website.trim() !== "") {
+    return { status: 200, body: { ok: true } };
+  }
+
+  const parsed = contactSchema.safeParse(raw);
   if (!parsed.success) {
     return {
       status: 400,

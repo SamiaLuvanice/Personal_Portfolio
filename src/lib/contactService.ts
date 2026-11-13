@@ -2,6 +2,8 @@ export type ContactPayload = {
   name: string;
   email: string;
   message: string;
+  /** Honeypot: só robôs preenchem (campo escondido no formulário). */
+  website?: string;
 };
 
 export type ContactSuccess = { ok: true };

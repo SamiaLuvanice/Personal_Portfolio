@@ -79,6 +79,14 @@ describe("handleContact", () => {
     expect(d.logError).toHaveBeenCalledWith("Falha ao enviar e-mail de contato", expect.any(Error));
   });
 
+  it("descarta em silêncio envio de robô que preenche o honeypot", async () => {
+    const d = deps();
+    const result = await handleContact("POST", { ...valid, website: "https://spam.example" }, d);
+    expect(result).toEqual({ status: 200, body: { ok: true } });
+    expect(d.saveMessage).not.toHaveBeenCalled();
+    expect(d.sendEmail).not.toHaveBeenCalled();
+  });
+
   it("funciona sem e-mail configurado", async () => {
     const result = await handleContact("POST", valid, deps({ sendEmail: undefined }));
     expect(result.status).toBe(200);

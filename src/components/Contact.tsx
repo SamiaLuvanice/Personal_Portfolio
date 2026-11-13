@@ -10,6 +10,7 @@ import { submitContactForm } from "@/lib/contactService";
 const Contact = () => {
     const [formData, setFormData] = useState({ name: "", email: "", message: "" });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [website, setWebsite] = useState(""); // honeypot anti-spam
 
     const socialLinks = [
         { href: "https://github.com/SamiaLuvanice", icon: Github, label: "GitHub", color: "hover:text-foreground" },
@@ -21,7 +22,7 @@ const Contact = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            await submitContactForm(formData);
+            await submitContactForm(website ? { ...formData, website } : formData);
             toast.success("Mensagem enviada com sucesso! Entrarei em contato em breve.");
             setFormData({ name: "", email: "", message: "" });
         } catch (error) {
@@ -76,6 +77,19 @@ const Contact = () => {
                                 </div>
 
                                 <form onSubmit={handleSubmit} className="space-y-5">
+                                    {/* Honeypot: invisível e fora da ordem de foco; só robôs preenchem. */}
+                                    <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                                        <label htmlFor="contact-website">Website</label>
+                                        <input
+                                            id="contact-website"
+                                            name="website"
+                                            type="text"
+                                            tabIndex={-1}
+                                            autoComplete="off"
+                                            value={website}
+                                            onChange={(e) => setWebsite(e.target.value)}
+                                        />
+                                    </div>
                                     <div>
                                         <Input
                                             id="contact-name"
