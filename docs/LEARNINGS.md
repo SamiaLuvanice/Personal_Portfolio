@@ -26,8 +26,5 @@ marca em texto passa por `color-mix` com preto ou branco (classe `.tech-badge`),
 
 **Anti-pattern:** desligar a regra `color-contrast` ou aumentar o timeout até o teste ficar verde.
 
-**Dívida aberta:** os cards fora de foco do carrossel de certificados (desktop) ficam com opacidade
-0,5 e brilho reduzido por decisão de design. Eles levam `data-inactive` e são excluídos do axe; o card
-ativo continua verificado. Revisar o design para manter AA também nesses cards.
 
-**Referências:** `e2e/portfolio.spec.ts`, `src/index.css` (`.tech-badge`), `src/components/Certificates.tsx`.
+**Referências:** `e2e/portfolio.spec.ts`, `src/index.css` (`.tech-badge`), `src/components/About.tsx`.

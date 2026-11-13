@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import type { IconType } from "react-icons";
 import {
@@ -71,7 +72,7 @@ const skills = {
   tools: [
     { name: "Git", color: "#F05032", icon: SiGit },
     {
-      name: "GitHub", 
+      name: "GitHub",
       color: "hsl(0, 0%, 30%)",
       className:
         "text-neutral-800 border-neutral-700/35 dark:text-neutral-300 dark:border-neutral-400/35",
@@ -115,16 +116,9 @@ const SkillBadge = ({
   iconSrc?: string;
 }) => (
   <div
-    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium ${className ?? ""}`}
-    style={
-      className
-        ? undefined
-        : {
-            backgroundColor: `${color}15`,
-            color: color,
-            border: `1px solid ${color}35`,
-          }
-    }
+    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium ${className ?? "tech-badge"}`}
+    // A cor da marca entra como variável; .tech-badge (index.css) garante contraste AA.
+    style={className ? undefined : ({ "--tech-color": color } as CSSProperties)}
   >
     {Icon ? <Icon className="h-4 w-4 shrink-0" aria-hidden="true" /> : null}
     {!Icon && iconSrc ? <img src={iconSrc} alt="" aria-hidden="true" className="h-4 w-4 shrink-0" /> : null}
