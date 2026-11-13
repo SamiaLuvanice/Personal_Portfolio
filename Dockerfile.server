@@ -6,6 +6,8 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY server ./server
+# Regra compartilhada com a função da Vercel (TypeScript executado pelo Node 22.18+).
+COPY api/_lib ./api/_lib
 
 ENV NODE_ENV=production
 ENV PORT=3001
