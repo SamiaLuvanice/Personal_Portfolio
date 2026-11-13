@@ -1,0 +1,10 @@
+# Normaliza fim de linha: scripts .sh e .mjs precisam de LF em qualquer sistema.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.mp3 binary
+*.woff2 binary
