@@ -18,7 +18,8 @@ flowchart LR
   Framer Motion. A atividade do GitHub vem da API pública, com cache de 5 minutos em `localStorage`.
 - **Função de contato** (`api/contact.ts`): adaptador HTTP que monta as dependências a partir do
   ambiente e delega para `api/_lib/contact.ts` (validação Zod com limites, escape de HTML do e-mail,
-  persistência e notificação). A falha do e-mail não perde a mensagem, que já foi salva. Erros
+  persistência e notificação). A falha do e-mail não perde a mensagem, que já foi salva. Um campo honeypot invisível (`website`)
+  descarta envios de robôs com resposta de sucesso, sem salvar. Erros
   respondem mensagem genérica; o detalhe vai só para o log da função.
 - **Mesma origem:** o front chama `/api` relativo, sem CORS. `VITE_API_URL` existe apenas para
   apontar para outro host em casos excepcionais.
@@ -32,7 +33,7 @@ flowchart LR
 | Cabeçalhos | `nosniff`, `Referrer-Policy`, `X-Frame-Options: DENY`, `Permissions-Policy`, HSTS; cache imutável em `/assets/*` |
 | Preview | um por PR (integração Git da Vercel) |
 | Produção | merge em `main` → https://samialuvanicedev.vercel.app |
-| Node | 22 (`engines` e `.nvmrc`) |
+| Node | 22.x (`engines` e `.nvmrc`) |
 
 O GitHub Actions apenas valida (`.github/workflows/ci.yml`); não publica nada.
 

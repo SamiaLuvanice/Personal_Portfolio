@@ -205,13 +205,12 @@ create table if not exists contact_messages (
   created_at timestamptz not null default now()
 );
 
+-- RLS ligado e SEM policies: só a função (service role) grava. Uma policy de insert
+-- pública deixaria qualquer pessoa inserir direto pela API REST, pulando a validação.
 alter table contact_messages enable row level security;
-
-create policy "public insert contact messages"
-on contact_messages for insert
-to public
-with check (true);
 ```
+
+Se o projeto já tinha a policy antiga, remova-a: `drop policy if exists "public insert contact messages" on contact_messages;`
 
 #### Email (Opcional)
 Para enviar emails automaticamente:
@@ -249,6 +248,7 @@ Para enviar emails automaticamente:
 - [api/contact.ts](api/contact.ts) - adaptador HTTP da função `POST /api/contact`
 - [api/_lib/contact.ts](api/_lib/contact.ts) - valida com Zod (limites de tamanho), escapa HTML do e-mail, salva no Supabase e notifica via Resend
 - Respostas: `200 { ok: true }`, `400` dados inválidos, `405` método, `500` genérico (sem detalhes internos)
+- Anti-spam: campo honeypot invisível (`website`); envios que o preenchem são descartados
 
 ### Vite
 - Path alias `@` apontando para `src/`
