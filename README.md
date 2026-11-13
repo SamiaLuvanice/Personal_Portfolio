@@ -32,9 +32,6 @@ Portfólio pessoal moderno desenvolvido com React 18, TypeScript e Tailwind CSS,
 - **TanStack React Query** - Gerenciamento de estado e cache de dados
 - **date-fns** - Manipulação de datas com locale pt-BR
 
-### APIs & Integração
-- **Resend** - Envio de e-mail pela API de contato (`/api/contact`)
-
 ### Development & Qualidade
 - **ESLint** (flat config, `--max-warnings=0`) e **TypeScript** em modo `strict`
 - **Vitest** - testes de unidade
@@ -110,16 +107,15 @@ Requer Node 22.18+ (`.nvmrc`).
 
 ```bash
 npm ci                 # instala dependências
-cp .env.example .env   # preencha as variáveis (o .env nunca é versionado)
-npm run dev            # SPA + /api/* em http://localhost:8080
+npm run dev            # http://localhost:8080
 ```
 
 | Script | O que faz |
 |---|---|
-| `npm run dev` | Vite com HMR; serve também as funções de `api/` (mesmo código da Vercel) |
+| `npm run dev` | Vite com HMR |
 | `npm run build` / `npm run preview` | Build de produção e preview local |
 | `npm run lint` | ESLint sem avisos tolerados |
-| `npm run typecheck` | TypeScript estrito para app, configs e `api/` |
+| `npm run typecheck` | TypeScript estrito para app e configs |
 | `npm test` | Vitest |
 | `npm run test:e2e` | Playwright + axe contra o build (instale antes: `npx playwright install chromium`) |
 | `npm run lighthouse` | Lighthouse CI sobre `dist/` (rode `npm run build` antes) |
@@ -127,7 +123,7 @@ npm run dev            # SPA + /api/* em http://localhost:8080
 
 ## Docker (alternativa local/self-host)
 
-A produção é a Vercel; o Docker é uma alternativa para rodar tudo localmente ou em servidor próprio. O ambiente Docker executa o frontend compilado com Nginx e o servidor Express da API em serviços separados. O Nginx encaminha `/api/*` para a API e mantém o fallback necessário para as rotas do React. O servidor (`server/index.js`) usa a mesma regra da função da Vercel (`api/_lib/contact.ts`), executada direto em TypeScript pelo Node 22.18+.
+A produção é a Vercel; o Docker é uma alternativa para rodar o site localmente ou em servidor próprio: o build é servido por Nginx, com fallback para as rotas do React.
 
 ### Subir o ambiente
 
@@ -137,9 +133,7 @@ Com o Docker Desktop em execução:
 docker compose up --build
 ```
 
-O portfólio ficará disponível em `http://localhost:8080` e o endpoint de saúde da API em `http://localhost:8080/health`.
-
-Para configurar o envio de emails, defina `RESEND_API_KEY`, `CONTACT_TO_EMAIL` e, opcionalmente, `CONTACT_FROM_EMAIL` no ambiente ou em um arquivo `.env` local. Esses valores não devem ser adicionados ao controle de versão.
+O portfólio ficará disponível em `http://localhost:8080`.
 
 Para encerrar os serviços:
 
@@ -151,10 +145,6 @@ docker compose down
 
 ```
 .agents/                 # Harness de agentes (fonte única; ver docs/harness.md)
-api/
-├── contact.ts           # Função serverless da Vercel (adaptador HTTP)
-└── _lib/contact.ts      # Regra do contato: validação, escape, honeypot (testada)
-server/index.js          # API para o deploy Docker (mesma regra de api/_lib)
 e2e/                     # Testes Playwright + axe
 docs/                    # Arquitetura, harness e aprendizados
 specs/                   # Especificações numeradas (fluxo /spec → /verify)
@@ -204,24 +194,8 @@ src/
 
 ## ⚙️ Configuração
 
-### API de contato
-`POST /api/contact` (`api/contact.ts` na Vercel; `server/index.js` no Docker) envia e-mail via Resend. A interface atual usa `mailto:`; a API continua publicada, por isso valida entrada (zod, limites de tamanho), escapa o HTML do e-mail, tem honeypot (`website`) e responde erros genéricos.
-
-#### Setup Local
-1) Copie [.env.example](.env.example) → `.env` (ignorado pelo Git). Nunca use prefixo `VITE_` para chaves: ele publica o valor no bundle do navegador.
-
-#### Email (Opcional)
-Para enviar emails automaticamente:
-1) Gere uma API key no [Resend](https://resend.com)
-2) Configure no `.env`:
-   - `RESEND_API_KEY`
-   - `CONTACT_TO_EMAIL` (seu email)
-   - `CONTACT_FROM_EMAIL` (opcional - padrão: `Portfolio <onboarding@resend.dev>`)
-
-**Nota:** O email padrão `onboarding@resend.dev` já está verificado e funciona imediatamente. Para usar um domínio customizado (ex: `noreply@seudominio.com`), você precisa verificá-lo no painel do Resend adicionando registros DNS.
-
-#### Desenvolvimento Local
-`npm run dev` já serve `POST /api/contact` pelo próprio Vite, carregando o `.env`. Não é preciso `vercel dev`.
+### Contato
+Não há backend: a seção de contato usa um link `mailto:` montado por `src/lib/contact.ts` (testado com Vitest). O projeto não precisa de variáveis de ambiente.
 
 #### Deployment na Vercel
 
@@ -229,29 +203,18 @@ Para enviar emails automaticamente:
    - Ir para [vercel.com](https://vercel.com)
    - Conectar repositório
 
-2) **Configurar variáveis de ambiente:**
-   - Em `Settings → Environment Variables`, adicionar:
-     - `RESEND_API_KEY` (API key do Resend)
-     - `CONTACT_TO_EMAIL` (seu email para receber mensagens)
-     - `CONTACT_FROM_EMAIL` (opcional - padrão: `Portfolio <onboarding@resend.dev>`)
-
-3) **Deploy automático:**
+2) **Deploy automático:**
    - Cada PR ganha um preview; cada merge em `main` vai para produção
    - O GitHub Actions (`.github/workflows/ci.yml`) só valida; quem publica é a Vercel
    - `vercel.json` define o fallback da SPA e cabeçalhos de segurança/cache
 
-#### Estrutura do Backend
-- [api/contact.ts](api/contact.ts) - adaptador HTTP da função `POST /api/contact`
-- [api/_lib/contact.ts](api/_lib/contact.ts) - validação, escape, honeypot e envio (testada com Vitest)
-- Respostas: `200 { ok: true }`, `400` dados inválidos, `405` método (com `Allow: POST`), `500` genérico
-
 ### Vite
 - Path alias `@` apontando para `src/`
-- Dev server na porta 8080, com plugin que serve `api/*.ts` localmente
+- Dev server na porta 8080
 - Suporte a Hot Module Replacement (HMR)
 
 ### TypeScript
-- Modo `strict` em todos os projetos (`tsconfig.app.json`, `tsconfig.node.json`, `tsconfig.api.json`)
+- Modo `strict` em todos os projetos (`tsconfig.app.json`, `tsconfig.node.json`)
 - Path mapping configurado para aliases (`@/*` → `src/*`)
 - JSX: react-jsx (React 18)
 
@@ -269,7 +232,6 @@ Para enviar emails automaticamente:
 - `tsconfig.json` - Configuração raiz com paths compartilhados
 - `tsconfig.app.json` - Configuração específica da aplicação
 - `tsconfig.node.json` - Configuração para ferramentas de build e testes
-- `tsconfig.api.json` - Funções em `api/`
 
 ## ⚡ Otimizações de Performance
 
@@ -304,16 +266,15 @@ Cada seção tem um `Suspense` com fallback de skeleton para melhor UX.
 ✅ **Seções completas** (Hero, About, Projects, Certificates, Contact, Footer)  
 ✅ **Layout glassmorphism** com cards estilizados  
 ✅ **Animações suaves** (Framer Motion) com hover effects  
-✅ **Contato** por e-mail (`mailto:`) e API `/api/contact` endurecida (Resend)  
+✅ **Contato** por e-mail (`mailto:` com assunto pronto)  
 ✅ **Footer com links sociais** (GitHub, LinkedIn, Email)  
 ✅ **Responsividade** mobile-first em todos os componentes  
 ✅ **Scroll smooth** entre seções  
 
-### Backend
-✅ Vercel Serverless Functions  
-✅ Integração com Resend (envio de emails)  
-✅ Deploy automático via GitHub  
-✅ **Deploy em produção** (https://samialuvanicedev.vercel.app)  
+### Deploy
+✅ Vercel (preview por PR, produção em `main`)
+✅ **Deploy em produção** (https://samialuvanicedev.vercel.app)
+✅ Docker + Nginx como alternativa local
 
 ### Performance
 ✅ **Code splitting** - Componentes pesados (Certificates, Projects, Contact) carregam sob demanda

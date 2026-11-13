@@ -6,11 +6,11 @@ alwaysApply: true
 # Workspace
 
 Portfólio pessoal (pt-BR) em SPA React 18 + TypeScript + Vite, estilizado com Tailwind e shadcn/ui,
-com uma API de contato (função da Vercel; Docker como alternativa local). O público são recrutadores e
+estática, publicada na Vercel (Docker como alternativa local). O público são recrutadores e
 pessoas da comunidade: primeira impressão, acessibilidade, desempenho e SEO são o produto.
 
 - Diagnóstico com evidência: `evidencia.md`. Conclusão: `task-done-criteria.md`.
-- Interface: `frontend.md`. API: `serverless-api.md`. Convenções: `naming.md`, `testing.md`, `security.md`.
+- Interface: `frontend.md`. Convenções: `naming.md`, `testing.md`, `security.md`.
 - Processo: `git.md`. Portões: skill `quality-gates`. Fluxo de spec: skill `spec-driven`.
 - Design: preserve a identidade atual (tokens em `src/index.css` e `tailwind.config.ts`); as skills
   `frontend-design`, `impeccable` e `shadcn` apoiam, sem autorizar redesign não pedido.

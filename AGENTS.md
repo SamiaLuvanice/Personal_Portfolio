@@ -1,8 +1,7 @@
 # Harness do projeto
 
-Portfólio pessoal de Sâmia Luvanice: SPA React 18 + TypeScript + Vite + Tailwind/shadcn, com uma
-função serverless (`api/contact.ts`, envio via Resend; contato da interface por `mailto:`). Deploy na
-**Vercel** (Docker como alternativa local). Priorize simplicidade, acessibilidade, desempenho e SEO; explique o porquê das decisões.
+Portfólio pessoal de Sâmia Luvanice: SPA estática React 18 + TypeScript + Vite + Tailwind/shadcn,
+sem backend (contato por `mailto:`). Deploy na **Vercel** (Docker com nginx como alternativa local). Priorize simplicidade, acessibilidade, desempenho e SEO; explique o porquê das decisões.
 
 Toda configuração de agentes vive em `.agents/`, a fonte única de verdade (ver `.agents/AGENTS.md`).
 
@@ -17,7 +16,7 @@ Leia antes de qualquer tarefa: `.agents/rules/workspace.md`, `evidencia.md`, `ta
 
 ## Regras por tema
 
-Interface: `frontend.md`. API serverless: `serverless-api.md`. Transversais: `naming.md`, `testing.md`, `security.md`.
+Interface: `frontend.md`. Transversais: `naming.md`, `testing.md`, `security.md`.
 
 ## Skills, agents e comandos
 

@@ -10,8 +10,8 @@ skills em `skills/`, comandos em `commands/` e a automação do harness em `scri
   `doc-sync-onboarding`; skills `spec-driven`, `tdd`, `quality-gates`, `learnings`, `bug-resolve`; e os
   scripts de `scripts/`. O núcleo não cita a stack: o que é específico vem de `harness.yaml` ou do
   perfil, e `diagnose.mjs` barra os termos de `diagnose.core_forbidden_terms`.
-- **Perfil `react-vite-spa`**: rules `workspace`, `security`, `naming`, `testing`, `frontend`,
-  `serverless-api`; skills `doc-sync-onboarding`, `react-feature`, `react-vite-performance`,
+- **Perfil `react-vite-spa`**: rules `workspace`, `security`, `naming`, `testing`, `frontend`;
+  skills `doc-sync-onboarding`, `react-feature`, `react-vite-performance`,
   `frontend-design`, `shadcn`, `impeccable`, `seo-audit`.
 
 O perfil ativo está em `modules.yaml`; use apenas o que estiver listado. Skills de terceiros têm origem e

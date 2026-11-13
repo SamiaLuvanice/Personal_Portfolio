@@ -24,7 +24,6 @@ profiles:
       - naming.md
       - testing.md
       - frontend.md
-      - serverless-api.md
     skills:
       - doc-sync-onboarding
       - react-feature
