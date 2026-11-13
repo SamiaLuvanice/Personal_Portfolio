@@ -59,6 +59,8 @@ const CertificateCard = ({
         href={cert.pdfUrl}
         target="_blank"
         rel="noopener noreferrer"
+        // Cards fora de foco são esmaecidos de propósito pelo design (ver docs/LEARNINGS.md).
+        data-inactive={desktop && !active ? "" : undefined}
         initial={desktop ? false : { opacity: 0, scale: 0.9 }}
         animate={
             desktop
