@@ -224,6 +224,46 @@
 }
 
 @layer components {
+  .portfolio-page {
+    --nav-edge: calc(1rem + env(safe-area-inset-bottom, 0px));
+    --nav-height: 3.375rem;
+    padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px);
+    padding-bottom: calc(var(--nav-edge) + var(--nav-height));
+  }
+
+  .portfolio-nav {
+    bottom: var(--nav-edge);
+  }
+
+  .portfolio-nav :is(a, button):hover {
+    @apply bg-secondary text-secondary-foreground;
+  }
+
+  .portfolio-nav :is(a, button):focus-visible {
+    @apply ring-foreground;
+  }
+
+  @media (width < 768px) {
+    .portfolio-nav-links {
+      @apply glass-strong absolute bottom-full left-1/2 mb-2 hidden w-48 max-w-[calc(100vw_-_2rem)] -translate-x-1/2 flex-col overflow-y-auto overscroll-contain rounded-2xl p-2;
+      max-height: calc(100dvh - var(--nav-edge) - var(--nav-height) - 1.5rem - env(safe-area-inset-top, 0px));
+    }
+
+    .portfolio-nav-links[data-expanded="true"] {
+      display: flex;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    .portfolio-nav :is(a, button) {
+      transition: none;
+    }
+  }
+
   /* Badge de tecnologia: mantém o matiz da marca (--tech-color) e garante contraste AA
      misturando com preto no tema claro e com branco no escuro. */
   .tech-badge {

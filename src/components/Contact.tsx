@@ -11,7 +11,7 @@ const Contact = () => {
     const emailHref = buildMailtoHref();
 
     return (
-        <section id="contact" className="py-24">
+        <section className="py-24">
             <div className="container mx-auto px-6">
                 <div className="mx-auto max-w-6xl">
                     <motion.div
@@ -27,13 +27,13 @@ const Contact = () => {
                         <div className="mt-5 h-px w-full bg-border/80" />
                     </motion.div>
 
-                    <div className="grid gap-16 md:grid-cols-2 md:gap-20">
+                    <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-20">
                         <motion.div
                             initial={{ opacity: 0, x: -18 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.1 }}
                             viewport={{ once: true }}
-                            className="space-y-8"
+                            className="min-w-0 space-y-8"
                         >
                             <div>
                                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
@@ -43,7 +43,7 @@ const Contact = () => {
                                     href={emailHref}
                                     className="mt-3 inline-flex items-center gap-3 text-2xl font-medium tracking-tight transition-smooth hover:text-primary md:text-3xl"
                                 >
-                                    <span>samia.luvanice.dev@gmail.com</span>
+                                    <span className="[overflow-wrap:anywhere]">samia.luvanice.dev@gmail.com</span>
                                     <span aria-hidden="true">↗</span>
                                 </a>
                             </div>

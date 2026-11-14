@@ -19,22 +19,28 @@ const LoadingFallback = () => (
 
 const Index = () => {
     return (
-        <div className="min-h-screen bg-background">
+        <div className="portfolio-page min-h-screen bg-background">
             <Navbar />
             <Hero />
             <About />
-            
-            <Suspense fallback={<LoadingFallback />}>
-                <Certificates />
-            </Suspense>
-            
-            <Suspense fallback={<LoadingFallback />}>
-                <Projects />
-            </Suspense>
-            
-            <Suspense fallback={<LoadingFallback />}>
-                <Contact />
-            </Suspense>
+
+            <div id="certificates" tabIndex={-1}>
+                <Suspense fallback={<LoadingFallback />}>
+                    <Certificates />
+                </Suspense>
+            </div>
+
+            <div id="projects" tabIndex={-1}>
+                <Suspense fallback={<LoadingFallback />}>
+                    <Projects />
+                </Suspense>
+            </div>
+
+            <div id="contact" tabIndex={-1}>
+                <Suspense fallback={<LoadingFallback />}>
+                    <Contact />
+                </Suspense>
+            </div>
 
             <Footer />
         </div>

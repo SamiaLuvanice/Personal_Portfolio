@@ -51,7 +51,7 @@ Portfólio pessoal moderno desenvolvido com React 18, TypeScript e Tailwind CSS,
 - **Contact** - E-mail (`mailto:` com assunto pronto) e redes sociais
 
 #### Navegação & Tema
-- **Navbar** - Menu responsivo com links âncora suave
+- **Navbar** - Barra inferior flutuante e translúcida, com atalhos para as seções e menu que abre para cima no celular
 - **NavLink** - Componente reutilizável para links de navegação
 - **ThemeToggle** - Alternador entre dark/light mode com ícone animado
 - **Footer** - Rodapé com links sociais, rápidos e informações de copyright
@@ -156,7 +156,7 @@ public/
 src/
 ├── assets/              # Imagens, ícones e arquivos estáticos
 ├── components/
-│   ├── Navbar.tsx           # Barra de navegação responsiva com logo e menu
+│   ├── Navbar.tsx           # Barra inferior flutuante com marca, atalhos e controle de tema
 │   ├── NavLink.tsx          # Link de navegação reutilizável com scroll suave
 │   ├── Hero.tsx             # Seção hero inicial com apresentação e CTA
 │   ├── About.tsx            # Grid de skills categorizados (frontend, backend, tools, etc)

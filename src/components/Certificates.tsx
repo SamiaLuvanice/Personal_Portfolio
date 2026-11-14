@@ -77,7 +77,7 @@ const CertificateRow = ({ cert, index }: { cert: Certificate; index: number }) =
 
 const Certificates = () => {
     return (
-        <section id="certificates" className="py-24 md:py-32">
+        <section className="py-24 md:py-32">
             <div className="container mx-auto px-6">
                 <div className="mx-auto max-w-6xl md:grid md:grid-cols-[0.9fr_1.1fr] md:gap-16">
                     <motion.div
