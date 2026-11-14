@@ -25,6 +25,8 @@ profiles:
       - testing.md
       - frontend.md
     skills:
+      - po-intake
+      - agent-orchestration
       - doc-sync-onboarding
       - react-feature
       - react-vite-performance

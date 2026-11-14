@@ -65,6 +65,9 @@ As actions são fixadas por SHA. A Vercel publica o preview de cada PR e a produ
    (agente `code-reviewer`) e `docs-impact` como etapa final.
 4. Abra o PR com o template, confira o preview da Vercel e faça o merge com o `CI` verde.
 
+No Codex, abra um chat neste projeto e digite `$po-intake` para transformar uma demanda em uma spec
+verificável ou `$agent-orchestration` para coordenar a execução, a revisão e o QA de uma spec.
+
 ## Configuração manual no GitHub (uma vez)
 
 - Proteção de `main`: exigir PR e o check `CI`, e bloquear push forçado.
