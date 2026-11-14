@@ -100,7 +100,7 @@ const FEATURED_PROJECTS: FeaturedProject[] = [
 
 const Projects = () => {
     return (
-        <section id="projects" className="py-24">
+        <section className="py-24">
             <div className="container mx-auto px-6">
                 <div className="mx-auto max-w-6xl">
                     <motion.div

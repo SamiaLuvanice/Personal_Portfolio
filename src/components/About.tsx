@@ -128,7 +128,7 @@ const SkillBadge = ({
 
 const About = () => {
   return (
-    <section id="about" className="py-24">
+    <section id="about" tabIndex={-1} className="py-24">
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-6xl">
           <motion.div

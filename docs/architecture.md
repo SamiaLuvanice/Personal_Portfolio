@@ -9,9 +9,12 @@ flowchart LR
   S -->|mailto:| M[Cliente de e-mail do visitante]
 ```
 
-- **SPA estática** (`src/`): uma página (`/`) com seções por âncora (`#about`, `#projects`,
-  `#certificates`, `#contact`) e `NotFound` para o resto. Tema claro/escuro com `next-themes`;
-  animações com GSAP e Framer Motion.
+- **SPA estática** (`src/`): uma página (`/`) com âncoras para o início (`#inicio`) e as
+  seções (`#about`, `#certificates`, `#projects`, `#contact`), além de `NotFound` para as
+  demais rotas. Tema claro/escuro com `next-themes`. Animações com GSAP e Framer Motion.
+- **Navegação** — A barra inferior flutuante usa links nativos de fragmento. Os destinos de
+  Certificados, Projetos e Contato ficam em contêineres persistentes de `Index.tsx`, disponíveis
+  enquanto o conteúdo dessas seções é carregado sob demanda.
 - **Sem backend:** o contato é um link `mailto:` com assunto e corpo prontos, montado por
   `src/lib/contact.ts`. O projeto não tem funções serverless nem variáveis de ambiente. A antiga
   API de contato (Resend) foi removida no PR #2 por não ser usada pela interface; a versão endurecida

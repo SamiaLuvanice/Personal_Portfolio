@@ -78,7 +78,7 @@ const Hero = () => {
   };
 
   return (
-    <section ref={heroRef} aria-labelledby="hero-title" role="region" className="relative min-h-screen flex items-center justify-center overflow-hidden py-20 lg:py-24">
+    <section id="inicio" tabIndex={-1} ref={heroRef} aria-labelledby="hero-title" role="region" className="relative min-h-screen flex items-center justify-center overflow-hidden py-20 lg:py-24">
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
           style={{ y: y1 }}
