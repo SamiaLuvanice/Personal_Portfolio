@@ -114,3 +114,65 @@ test("menu estreito abre para cima, fecha com Escape e navega para a seção", a
   await expect(page.locator("#projects")).toBeFocused();
   await expect(menu).toHaveAttribute("aria-expanded", "false");
 });
+
+test("monograma usa o degradê do favicon com contraste nos dois temas", async ({ page }, testInfo) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#contact");
+
+  const nav = page.getByRole("navigation", { name: "Navegação principal" });
+  const home = nav.getByRole("link", { name: "SL, início" });
+  const monogram = home.getByText("SL", { exact: true });
+  const themeToggle = nav.getByRole("button", { name: "Alternar tema" });
+  const pink = [236, 72, 153];
+  const blue = [59, 130, 246];
+  const luminance = (rgb: number[]) => rgb
+    .map((value) => value / 255)
+    .map((value) => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4)
+    .reduce((sum, value, channel) => sum + value * [0.2126, 0.7152, 0.0722][channel], 0);
+
+  async function checkGradient() {
+    await expect(monogram).toHaveCSS(
+      "background-image",
+      /^linear-gradient\(to right bottom, rgb\(236, 72, 153\), rgb\(59, 130, 246\)\)$/,
+    );
+    await expect(monogram).toHaveCSS("background-clip", "text");
+    const background = await home.evaluate((link) => getComputedStyle(link).backgroundColor);
+    const match = /^rgb\((\d+), (\d+), (\d+)\)$/.exec(background);
+    expect(match, "a superfície da marca é opaca").not.toBeNull();
+    const backgroundLuminance = luminance(match!.slice(1).map(Number));
+    for (let percent = 0; percent <= 100; percent += 1) {
+      const color = pink.map((value, channel) => value + (blue[channel] - value) * percent / 100);
+      expect((luminance(color) + 0.05) / (backgroundLuminance + 0.05)).toBeGreaterThanOrEqual(4.5);
+    }
+  }
+
+  for (const theme of ["dark", "light"]) {
+    await expect(page.locator("html")).toHaveClass(theme);
+    await checkGradient();
+    if (testInfo.project.name === "desktop") {
+      await home.hover();
+      await checkGradient();
+      await page.mouse.move(0, 0);
+    }
+    await home.focus();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Shift+Tab");
+    await expect(home).toBeFocused();
+    await expect(home).not.toHaveCSS("box-shadow", "none");
+    await checkGradient();
+    await themeToggle.click();
+  }
+
+  if (testInfo.project.name === "mobile") await home.tap();
+  else await home.click();
+  await expect(page).toHaveURL(/#inicio$/);
+  await expect(page.locator("#inicio")).toBeFocused();
+
+  await page.goto("/#contact");
+  await home.press("Enter");
+  await expect(page).toHaveURL(/#inicio$/);
+
+  await page.emulateMedia({ forcedColors: "active" });
+  await expect(monogram).toHaveCSS("background-image", "none");
+  await expect(monogram).not.toHaveCSS("color", "rgba(0, 0, 0, 0)");
+});

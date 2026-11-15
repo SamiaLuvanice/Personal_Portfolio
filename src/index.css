@@ -243,6 +243,33 @@
     @apply ring-foreground;
   }
 
+  .portfolio-nav .portfolio-nav-brand,
+  .portfolio-nav .portfolio-nav-brand:hover {
+    /* Fundo opaco para manter contraste inclusive nas cores intermediárias do degradê. */
+    background-color: #0a0a0a;
+    color: white;
+  }
+
+  @supports (background-clip: text) {
+    .portfolio-nav-brand span {
+      background-image: linear-gradient(to right bottom, #ec4899, #3b82f6);
+      background-clip: text;
+      color: transparent;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .portfolio-nav-brand span {
+      background-image: none;
+      color: LinkText;
+    }
+
+    .portfolio-nav .portfolio-nav-brand:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+  }
+
   @media (width < 768px) {
     .portfolio-nav-links {
       @apply glass-strong absolute bottom-full left-1/2 mb-2 hidden w-48 max-w-[calc(100vw_-_2rem)] -translate-x-1/2 flex-col overflow-y-auto overscroll-contain rounded-2xl p-2;

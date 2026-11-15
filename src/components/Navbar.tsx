@@ -32,9 +32,9 @@ const Navbar = () => {
       }}
     >
       <div className="glass-strong flex items-center gap-2 rounded-full p-1.5 md:gap-3">
-        <Button asChild variant="ghost" size="icon" className="rounded-full font-display text-lg font-bold">
+        <Button asChild variant="ghost" size="icon" className="portfolio-nav-brand rounded-full font-display text-lg font-bold">
           <a href="#inicio" aria-label="SL, início" onClick={closeMenu}>
-            SL
+            <span>SL</span>
           </a>
         </Button>
 
