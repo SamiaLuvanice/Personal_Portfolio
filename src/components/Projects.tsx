@@ -1,147 +1,67 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { ArrowUpRight } from "lucide-react";
+import ProjectCard from "@/components/ProjectCard";
+import SectionTitle from "@/components/SectionTitle";
+import { PROJECTS, SOCIAL_LINKS } from "@/content/portfolio";
+import { filterProjects, type ProjectFilter } from "@/lib/filter-projects";
+import { cn } from "@/lib/utils";
 
-// Interface para projetos em destaque (Vercel, etc)
-interface FeaturedProject {
-    name: string;
-    description: string;
-    url: string;
-    image?: string;
-    language?: string;
-    tags?: string[];
-    status?: "live" | "building" | "archived";
-}
-
-// Language to color mapping
-const FeaturedProjectCard = ({ project, index }: { project: FeaturedProject; index: number }) => (
-    <motion.a
-        href={project.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        layout
-        initial={{ opacity: 0, y: 18 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.45, delay: index * 0.08 }}
-        whileHover={{ y: -2 }}
-        className="group grid overflow-hidden border-b border-border/70 py-6 transition-smooth md:grid-cols-[0.95fr_1.05fr] md:gap-8 md:py-8"
-    >
-        {project.image && (
-            <div className="relative h-56 overflow-hidden rounded-2xl border border-border/60 bg-background/40 md:h-full">
-                <motion.img
-                    src={project.image}
-                    alt={project.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                />
-            </div>
-        )}
-
-        <div className="mt-5 flex flex-col justify-between md:mt-0">
-            <div className="space-y-5">
-                <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
-                        Destaque
-                    </p>
-                    {project.status === "live" && (
-                        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
-                            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                            Ao vivo
-                        </div>
-                    )}
-                </div>
-
-                <h3 className="font-display text-2xl font-bold leading-tight md:text-3xl">
-                    {project.name}
-                </h3>
-
-                <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-                {project.description}
-                </p>
-
-                {(project.tags || project.language) && (
-                    <div className="flex flex-wrap gap-2 pt-1">
-                        {project.language && (
-                            <span className="border border-border/60 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-foreground">
-                                {project.language}
-                            </span>
-                        )}
-                        {project.tags?.slice(0, 2).map((tag) => (
-                            <span
-                                key={tag}
-                                className="border border-border/60 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground"
-                            >
-                                {tag}
-                            </span>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            <div className="mt-6 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground transition-smooth group-hover:text-primary">
-                <span>Ver projeto</span>
-                <span aria-hidden="true">↗</span>
-            </div>
-        </div>
-    </motion.a>
-);
-
-// Projetos em destaque (adicione seus projetos Vercel aqui)
-const FEATURED_PROJECTS: FeaturedProject[] = [
-    {
-        name: "StudyNice",
-        description: "Acompanhe suas metas de estudo, crie hábitos consistentes e veja seu progresso crescer com nosso sistema de sequências motivador.",
-        url: "https://studynice.vercel.app/",
-        image: "/projects/studynice-hero.png",
-        language: "TypeScript",
-        tags: ["Vercel", "Production"],
-        status: "live",
-    },
-    // Adicione mais projetos em destaque conforme necessário
+const FILTERS: { value: ProjectFilter; label: string; announce: string }[] = [
+  { value: "todos", label: "Todos", announce: "projetos" },
+  { value: "autoral", label: "Autorais", announce: "projetos autorais" },
+  { value: "comercial", label: "Comerciais", announce: "projetos comerciais" },
 ];
 
 const Projects = () => {
-    return (
-        <section className="py-24">
-            <div className="container mx-auto px-6">
-                <div className="mx-auto max-w-6xl">
-                    <motion.div
-                        initial={{ opacity: 0, y: 16 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        viewport={{ once: true }}
-                        className="mb-10"
-                    >
-                        <h2 className="font-display text-4xl font-bold uppercase tracking-tight md:text-6xl">
-                            <span className="text-gradient">Projetos</span>
-                        </h2>
-                        <div className="mt-5 h-px w-full bg-border/80" />
-                    </motion.div>
+  const [filter, setFilter] = useState<ProjectFilter>("todos");
+  const visible = filterProjects(PROJECTS, filter);
+  const active = FILTERS.find((item) => item.value === filter)!;
 
-                    {FEATURED_PROJECTS.length > 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 16 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                            viewport={{ once: true }}
-                            className="space-y-2"
-                        >
-                            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                                Destaque
-                            </p>
-                            <div className="mt-6">
-                                {FEATURED_PROJECTS.map((project, index) => (
-                                    <FeaturedProjectCard
-                                        key={project.url}
-                                        project={project}
-                                        index={index}
-                                    />
-                                ))}
-                            </div>
-                        </motion.div>
-                    )}
-                </div>
-            </div>
-        </section>
-    );
+  return (
+    <section aria-labelledby="projects-title" className="surface-light px-5 py-20 md:px-10 md:py-24 lg:px-20 lg:py-32">
+      <div className="mx-auto flex max-w-[80rem] flex-col items-center gap-8 md:gap-12">
+        <SectionTitle id="projects-title">PROJETOS</SectionTitle>
+
+        <div role="group" aria-label="Filtrar projetos" className="flex flex-wrap justify-center gap-1">
+          {FILTERS.map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              aria-pressed={filter === item.value}
+              onClick={() => setFilter(item.value)}
+              className={cn(
+                "min-h-11 rounded-full px-4 text-[0.9375rem] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-base",
+                filter === item.value ? "font-semibold text-foreground underline decoration-primary decoration-2 underline-offset-8" : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+        <p role="status" className="sr-only">
+          {visible.length} {active.announce}
+        </p>
+
+        <ul aria-label="Projetos" className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 md:gap-8">
+          {visible.map((project) => (
+            <li key={project.name}>
+              <ProjectCard project={project} />
+            </li>
+          ))}
+        </ul>
+
+        <a
+          href={SOCIAL_LINKS.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-5 text-sm font-medium transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          Mais no GitHub
+          <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+        </a>
+      </div>
+    </section>
+  );
 };
 
 export default Projects;

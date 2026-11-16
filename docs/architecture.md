@@ -9,12 +9,20 @@ flowchart LR
   S -->|mailto:| M[Cliente de e-mail do visitante]
 ```
 
-- **SPA estática** (`src/`): uma página (`/`) com âncoras para o início (`#inicio`) e as
-  seções (`#about`, `#certificates`, `#projects`, `#contact`), além de `NotFound` para as
-  demais rotas. Tema claro/escuro com `next-themes`. Animações com GSAP e Framer Motion.
-- **Navegação** — A barra inferior flutuante usa links nativos de fragmento. Os destinos de
-  Certificados, Projetos e Contato ficam em contêineres persistentes de `Index.tsx`, disponíveis
-  enquanto o conteúdo dessas seções é carregado sob demanda.
+- **SPA estática** (`src/`): uma página (`/`) com Hero (`#inicio`), Projetos (`#projects`),
+  Expertise (`#expertise`), Experiência (`#experience`) e Contato (`#contact`), seguidos do rodapé
+  (`Footer.tsx`, único `contentinfo`), além de `NotFound` para as demais rotas. Sem tema
+  alternável: o esquema de cores é fixo por seção (`:root` claro e `.surface-dark` em
+  `src/index.css`). Sem GSAP nem Framer Motion. O conteúdo fica em `src/content/portfolio.ts`; a
+  lógica pura em `src/lib/filter-projects.ts` e `src/lib/active-section.ts`.
+- **Navegação** — Links nativos de fragmento: barra superior fixa a partir de 1024 px e barra
+  inferior de quatro colunas abaixo disso. A seção ativa recebe `aria-current`
+  (`src/hooks/use-active-section.ts`). Os destinos de Projetos, Expertise, Experiência e Contato
+  ficam em contêineres persistentes de `Index.tsx`, disponíveis enquanto o conteúdo dessas seções é
+  carregado sob demanda.
+- **Imagens e fontes** — Imagens dos projetos em WebP (`public/projects/`), preguiçosas. O retrato
+  (`public/hero/portrait.webp`) é a imagem do LCP e é pré-carregado no `index.html`, assim como as
+  fontes do Google, que entram por `preload` com troca no `onload` para não bloquear a renderização.
 - **Sem backend:** o contato é um link `mailto:` com assunto e corpo prontos, montado por
   `src/lib/contact.ts`. O projeto não tem funções serverless nem variáveis de ambiente. A antiga
   API de contato (Resend) foi removida no PR #2 por não ser usada pela interface; a versão endurecida
@@ -48,4 +56,5 @@ Metadados em `index.html` (title, description, canonical, Open Graph, Twitter), 
 ## Qualidade
 
 Ver `docs/harness.md`. Resumo: lint sem avisos, TypeScript estrito, Vitest, Playwright + axe nos
-viewports desktop e mobile, e Lighthouse CI com orçamento (`lighthouserc.json`).
+viewports desktop e mobile (incluindo larguras de 320 a 1440 px, cores forçadas e movimento
+reduzido), e Lighthouse CI com orçamento (`lighthouserc.json`).

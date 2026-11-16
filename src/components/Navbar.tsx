@@ -1,73 +1,43 @@
-import { useRef, useState, type KeyboardEvent } from "react";
-import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import ThemeToggle from "./ThemeToggle";
+import { ArrowRight } from "lucide-react";
+import AvailabilityBadge from "@/components/AvailabilityBadge";
+import { NAV_ITEMS } from "@/content/portfolio";
+import { useActiveSection } from "@/hooks/use-active-section";
 
-const NAV_ITEMS = [
-  { name: "Tecnologias", href: "#about" },
-  { name: "Certificados", href: "#certificates" },
-  { name: "Projetos", href: "#projects" },
-  { name: "Contato", href: "#contact" },
-];
+const SECTION_IDS = NAV_ITEMS.map((item) => item.id);
 
+/** Barra superior a partir de 1024 px e barra inferior de quatro colunas abaixo disso (spec 0003). */
 const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const menuButton = useRef<HTMLButtonElement>(null);
-
-  const closeMenu = () => setIsMobileMenuOpen(false);
-  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && isMobileMenuOpen) {
-      closeMenu();
-      menuButton.current?.focus();
-    }
-  };
+  const active = useActiveSection(SECTION_IDS);
 
   return (
-    <nav
-      aria-label="Navegação principal"
-      className="portfolio-nav fixed left-1/2 z-50 w-max max-w-[calc(100%_-_2rem)] -translate-x-1/2"
-      onKeyDown={handleKeyDown}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) closeMenu();
-      }}
-    >
-      <div className="glass-strong flex items-center gap-2 rounded-full p-1.5 md:gap-3">
-        <Button asChild variant="ghost" size="icon" className="portfolio-nav-brand rounded-full font-display text-lg font-bold">
-          <a href="#inicio" aria-label="SL, início" onClick={closeMenu}>
-            <span>SL</span>
-          </a>
-        </Button>
-
-        <Button
-          ref={menuButton}
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="rounded-full md:hidden"
-          onClick={(event) => {
-            event.currentTarget.focus();
-            setIsMobileMenuOpen((isOpen) => !isOpen);
-          }}
-          aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
-          aria-expanded={isMobileMenuOpen}
-          aria-controls="portfolio-nav-links"
-        >
-          {isMobileMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-        </Button>
-        <ul
-          id="portfolio-nav-links"
-          data-expanded={isMobileMenuOpen}
-          className="portfolio-nav-links gap-1 md:flex"
-        >
-          {NAV_ITEMS.map(({ name, href }) => (
-            <li key={href}>
-              <Button asChild variant="ghost" className="w-full justify-start md:rounded-full">
-                <a href={href} onClick={closeMenu}>{name}</a>
-              </Button>
+    <nav aria-label="Navegação principal" className="site-nav">
+      <div className="site-nav-surface flex items-center rounded-full p-1 sm:p-1.5 lg:justify-between lg:rounded-none lg:px-10 lg:py-4">
+        <AvailabilityBadge className="hidden lg:inline-flex" />
+        <ul className="grid w-full grid-cols-4 lg:flex lg:w-auto lg:items-center lg:gap-8">
+          {NAV_ITEMS.map((item) => (
+            <li key={item.id} className="min-w-0">
+              <a
+                href={`#${item.id}`}
+                aria-current={active === item.id ? "true" : undefined}
+                className="flex min-h-11 items-center justify-center gap-1 rounded-full px-1 text-[0.75rem] text-[hsl(280_10%_72%)] transition-colors hover:text-white motion-reduce:transition-none sm:px-4 sm:text-sm lg:px-3 lg:text-[0.9375rem] lg:text-white/90"
+              >
+                {item.label}
+                {item.count && (
+                  <span aria-hidden="true" className="hidden self-start pt-2.5 font-display text-[0.6875rem] leading-none text-[hsl(280_10%_72%)] lg:inline">
+                    [{item.count}]
+                  </span>
+                )}
+              </a>
             </li>
           ))}
         </ul>
-        <ThemeToggle className="rounded-full" />
+        <a
+          href="#projects"
+          className="hidden min-h-11 items-center gap-2 rounded-full border border-white/25 px-5 text-sm font-semibold text-white transition-colors hover:bg-white/10 lg:inline-flex"
+        >
+          Ver projetos
+          <ArrowRight aria-hidden="true" className="h-4 w-4" />
+        </a>
       </div>
     </nav>
   );
