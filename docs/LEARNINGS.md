@@ -27,4 +27,6 @@ marca em texto passa por `color-mix` com preto ou branco (classe `.tech-badge`),
 **Anti-pattern:** desligar a regra `color-contrast` ou aumentar o timeout até o teste ficar verde.
 
 
-**Referências:** `e2e/portfolio.spec.ts`, `src/index.css` (`.tech-badge`), `src/components/About.tsx`.
+**Referências:** `e2e/portfolio.spec.ts`. A classe `.tech-badge` e o `src/components/About.tsx`
+saíram no redesign da spec 0003, junto com as animações de GSAP e Framer Motion; o princípio de rolar
+a página antes do axe continua no e2e.

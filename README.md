@@ -1,6 +1,6 @@
 # 🚀 Personal Portfolio
 
-Portfólio pessoal moderno desenvolvido com React 18, TypeScript e Tailwind CSS, com animações suaves, componentes acessíveis e design responsivo.
+Portfólio pessoal moderno desenvolvido com React 18, TypeScript e Tailwind CSS, com componentes acessíveis e design responsivo.
 
 **Produção:** https://samialuvanicedev.vercel.app (Vercel)
 
@@ -11,25 +11,19 @@ Portfólio pessoal moderno desenvolvido com React 18, TypeScript e Tailwind CSS,
 - **TypeScript** - Superset tipado do JavaScript
 - **Vite** - Build tool e dev server ultra-rápido
 
-### Styling & Animation
+### Styling
 - **Tailwind CSS** - Framework CSS utility-first
-- **Framer Motion** - Biblioteca de animações para React
 - **Tailwind Merge** - Utilitário para merge de classes Tailwind
 - **CLSX** - Utilitário para gerenciamento condicional de classes
 
 ### UI & Components
 - **Radix UI** - Componentes primitivos acessíveis
-  - `@radix-ui/react-toast` - Sistema de notificações nativo
-  - `@radix-ui/react-tooltip` - Tooltips acessíveis
+  - `@radix-ui/react-accordion` - Accordion da seção Expertise
   - `@radix-ui/react-slot` - Primitivo de composição
-- **Sonner** - Toast notifications com animações
 - **Lucide React** - Ícones SVG limpos e consistentes
-- **React Icons** - Logos de tecnologias e ferramentas no About
-- **Next Themes** - Gerenciamento de tema dark/light mode
 
-### Roteamento & Data
+### Roteamento
 - **React Router DOM v6** - Roteamento para SPAs
-- **TanStack React Query** - Gerenciamento de estado e cache de dados
 - **date-fns** - Manipulação de datas com locale pt-BR
 
 ### Development & Qualidade
@@ -44,16 +38,18 @@ Portfólio pessoal moderno desenvolvido com React 18, TypeScript e Tailwind CSS,
 ### Componentes Principais
 
 #### Seções de Conteúdo
-- **Hero** - Apresentação inicial com animações e CTA
-- **About** - Grid de skills e tecnologias com badges coloridos, logos e categorias
-- **Projects** - Galeria de repositórios GitHub com filtros por linguagem, stats e links
-- **Certificates** - Cards em glassmorphism com informações de cursos e formações
-- **Contact** - E-mail (`mailto:` com assunto pronto) e redes sociais
+A ordem na página é Hero, Projetos, Expertise, Experiência e Contato, seguida do rodapé. As seções
+abaixo da dobra são carregadas sob demanda e o conteúdo fica em `src/content/portfolio.ts`.
 
-#### Navegação & Tema
-- **Navbar** - Barra inferior flutuante e translúcida, com atalhos para as seções e menu que abre para cima no celular
-- **NavLink** - Componente reutilizável para links de navegação
-- **ThemeToggle** - Alternador entre dark/light mode com ícone animado
+- **Hero** - Apresentação inicial com retrato e CTA
+- **Projects** - Projetos com filtro (todos, autorais, comerciais) em cards (`ProjectCard`)
+- **Expertise** - Accordion (Radix) com vários itens abertos e prévia ilustrada (`ExpertisePreview`)
+- **Experience** - Experiência profissional
+- **Contact** - E-mail (`mailto:` com assunto pronto) e redes sociais
+- **SectionTitle** / **AvailabilityBadge** - Título de seção e selo de disponibilidade
+
+#### Navegação
+- **Navbar** - Barra superior fixa a partir de 1024 px e barra inferior de quatro colunas abaixo disso; a seção ativa recebe `aria-current`
 - **Footer** - Rodapé com links sociais, rápidos e informações de copyright
 
 #### Componentes UI Reutilizáveis
@@ -65,17 +61,13 @@ O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
 - E muitos outros...
 
 ### Padrões de Design
-- **Layout glassmorphism** - Cards com efeito vidro translúcido
-- **Animações Framer Motion** - Fade, scale, y-offset, rotate, hover effects
 - **Responsividade** - Tailwind breakpoints (mobile-first)
 - **Acessibilidade** - Radix UI primitivos acessíveis, labels, ARIA
-- **Temas** - Dark/light mode com next-themes
+- **Esquema de cores fixo por seção** - `:root` claro e `.surface-dark` em `src/index.css`, sem alternância de tema
 
 ### Hooks Customizados
+- **useActiveSection()** - Indica a seção visível para marcar o link ativo da navegação (`src/hooks/use-active-section.ts`)
 - **useToast()** - Hook para disparar notificações toast
-- **useTheme()** - Hook para gerenciar tema dark/light (next-themes)
-- **useGitHubRepos()** - Hook para buscar repositórios com React Query, filtros por linguagem
-- **useIsMobile()** - Hook para detecção de dispositivos móveis com media queries
 
 ### Tipografia
 - **Sora** - Fonte principal (sans-serif)
@@ -89,14 +81,12 @@ O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
 - `--accent` - Cor de destaque (magenta)
 - `--tertiary` - Cor terciária (ciano)
 - `--muted` - Cores neutras
-- Suporte completo para dark mode via `next-themes`
+- `--surface-dark` - Superfície escura aplicada por seção com `.surface-dark`
 
 ### Recursos de Design
 - Sistema de cores HSL configurável
 - Gradientes personalizados
-- Efeitos glassmorphism
-- Logos de tecnologias no About (`react-icons` + SVGs customizados)
-- Animações customizadas (float, fade, slide, scale)
+- Imagens em WebP (`public/projects/`, `public/hero/portrait.webp`)
 - Sombras suaves e glow effects
 - Transições smooth e bounce
 - Componentes responsivos
@@ -149,22 +139,23 @@ e2e/                     # Testes Playwright + axe
 docs/                    # Arquitetura, harness e aprendizados
 specs/                   # Especificações numeradas (fluxo /spec → /verify)
 public/
-├── icons/
-│   ├── manychat.svg     # Logo customizada do ManyChat usada no About
-│   └── vscode.svg       # Logo customizada do VS Code usada no About
-└── ...                  # Arquivos públicos (robots, certificados, projetos, etc.)
+├── hero/portrait.webp   # Retrato do Hero (pré-carregado no index.html)
+├── projects/            # Imagens dos projetos em WebP
+└── ...                  # Arquivos públicos (robots, sitemap, certificados, etc.)
 src/
-├── assets/              # Imagens, ícones e arquivos estáticos
 ├── components/
-│   ├── Navbar.tsx           # Barra inferior flutuante com marca, atalhos e controle de tema
-│   ├── NavLink.tsx          # Link de navegação reutilizável com scroll suave
+│   ├── Navbar.tsx           # Barra superior (≥ 1024 px) ou inferior de quatro colunas, com seção ativa
 │   ├── Hero.tsx             # Seção hero inicial com apresentação e CTA
-│   ├── About.tsx            # Grid de skills categorizados (frontend, backend, tools, etc)
-│   ├── Projects.tsx         # Seção de projetos
-│   ├── Certificates.tsx     # Cards em glassmorphism com certificados/formações
+│   ├── AvailabilityBadge.tsx # Selo de disponibilidade
+│   ├── SectionTitle.tsx     # Título padrão das seções
+│   ├── Projects.tsx         # Seção de projetos com filtro
+│   ├── ProjectCard.tsx      # Card de projeto
+│   ├── Expertise.tsx        # Accordion de áreas de atuação
+│   ├── ExpertisePreview.tsx # Prévia ilustrada de cada área
+│   ├── Experience.tsx       # Experiência profissional
 │   ├── Contact.tsx          # Contato por e-mail e redes sociais
 │   ├── Footer.tsx           # Rodapé com links sociais e rápidos
-│   ├── ThemeToggle.tsx      # Alternador entre dark/light mode
+│   ├── ErrorBoundary.tsx    # Fallback para erros de renderização
 │   └── ui/                  # 25+ Componentes UI reutilizáveis (Shadcn/Radix)
 │       ├── button.tsx       # Botão estilizado com variantes
 │       ├── input.tsx        # Input de formulário
@@ -178,15 +169,20 @@ src/
 │       ├── avatar.tsx       # Avatar para imagens de perfil
 │       ├── separator.tsx    # Separador visual
 │       └── [outros...].tsx  # Accordion, Alert, Dialog, Drawer, Select, etc.
+├── content/
+│   └── portfolio.ts         # Conteúdo da página (projetos, expertise, experiência, links, navegação)
 ├── hooks/
-│   ├── use-toast.ts         # Hook para disparo de notificações
-│   └── use-mobile.tsx       # Hook para detecção de dispositivos móveis
+│   ├── use-active-section.ts # Seção visível para a navegação
+│   └── use-toast.ts         # Hook para disparo de notificações
 ├── lib/
-│   ├── utils.ts             # Funções utilitárias (cn para merge de classes)
+│   ├── active-section.ts    # Lógica pura da seção ativa
+│   ├── contact.ts           # Monta o link mailto: do contato
+│   ├── filter-projects.ts   # Filtro de projetos por categoria
+│   └── utils.ts             # Funções utilitárias (cn para merge de classes)
 ├── pages/
-│   ├── Index.tsx            # Página principal com todas as seções
+│   ├── Index.tsx            # Página principal; seções abaixo da dobra sob demanda
 │   └── NotFound.tsx         # Página 404 customizada
-├── App.tsx                  # Componente raiz com providers e routing
+├── App.tsx                  # Componente raiz com ErrorBoundary e routing
 ├── App.css                  # Estilos específicos do App
 ├── index.css                # Estilos globais e CSS variables (HSL)
 └── main.tsx                 # Entry point da aplicação
@@ -236,12 +232,16 @@ Não há backend: a seção de contato usa um link `mailto:` montado por `src/li
 ## ⚡ Otimizações de Performance
 
 ### Code Splitting
-O projeto usa `React.lazy()` para carregar componentes pesados sob demanda:
-- **Certificates** - Carregado apenas quando próximo de ser visualizado
-- **Projects** - Carregado sob demanda
-- **Contact** - Componente carregado sob demanda
+O projeto usa `React.lazy()` para carregar sob demanda as seções abaixo da dobra:
+**Projects**, **Expertise**, **Experience** e **Contact**.
 
-Cada seção tem um `Suspense` com fallback de skeleton para melhor UX.
+Cada seção tem um `Suspense` com um espaço reservado de altura mínima, para a página não pular
+enquanto o chunk carrega.
+
+### Imagens e fontes
+- Retrato do Hero em `public/hero/portrait.webp`, pré-carregado no `index.html` (imagem do LCP)
+- Imagens dos projetos em WebP, preguiçosas
+- Fontes do Google com `preload` e troca no `onload`, sem bloquear a renderização
 
 **Arquivo:** [src/pages/Index.tsx](src/pages/Index.tsx)
 
@@ -251,21 +251,14 @@ Cada seção tem um `Suspense` com fallback de skeleton para melhor UX.
 ✅ Vite + React 18 + TypeScript (strict)  
 ✅ Tailwind CSS  
 ✅ Componentes UI (Radix + Shadcn)  
-✅ Tema dark/light (next-themes)  
-✅ Toast notifications (Radix + Sonner)  
-✅ Tooltips acessíveis  
-✅ Animações (Framer Motion)  
 ✅ Ícones (Lucide React)  
-✅ Logos de tecnologias (React Icons + SVG custom)  
 ✅ Roteamento (React Router v6)  
-✅ Gerenciamento de dados (TanStack Query)  
 ✅ Linting e análise de código  
 ✅ **Code splitting** (React.lazy + Suspense)  
 
 ### Funcionalidades
-✅ **Seções completas** (Hero, About, Projects, Certificates, Contact, Footer)  
-✅ **Layout glassmorphism** com cards estilizados  
-✅ **Animações suaves** (Framer Motion) com hover effects  
+✅ **Seções completas** (Hero, Projects, Expertise, Experience, Contact, Footer)  
+✅ **Navegação com seção ativa** (`aria-current`)  
 ✅ **Contato** por e-mail (`mailto:` com assunto pronto)  
 ✅ **Footer com links sociais** (GitHub, LinkedIn, Email)  
 ✅ **Responsividade** mobile-first em todos os componentes  
@@ -277,8 +270,8 @@ Cada seção tem um `Suspense` com fallback de skeleton para melhor UX.
 ✅ Docker + Nginx como alternativa local
 
 ### Performance
-✅ **Code splitting** - Componentes pesados (Certificates, Projects, Contact) carregam sob demanda
-✅ **Loading skeletons** - Fallback visual durante carregamento de componentes
+✅ **Code splitting** - Seções abaixo da dobra (Projects, Expertise, Experience, Contact) carregam sob demanda
+✅ **Espaço reservado** - Altura mínima durante o carregamento das seções
 ✅ **Vite otimizado** - Build ultra-rápido com chunking automático  
 
 ## 🎯 Próximos Passos Sugeridos
