@@ -1,187 +1,80 @@
-﻿import profilePhotoDark from "@/assets/profile-photo-b.jpeg";
-import profilePhotoLight from "@/assets/profile-photo-w.png";
-import { Button } from "@/components/ui/button";
-import gsap from "gsap";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowDown, Download, Github, Linkedin, Mail, MapPin } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useLayoutEffect, useRef } from "react";
+﻿import AvailabilityBadge from "@/components/AvailabilityBadge";
+import { SOCIAL_LINKS } from "@/content/portfolio";
+import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
 
-const Hero = () => {
-  const { theme } = useTheme();
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 150]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -100]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-  const heroRef = useRef<HTMLElement | null>(null);
-  const textBlockRef = useRef<HTMLDivElement | null>(null);
-  const photoRef = useRef<HTMLDivElement | null>(null);
-  const buttonsRef = useRef<HTMLDivElement | null>(null);
+const HERO_LINKS = [
+  { label: "GitHub", href: SOCIAL_LINKS.github, external: true, Icon: ArrowUpRight },
+  { label: "LinkedIn", href: SOCIAL_LINKS.linkedin, external: true, Icon: ArrowUpRight },
+  { label: "Currículo (PDF)", href: SOCIAL_LINKS.resume, external: true, Icon: ArrowDown },
+  { label: "E-mail", href: SOCIAL_LINKS.email, external: false, Icon: ArrowUpRight },
+];
 
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-      const buttonItems = buttonsRef.current
-        ? (Array.from(buttonsRef.current.children) as HTMLElement[])
-        : [];
+/** Hero F: escuro monocromático, retrato P&B e nome com blend "difference" (spec 0003). */
+const Hero = () => (
+  <section id="inicio" tabIndex={-1} aria-labelledby="hero-title" className="surface-dark relative focus:outline-none overflow-hidden px-5 pb-16 pt-5 md:px-10 md:pb-20 lg:px-10 lg:pb-10 lg:pt-[calc(var(--nav-top-height)+1.5rem)]">
+    <p aria-hidden="true" className="ghost-word absolute inset-x-0 top-16 text-center font-display font-bold leading-none [font-size:36vw] lg:top-[calc(var(--nav-top-height)-1rem)] lg:[font-size:min(29vw,26rem)]">
+      SÂMIA
+    </p>
 
-      const targets = [textBlockRef.current, photoRef.current, ...buttonItems].filter(Boolean) as HTMLElement[];
+    <div className="relative mx-auto grid max-w-[90rem] grid-cols-1 items-center gap-6 md:gap-8 lg:grid-cols-[1fr_minmax(0,38rem)_1fr] lg:items-end lg:gap-x-8 lg:gap-y-0">
+      <div className="flex items-center justify-between lg:hidden">
+        <AvailabilityBadge short />
+        <a href="#projects" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/25 px-4 text-sm font-semibold text-white">
+          Ver projetos
+          <ArrowRight aria-hidden="true" className="h-4 w-4" />
+        </a>
+      </div>
 
-      gsap.set(targets, {
-        willChange: "transform, opacity",
-      });
-
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-      tl.fromTo(
-        textBlockRef.current,
-        {
-          opacity: 0,
-          x: isDesktop ? 240 : 0,
-          y: isDesktop ? 0 : 28,
-          scale: 0.97,
-        },
-        {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          scale: 1,
-          ease: "power2.out",
-          duration: 3,
-        },
-      )
-        .fromTo(
-          buttonItems,
-          {
-            opacity: 0,
-            y: 24,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            stagger: 0.5,
-          },
-            "+=0.15",
-          );
-    }, heroRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  const scrollToAbout = () => {
-    document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const scrollToContact = () => {
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  return (
-    <section id="inicio" tabIndex={-1} ref={heroRef} aria-labelledby="hero-title" role="region" className="relative min-h-screen flex items-center justify-center overflow-hidden py-20 lg:py-24">
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          style={{ y: y1 }}
-          className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          style={{ y: y2 }}
-          className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          style={{ y: y1, opacity }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-hero opacity-5 rounded-full blur-3xl"
+      <div className="mx-auto w-[min(80vw,19.5rem)] md:w-[26rem] lg:col-start-2 lg:row-start-1 lg:w-[min(100%,calc((100svh-15rem)*0.7776))]">
+        <img
+          src="/hero/portrait.webp"
+          alt="Retrato de Sâmia Luvanice sorrindo, de braços cruzados"
+          width={720}
+          height={926}
+          {...{ fetchpriority: "high" }}
+          decoding="async"
+          className="hero-portrait h-auto w-full"
         />
       </div>
 
-      <motion.div style={{ opacity }} className="container mx-auto px-6 lg:pr-0 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-6 items-center w-full">
-          <div ref={textBlockRef} className="lg:col-span-8 lg:pr-8 text-center lg:text-left order-2 lg:order-1">
-            <h1 id="hero-title" className="font-display text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-wide text-foreground/90">
-              Sâmia Luvanice
-            </h1>
+      <h1
+        id="hero-title"
+        className="hero-name relative z-10 -mt-[1em] text-center font-display font-bold uppercase leading-[0.88] tracking-[-0.03em] [font-size:calc((100vw-2.5rem)/4.3)] md:-mt-[0.6em] md:whitespace-nowrap md:[font-size:calc((100vw-5rem)/7.7)] lg:col-span-3 lg:row-start-2 lg:-mt-[0.6em] lg:[font-size:min(calc((100vw-5rem)/7.7),10.5rem)]"
+      >
+        <span className="block md:inline">Sâmia</span> <span className="block md:inline">Luvanice</span>
+      </h1>
 
-            <div className="origin-left h-px bg-primary/40 mt-4" />
-
-            <p className="text-base md:text-lg text-muted-foreground mt-6 max-w-2xl leading-relaxed">
-              Sou desenvolvedora de software que une criatividade a experiências digitais. Transformo ideias em produtos com foco em <span className="font-semibold">performance</span>, <span className="font-semibold">design</span> e <span className="font-semibold">qualidade de código</span>.
-            </p>
-
-            <div
-              ref={buttonsRef}
-              className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3"
-            >
-              <Button variant="outline" size="lg" asChild className="gap-2">
-                <a href="https://github.com/SamiaLuvanice" target="_blank" rel="noopener noreferrer">
-                  <Github className="w-5 h-5" />
-                  GitHub
-                </a>
-              </Button>
-
-              <Button variant="outline" size="lg" asChild className="gap-2">
-                <a href="https://linkedin.com/in/samialuvanice" target="_blank" rel="noopener noreferrer">
-                  <Linkedin className="w-5 h-5" />
-                  LinkedIn
-                </a>
-              </Button>
-
-              <Button variant="outline" size="lg" className="gap-2" onClick={scrollToContact}>
-                <Mail className="w-5 h-5" />
-                Email
-              </Button>
-
-              <Button
-                size="lg"
-                asChild
-                className="gap-2 bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all"
-              >
-                <a href="/curriculo.pdf" download="Curriculo-Samia-Luvanice.pdf">
-                  <Download className="w-5 h-5" />
-                  Currículo
-                </a>
-              </Button>
-            </div>
-          </div>
-
-          <motion.div
-            ref={photoRef}
-            style={{ y: y2 }}
-            className="lg:col-span-4 flex justify-center lg:justify-end order-1 lg:order-2 lg:-mt-16 xl:-mt-28 lg:translate-x-14 xl:translate-x-28"
-          >
-            <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-hero blur-2xl opacity-25 rounded-[2.75rem]" />
-              <div className="relative w-[340px] h-[430px] md:w-[420px] md:h-[540px] overflow-hidden border border-border/60 shadow-glow rounded-tl-none rounded-bl-[2.75rem] rounded-tr-none rounded-br-none">
-                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-background/20 z-10" />
-                <img
-                  src={theme === "dark" ? profilePhotoDark : profilePhotoLight}
-                  alt="Retrato de Sâmia Luvanice"
-                  loading="eager"
-                  decoding="async"
-                  className="w-full h-full object-cover scale-105"
-                />
-              </div>
-
-              <div className="absolute -bottom-3 -left-3 bg-card/95 backdrop-blur px-4 py-2 rounded-full shadow-card flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">Sobral, CE</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1 }}
-          onClick={scrollToAbout}
-          className="absolute -bottom-16 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-smooth"
+      <div className="flex flex-col gap-4 md:gap-5 lg:col-start-1 lg:row-start-1 lg:self-center lg:max-w-[22rem]">
+        <p className="font-display text-3xl font-medium leading-tight md:text-4xl lg:text-[2.75rem]">
+          Full Stack <br className="hidden lg:block" />
+          Developer
+        </p>
+        <p className="text-base text-muted-foreground md:text-lg">Aplicações web completas — da interface ao banco de dados.</p>
+        <a
+          href="#contact"
+          className="inline-flex min-h-12 w-full items-center justify-center gap-2 self-start rounded-full border border-transparent bg-primary px-6 font-semibold text-primary-foreground transition-colors hover:bg-primary-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--surface-dark))] md:w-auto"
         >
-          <span className="text-sm">Scroll</span>
-          <ArrowDown className="w-5 h-5 animate-bounce" />
-        </motion.button>
-      </motion.div>
-    </section>
-  );
-};
+          Vamos conversar
+          <ArrowRight aria-hidden="true" className="h-4 w-4" />
+        </a>
+      </div>
+
+      <ul aria-label="Links profissionais" className="hidden flex-wrap gap-2 md:flex lg:col-start-3 lg:row-start-1 lg:self-center lg:flex-col lg:items-end">
+        {HERO_LINKS.map(({ label, href, external, Icon }) => (
+          <li key={label}>
+            <a
+              href={href}
+              {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 px-4 text-sm text-white/90 transition-colors hover:border-white/50 hover:bg-white/10"
+            >
+              {label}
+              <Icon aria-hidden="true" className="h-4 w-4" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+);
 
 export default Hero;

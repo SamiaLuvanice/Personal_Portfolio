@@ -1,106 +1,31 @@
-import { motion } from "framer-motion";
-import { Github, Linkedin } from "lucide-react";
-import { buildMailtoHref } from "@/lib/contact";
+import AvailabilityBadge from "@/components/AvailabilityBadge";
+import { SOCIAL_LINKS } from "@/content/portfolio";
+import { ArrowUpRight } from "lucide-react";
 
-const Contact = () => {
-    const socialLinks = [
-        { href: "https://github.com/SamiaLuvanice", icon: Github, label: "GitHub", color: "hover:text-foreground" },
-        { href: "https://linkedin.com/in/samialuvanice", icon: Linkedin, label: "LinkedIn", color: "hover:text-[hsl(201,100%,35%)]" },
-    ];
-
-    const emailHref = buildMailtoHref();
-
-    return (
-        <section className="py-24">
-            <div className="container mx-auto px-6">
-                <div className="mx-auto max-w-6xl">
-                    <motion.div
-                        initial={{ opacity: 0, y: 16 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        viewport={{ once: true }}
-                        className="mb-10"
-                    >
-                        <h2 className="font-display text-4xl font-bold uppercase tracking-tight md:text-6xl">
-                            <span className="text-gradient">Contato</span>
-                        </h2>
-                        <div className="mt-5 h-px w-full bg-border/80" />
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-20">
-                        <motion.div
-                            initial={{ opacity: 0, x: -18 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                            viewport={{ once: true }}
-                            className="min-w-0 space-y-8"
-                        >
-                            <div>
-                                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                                    E-mail
-                                </p>
-                                <a
-                                    href={emailHref}
-                                    className="mt-3 inline-flex items-center gap-3 text-2xl font-medium tracking-tight transition-smooth hover:text-primary md:text-3xl"
-                                >
-                                    <span className="[overflow-wrap:anywhere]">samia.luvanice.dev@gmail.com</span>
-                                    <span aria-hidden="true">↗</span>
-                                </a>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, x: 18 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            viewport={{ once: true }}
-                            className="space-y-10 md:border-l md:border-border/80 md:pl-10"
-                        >
-                            <div>
-                                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                                    Redes sociais
-                                </p>
-                                <div className="mt-4 space-y-3">
-                                    {socialLinks.map((social, index) => (
-                                        <motion.a
-                                            key={social.label}
-                                            href={social.href}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            initial={{ opacity: 0, y: 10 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.35, delay: 0.22 + index * 0.08 }}
-                                            viewport={{ once: true }}
-                                            whileHover={{ x: 4 }}
-                                            className={`flex items-center gap-3 text-lg font-medium tracking-tight transition-smooth ${social.color}`}
-                                            title={social.label}
-                                        >
-                                            <span aria-hidden="true">↗</span>
-                                            <span>{social.label}</span>
-                                        </motion.a>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div>
-                                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                                    Currículo
-                                </p>
-                                <a
-                                    href="/curriculo.pdf"
-                                    download="Curriculo-Samia-Luvanice.pdf"
-                                    className="mt-3 inline-flex items-center gap-3 text-lg font-medium tracking-tight transition-smooth hover:text-primary"
-                                >
-                                    <span>download pdf</span>
-                                    <span aria-hidden="true">↗</span>
-                                </a>
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
-};
+/** Contato monocromático, espelhando o hero: o laranja fica só no botão (spec 0003). */
+const Contact = () => (
+  <section aria-labelledby="contact-title" className="surface-dark relative overflow-hidden px-5 pb-12 pt-20 md:px-10 md:pt-28 lg:px-20 lg:pt-36">
+    <p aria-hidden="true" className="ghost-word absolute inset-x-0 top-8 text-center font-display font-bold leading-none [font-size:24vw] lg:[font-size:min(21vw,19rem)]">
+      CONTATO
+    </p>
+    <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-6 text-center md:gap-8">
+      <AvailabilityBadge />
+      <h2 id="contact-title" className="font-display text-[2.5rem] font-bold uppercase leading-[0.98] tracking-tight md:text-6xl lg:text-8xl">
+        Vamos construir algo relevante?
+      </h2>
+      <p className="text-base text-muted-foreground md:text-lg">Aberta a oportunidades em desenvolvimento Full Stack.</p>
+      <a
+        href={SOCIAL_LINKS.email}
+        className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full border border-transparent bg-primary px-8 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--surface-dark))] sm:w-auto"
+      >
+        Iniciar conversa
+        <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+      </a>
+      <a href={SOCIAL_LINKS.email} className="inline-flex min-h-11 items-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline md:text-base [overflow-wrap:anywhere]">
+        {SOCIAL_LINKS.emailAddress}
+      </a>
+    </div>
+  </section>
+);
 
 export default Contact;

@@ -5,8 +5,8 @@ import { afterEach } from "vitest";
 // Sem globals do Vitest, a Testing Library não desmonta sozinha entre testes.
 afterEach(cleanup);
 
-// jsdom não implementa IntersectionObserver nem matchMedia, usados por
-// framer-motion (whileInView), GSAP e next-themes.
+// jsdom não implementa IntersectionObserver nem matchMedia; os stubs mantêm
+// componentes de ui/ e hooks de layout funcionando nos testes.
 class IntersectionObserverStub {
   observe() {}
   unobserve() {}

@@ -1,50 +1,58 @@
-import { lazy, Suspense } from "react";
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import About from "@/components/About";
+import { lazy, Suspense, useEffect } from "react";
 import Footer from "@/components/Footer";
-import { Skeleton } from "@/components/ui/skeleton";
+import Hero from "@/components/Hero";
+import Navbar from "@/components/Navbar";
 
-// Code splitting: componentes carregados sob demanda
-const Certificates = lazy(() => import("@/components/Certificates"));
-const Projects = lazy(() => import("@/components/Projects"));
-const Contact = lazy(() => import("@/components/Contact"));
+// Seções abaixo da dobra em chunks próprios: mantêm o primeiro render leve (LCP do retrato).
+const loaders = {
+  projects: () => import("@/components/Projects"),
+  expertise: () => import("@/components/Expertise"),
+  experience: () => import("@/components/Experience"),
+  contact: () => import("@/components/Contact"),
+};
 
-const LoadingFallback = () => (
-  <div className="space-y-4 py-24">
-    <Skeleton className="h-12 w-full" />
-    <Skeleton className="h-64 w-full" />
-  </div>
-);
+const SECTIONS = [
+  { id: "projects", Component: lazy(loaders.projects), minHeight: "min-h-[60rem]" },
+  { id: "expertise", Component: lazy(loaders.expertise), minHeight: "min-h-[40rem]" },
+  { id: "experience", Component: lazy(loaders.experience), minHeight: "min-h-[20rem]" },
+  { id: "contact", Component: lazy(loaders.contact), minHeight: "min-h-[30rem]" },
+];
 
 const Index = () => {
-    return (
-        <div className="portfolio-page min-h-screen bg-background">
-            <Navbar />
-            <Hero />
-            <About />
+  // Numa SPA o navegador tenta rolar até o fragmento antes de a seção existir. Depois que os
+  // chunks carregam e as seções montam com a altura real, refaz a rolagem até o destino.
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (!id) return;
+    let cancelled = false;
+    Promise.all(Object.values(loaders).map((load) => load())).then(() => {
+      window.requestAnimationFrame(() =>
+        window.requestAnimationFrame(() => {
+          if (!cancelled && window.location.hash.slice(1) === id) document.getElementById(id)?.scrollIntoView();
+        }),
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-            <div id="certificates" tabIndex={-1}>
-                <Suspense fallback={<LoadingFallback />}>
-                    <Certificates />
-                </Suspense>
-            </div>
-
-            <div id="projects" tabIndex={-1}>
-                <Suspense fallback={<LoadingFallback />}>
-                    <Projects />
-                </Suspense>
-            </div>
-
-            <div id="contact" tabIndex={-1}>
-                <Suspense fallback={<LoadingFallback />}>
-                    <Contact />
-                </Suspense>
-            </div>
-
-            <Footer />
-        </div>
-    );
+  return (
+    <div className="portfolio-page min-h-screen bg-[hsl(var(--surface-dark))]">
+      <Navbar />
+      <main>
+        <Hero />
+        {SECTIONS.map(({ id, Component, minHeight }) => (
+          <div key={id} id={id} tabIndex={-1} className="focus:outline-none">
+            <Suspense fallback={<div className={minHeight} />}>
+              <Component />
+            </Suspense>
+          </div>
+        ))}
+      </main>
+      <Footer />
+    </div>
+  );
 };
 
 export default Index;
