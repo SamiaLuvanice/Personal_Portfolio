@@ -18,23 +18,50 @@ const SECTIONS = [
   { id: "contact", Component: lazy(loaders.contact), minHeight: "min-h-[30rem]" },
 ];
 
+/** Sinais de que a pessoa assumiu a rolagem (inclui arrastar a barra de rolagem). */
+const USER_SCROLL_EVENTS = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+
 const Index = () => {
   // Numa SPA o navegador tenta rolar até o fragmento antes de a seção existir. Depois que os
-  // chunks carregam e as seções montam com a altura real, refaz a rolagem até o destino.
+  // chunks carregam, refaz a rolagem até o destino a cada mudança de altura da página (as seções
+  // montam em momentos diferentes), por até 2 s ou até a pessoa rolar por conta própria.
   useEffect(() => {
-    const id = decodeURIComponent(window.location.hash.slice(1));
-    if (!id) return;
-    let cancelled = false;
-    Promise.all(Object.values(loaders).map((load) => load())).then(() => {
-      window.requestAnimationFrame(() =>
-        window.requestAnimationFrame(() => {
-          if (!cancelled && window.location.hash.slice(1) === id) document.getElementById(id)?.scrollIntoView();
-        }),
-      );
-    });
-    return () => {
-      cancelled = true;
+    const currentId = () => {
+      try {
+        return decodeURIComponent(window.location.hash.slice(1));
+      } catch {
+        return ""; // fragmento malformado (ex.: "#%"): não há destino
+      }
     };
+    const id = currentId();
+    if (!id) return;
+    let done = false;
+    let observer: ResizeObserver | null = null;
+    let timer = 0;
+    const realign = () => {
+      // "instant": o realinhamento não pode virar uma animação recomeçada a cada mudança de altura.
+      if (!done && currentId() === id) document.getElementById(id)?.scrollIntoView({ behavior: "instant" });
+    };
+    const stop = () => {
+      done = true;
+      observer?.disconnect();
+      window.clearTimeout(timer);
+      for (const type of USER_SCROLL_EVENTS) window.removeEventListener(type, stop);
+    };
+    for (const type of USER_SCROLL_EVENTS) window.addEventListener(type, stop, { passive: true });
+    Promise.all(Object.values(loaders).map((load) => load()))
+      .then(() => {
+      if (done) return;
+      window.requestAnimationFrame(realign);
+      if (typeof ResizeObserver !== "undefined") {
+        observer = new ResizeObserver(realign);
+        observer.observe(document.body);
+      }
+      timer = window.setTimeout(stop, 2000);
+      })
+      // Falha de rede num chunk: o Suspense da seção trata; aqui só não há realinhamento.
+      .catch(stop);
+    return stop;
   }, []);
 
   return (
