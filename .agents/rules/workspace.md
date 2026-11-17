@@ -14,6 +14,8 @@ pessoas da comunidade: primeira impressão, acessibilidade, desempenho e SEO sã
 - Processo: `git.md`. Portões: skill `quality-gates`. Fluxo de spec: skill `spec-driven`.
 - Design: preserve a identidade atual (tokens em `src/index.css` e `tailwind.config.ts`); as skills
   `frontend-design`, `impeccable` e `shadcn` apoiam, sem autorizar redesign não pedido.
+- Figma: trabalhe sempre no Figma aberto no Chrome desta máquina Windows local, com a sessão já
+  autenticada; não use ambiente remoto, nuvem ou outra máquina para abrir ou editar os arquivos.
 
 Identificadores em inglês; documentação, commits e textos de interface em português. Segredos só por
 variável de ambiente (local em `.env`, produção na Vercel).
