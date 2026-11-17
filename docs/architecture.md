@@ -21,8 +21,11 @@ flowchart LR
   ficam em contêineres persistentes de `Index.tsx`, disponíveis enquanto o conteúdo dessas seções é
   carregado sob demanda.
 - **Imagens e fontes** — Imagens dos projetos em WebP (`public/projects/`), preguiçosas. O retrato
-  (`public/hero/portrait.webp`) é a imagem do LCP e é pré-carregado no `index.html`, assim como as
-  fontes do Google, que entram por `preload` com troca no `onload` para não bloquear a renderização.
+  (`public/hero/portrait.webp`) é a imagem do LCP e é o único recurso pré-carregado no `index.html`.
+  Sora e Space Grotesk vêm do próprio domínio (`@fontsource-variable/sora` e
+  `@fontsource-variable/space-grotesk`, importados em `src/fonts.ts`); `src/main.tsx` carrega esse
+  módulo por import dinâmico depois do evento `load`, e o texto troca da fonte do sistema com
+  `font-display: swap`. Não há fontes do Google, `preconnect` nem `preload` de fontes.
 - **Sem backend:** o contato é um link `mailto:` com assunto e corpo prontos, montado por
   `src/lib/contact.ts`. O projeto não tem funções serverless nem variáveis de ambiente. A antiga
   API de contato (Resend) foi removida no PR #2 por não ser usada pela interface; a versão endurecida
@@ -36,22 +39,31 @@ flowchart LR
 |---|---|
 | Build | `npm run build` → `dist/` (`vercel.json`) |
 | Fallback da SPA | rewrite de todas as rotas para `/index.html` (arquivos estáticos têm precedência) |
-| Cabeçalhos | `nosniff`, `Referrer-Policy`, `X-Frame-Options: DENY`, `Permissions-Policy`, HSTS; cache imutável em `/assets/*` |
+| Cabeçalhos | `nosniff`, `Referrer-Policy`, `X-Frame-Options: DENY`, `Permissions-Policy`, HSTS; cache imutável em `/assets/*`; 7 dias (`max-age=604800, stale-while-revalidate=86400`) em `/hero/*`, `/projects/*` e `/og-image.jpg` |
 | Preview | um por PR (integração Git da Vercel) |
 | Produção | merge em `main` → https://samialuvanicedev.vercel.app |
 | Node | 22.x (`engines` e `.nvmrc`) |
+
+Imagens de `public/` não têm hash no nome: imagem substituída ganha nome novo (e a referência é
+atualizada), ou a versão antiga pode ser servida do cache por até 7 dias.
 
 O GitHub Actions apenas valida (`.github/workflows/ci.yml`); não publica nada.
 
 ### Alternativa: Docker (local ou servidor próprio)
 
 `docker compose up --build` gera o build e o serve com nginx na porta 8080 (`Dockerfile`,
-`nginx.conf`), com fallback da SPA.
+`nginx.conf`), com fallback da SPA. O `nginx.conf` não replica os cabeçalhos de segurança nem de
+cache do `vercel.json`.
 
 ## SEO técnico
 
 Metadados em `index.html` (title, description, canonical, Open Graph, Twitter), `public/robots.txt` com
-`Sitemap:` e `public/sitemap.xml` com a URL de produção. Pendente: imagem `og:image`.
+`Sitemap:` e `public/sitemap.xml` com a URL de produção.
+
+Prévia de link: `public/og-image.jpg` (1200 × 630, JPEG) é gerada do hero do build por
+`node scripts/generate-og-image.mjs` (rode depois de `npm run build`). O `index.html` declara
+`og:image` com largura, altura, tipo e texto alternativo, `twitter:card` `summary_large_image` e
+`twitter:image` com texto alternativo.
 
 ## Qualidade
 

@@ -30,3 +30,21 @@ marca em texto passa por `color-mix` com preto ou branco (classe `.tech-badge`),
 **Referências:** `e2e/portfolio.spec.ts`. A classe `.tech-badge` e o `src/components/About.tsx`
 saíram no redesign da spec 0003, junto com as animações de GSAP e Framer Motion; o princípio de rolar
 a página antes do axe continua no e2e.
+
+## 2026-11-17 — Lighthouse simulado conta no FCP o que é pedido antes do primeiro paint
+
+**Contexto:** na spec 0004, as fontes passaram a vir do próprio domínio importadas no CSS principal.
+Os `.woff2` eram descobertos junto com o retrato do hero e, no Lighthouse simulado (Lantern), o FCP
+subiu de 1,5 para 1,9 s e o LCP de 2,1 para 2,4 s. Com throttling real
+(`--settings.throttlingMethod=devtools`), a mesma branch ficou melhor que a `main` (LCP de 2,40 a
+2,74 s contra 3,10 a 3,45 s).
+
+**Princípio:** no modo simulado, todo recurso pedido antes do primeiro paint observado entra no grafo
+do FCP. Recurso que não precisa estar pronto no primeiro paint (como fontes com `font-display: swap`)
+é pedido depois do evento `load`, por import dinâmico. Divergência entre o simulado e o real se
+confirma com `throttlingMethod=devtools` antes de concluir.
+
+**Anti-pattern:** importar fontes no CSS principal ou pré-carregá-las competindo com a imagem do LCP;
+tirar conclusão de desempenho de uma única medição simulada.
+
+**Referências:** `src/fonts.ts`, `src/main.tsx`, `specs/0004-pendencias-pos-redesign/plan.md`.

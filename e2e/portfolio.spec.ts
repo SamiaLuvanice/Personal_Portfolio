@@ -1,4 +1,5 @@
 /// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
 
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
@@ -69,6 +70,58 @@ test("metadados de SEO descrevem a Full Stack Developer", async ({ page }) => {
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /^https:\/\//);
 });
 
+test("prévia de link usa imagem grande de 1200 × 630 com texto alternativo (spec 0004)", async ({ page, request }) => {
+  await page.goto("/");
+  const meta = (selector: string) =>
+    page.evaluate((target) => document.querySelector(target)?.getAttribute("content") ?? null, selector);
+  const image = await meta('meta[property="og:image"]');
+  expect(image).toMatch(/^https:\/\/samialuvanicedev\.vercel\.app\/og-image\.jpg$/);
+  expect(await meta('meta[property="og:image:width"]')).toBe("1200");
+  expect(await meta('meta[property="og:image:height"]')).toBe("630");
+  expect(await meta('meta[property="og:image:type"]')).toBe("image/jpeg");
+  expect(await meta('meta[property="og:image:alt"]')).toMatch(/Sâmia Luvanice.*Full Stack Developer/);
+  expect(await meta('meta[name="twitter:card"]')).toBe("summary_large_image");
+  expect(await meta('meta[name="twitter:image"]')).toBe(image);
+  expect(await meta('meta[name="twitter:image:alt"]')).toMatch(/Sâmia Luvanice/);
+
+  const response = await request.get("/og-image.jpg");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toBe("image/jpeg");
+  expect((await response.body()).length).toBeLessThanOrEqual(300 * 1024);
+  const size = await page.evaluate(async () => {
+    const image = new Image();
+    image.src = "/og-image.jpg";
+    await image.decode();
+    return [image.naturalWidth, image.naturalHeight];
+  });
+  expect(size).toEqual([1200, 630]);
+});
+
+test("fontes vêm do próprio site, sem serviço de terceiros (spec 0004)", async ({ page }) => {
+  // Qualquer requisição de fonte (ou da folha de estilo do serviço) precisa ser da mesma origem.
+  const fonts: string[] = [];
+  page.on("request", (req) => {
+    if (req.resourceType() === "font" || /fonts\.(googleapis|gstatic)\.com/.test(req.url())) fonts.push(req.url());
+  });
+  await page.goto("/");
+  await loadAllSections(page);
+  // As fontes entram depois do evento load; espera as duas faces carregarem.
+  await expect
+    .poll(() =>
+      page.evaluate(() => [...document.fonts].filter((face) => face.status === "loaded").map((face) => face.family.replace(/"/g, ""))),
+    )
+    .toEqual(expect.arrayContaining(["Sora Variable", "Space Grotesk Variable"]));
+  const origin = new URL(page.url()).origin;
+  expect(fonts.length).toBeGreaterThan(0);
+  expect(fonts.filter((url) => new URL(url).origin !== origin)).toEqual([]);
+  const families = await page.evaluate(() => ({
+    body: getComputedStyle(document.body).fontFamily,
+    title: getComputedStyle(document.querySelector("h1")!).fontFamily,
+  }));
+  expect(families.body).toMatch(/^"?Sora/);
+  expect(families.title).toMatch(/^"?Space Grotesk/);
+});
+
 test("hero leva ao Contato e mostra os links profissionais no desktop", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("#inicio");
@@ -91,7 +144,8 @@ test("cards abrem cada projeto em nova aba e o filtro separa autorais de comerci
   await page.goto("/#projects");
   const list = page.getByRole("list", { name: "Projetos" });
   const hrefs = () => list.getByRole("link").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
-  expect(await hrefs()).toEqual([
+  // A seção monta sob demanda e o filtro re-renderiza: lê de novo até estabilizar.
+  await expect.poll(hrefs).toEqual([
     "https://bestprice-stage.pages.dev/",
     "https://studynice.vercel.app/",
     "https://www.soundhouse.com.br/",
@@ -100,12 +154,12 @@ test("cards abrem cada projeto em nova aba e o filtro separa autorais de comerci
   for (const link of await list.getByRole("link").all()) await expect(link).toHaveAttribute("target", "_blank");
 
   await page.getByRole("button", { name: "Autorais" }).click();
-  expect(await hrefs()).toEqual(["https://bestprice-stage.pages.dev/", "https://studynice.vercel.app/"]);
+  await expect.poll(hrefs).toEqual(["https://bestprice-stage.pages.dev/", "https://studynice.vercel.app/"]);
   await expect(page.getByRole("status").filter({ hasText: "projetos autorais" })).toHaveText("2 projetos autorais");
   await page.getByRole("button", { name: "Comerciais" }).click();
-  expect(await hrefs()).toEqual(["https://www.soundhouse.com.br/", "https://lopestech.abeesys.com/"]);
+  await expect.poll(hrefs).toEqual(["https://www.soundhouse.com.br/", "https://lopestech.abeesys.com/"]);
   await page.getByRole("button", { name: "Todos" }).click();
-  expect(await hrefs()).toHaveLength(4);
+  await expect.poll(hrefs).toHaveLength(4);
 
   await expect(page.getByRole("link", { name: /Mais no GitHub/ })).toHaveAttribute("href", "https://github.com/SamiaLuvanice");
 });
@@ -350,12 +404,10 @@ test("com movimento reduzido, abrir um item da Expertise não anima a altura", a
 test("foco de teclado não fica inteiramente escondido sob a barra fixa (WCAG 2.4.11)", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await page.goto("/");
-  // As fontes carregam sem bloquear; espera para medir o layout final.
-  await page.waitForFunction(async () => {
-    const sheet = document.querySelector('link[rel="stylesheet"][href*="fonts.googleapis"]');
-    await document.fonts.ready;
-    return Boolean(sheet) && document.fonts.status === "loaded" && document.fonts.check('700 16px "Space Grotesk"');
-  });
+  // As fontes usam font-display: swap; espera a fonte de título carregar para medir o layout final.
+  await page.waitForFunction(() =>
+    [...document.fonts].some((face) => face.family.includes("Space Grotesk") && face.status === "loaded"),
+  );
   const nav = page.getByRole("navigation", { name: "Navegação principal" });
   // Chega a cada alvo pelo Tab, como faria quem navega pelo teclado.
   const footer = page.getByRole("contentinfo");

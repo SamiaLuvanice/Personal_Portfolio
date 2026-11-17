@@ -110,6 +110,7 @@ npm run dev            # http://localhost:8080
 | `npm run test:e2e` | Playwright + axe contra o build (instale antes: `npx playwright install chromium`) |
 | `npm run lighthouse` | Lighthouse CI sobre `dist/` (rode `npm run build` antes) |
 | `npm run check` | Todos os portões de `harness.yaml` |
+| `node scripts/generate-og-image.mjs` | Gera `public/og-image.jpg` (prévia de link, 1200 × 630) a partir do hero (rode `npm run build` antes) |
 
 ## Docker (alternativa local/self-host)
 
@@ -241,7 +242,8 @@ enquanto o chunk carrega.
 ### Imagens e fontes
 - Retrato do Hero em `public/hero/portrait.webp`, pré-carregado no `index.html` (imagem do LCP)
 - Imagens dos projetos em WebP, preguiçosas
-- Fontes do Google com `preload` e troca no `onload`, sem bloquear a renderização
+- Sora e Space Grotesk servidas pelo próprio domínio (`@fontsource-variable`, em `src/fonts.ts`), carregadas por import dinâmico depois do evento `load`, com `font-display: swap`
+- Retrato, capturas dos projetos e `og-image.jpg` com cache de 7 dias (`vercel.json`); imagem substituída ganha nome novo
 
 **Arquivo:** [src/pages/Index.tsx](src/pages/Index.tsx)
 
@@ -280,7 +282,7 @@ enquanto o chunk carrega.
 - [x] Otimizar SEO (canonical, Open Graph, sitemap.xml, robots.txt)
 - [x] Adicionar testes unitários (Vitest)
 - [x] Adicionar testes E2E (Playwright + axe)
-- [ ] Imagem Open Graph (`og:image`) para prévias em redes sociais
+- [x] Imagem Open Graph (`og:image`) para prévias em redes sociais
 - [ ] Adicionar suporte a múltiplos idiomas (i18n)
 - [x] Melhorar tratamento de erros no backend
 - [x] Adicionar validação mais robusta no servidor
