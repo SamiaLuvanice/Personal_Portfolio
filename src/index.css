@@ -53,7 +53,7 @@
   line-gap-override: 0%;
 }
 
-/* Nome do hero e marca d'água: só maiúsculas, mais largas no fallback que o texto misto. O nome vai
+/* Nome do hero: só maiúsculas, mais largas no fallback que o texto misto. O nome vai
    de borda a borda, então o ajuste segue "LUVANICE" (a linha mais longa), com 0,3% de folga. */
 @font-face {
   font-family: "Space Grotesk Hero Fallback";
@@ -287,16 +287,205 @@
     }
   }
 
-  /* Hero: nome com blend "difference" sobre o retrato; sem suporte, branco sólido. */
-  .hero-name {
-    color: white;
-    mix-blend-mode: difference;
+  /* Hero Liquid Aurora (spec 0006): monocromático por padrão, cor pela interação.
+     A primeira pintura é só fundo, foto e texto. A aurora e as cópias coloridas da foto entram
+     depois do carregamento (`data-motion="on"`, ver useHeroMotion), com imagens pequenas
+     pré-renderizadas (scripts/generate-hero-aurora.mjs). Três modos:
+     - ponteiro (hover fino, sem movimento reduzido): a cor aparece numa máscara radial que segue
+       --mx/--my/--px/--py, gravadas pelo JS;
+     - ambiente (sem hover): dois focos fixos, já recortados nas imagens, alternam por opacidade;
+     - estático (movimento reduzido): só o foco A, fixo e discreto.
+     Só transform e opacity são animados, para rodar no compositor. */
+  .hero {
+    --color-idle: 0.06;
+    --photo-color-idle: 0.05;
+    --reveal-r: min(34svh, 22rem);
+    --photo-r: calc(var(--reveal-r) * 0.72);
   }
 
+  .hero-name {
+    color: hsl(280 20% 95%);
+  }
+
+  /* A apresentação pode passar sobre a revelação colorida e sobre a base da foto: um halo escuro
+     suave garante o contraste AA nos piores pontos medidos (spec 0006, verification.md). */
+  .hero-intro {
+    max-width: 30rem;
+  }
+
+  .hero-intro p {
+    text-shadow: 0 1px 14px hsl(var(--surface-dark) / 0.85);
+  }
+
+  /* Desktop: a foto nunca invade o bloco de texto. O centro dela fica no maior valor entre a posição
+     do Figma (50% + 11vw) e a borda do texto + folga + metade da largura da foto (altura × 720/958/2). */
+  @media (min-width: 1024px) {
+    .hero {
+      --hero-h: max(40rem, 100svh);
+      --intro-w: 22rem;
+      --photo-scale: 0.85;
+    }
+
+    .hero-intro {
+      max-width: var(--intro-w);
+    }
+
+    .hero-photo {
+      height: calc(var(--hero-h) * var(--photo-scale));
+      left: max(calc(50% + 11vw), calc(2.5rem + var(--intro-w) + 2rem + var(--hero-h) * var(--photo-scale) * 0.3758));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .hero {
+      --intro-w: 30rem;
+      --photo-scale: 0.95;
+    }
+  }
+
+  @supports (-webkit-text-stroke: 1px) {
+    .hero-name-outline {
+      color: transparent;
+      -webkit-text-stroke: max(1px, 0.006em) hsl(280 20% 95% / 0.92);
+    }
+  }
+
+  .hero-aurora,
+  .hero-aurora-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero-aurora {
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 1.2s ease-out;
+  }
+
+  /* Overscan de 6% para a deriva nunca mostrar a borda da imagem. */
+  .hero-aurora-image {
+    position: absolute;
+    inset: -6%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+
+  /* A base da foto se funde ao fundo com uma máscara estática em cada imagem (rasterizada uma vez).
+     Não ponha a máscara no contêiner: com filhos animados, o compositor a recompõe a cada quadro.
+     Exceção consciente: no modo ponteiro (só desktop) a camada colorida mascarada tem a imagem em
+     deriva, para não desalinhar da camada mono; o custo só existe enquanto a revelação está ativa. */
   .hero-portrait {
-    filter: grayscale(1) contrast(1.15);
-    -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 46%, black 62%, transparent 100%);
-    mask-image: radial-gradient(ellipse 50% 50% at 50% 46%, black 62%, transparent 100%);
+    filter: grayscale(1) contrast(1.08);
+    -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 97%);
+    mask-image: linear-gradient(to bottom, #000 72%, transparent 97%);
+  }
+
+  .hero-portrait-color {
+    display: none;
+    opacity: var(--photo-color-idle);
+    transition: opacity 0.9s ease-out;
+    -webkit-mask-image: radial-gradient(circle var(--photo-r) at var(--px, 60%) var(--py, 24%), #000 0%, rgb(0 0 0 / 0.8) 45%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 97%);
+    mask-image: radial-gradient(circle var(--photo-r) at var(--px, 60%) var(--py, 24%), #000 0%, rgb(0 0 0 / 0.8) 45%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 97%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+
+  .hero-portrait-color-alt {
+    -webkit-mask-image: radial-gradient(circle var(--photo-r) at 30% 56%, #000 0%, rgb(0 0 0 / 0.8) 45%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 97%);
+    mask-image: radial-gradient(circle var(--photo-r) at 30% 56%, #000 0%, rgb(0 0 0 / 0.8) 45%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 97%);
+  }
+
+  .hero-aurora-color {
+    opacity: var(--color-idle);
+    transition: opacity 0.9s ease-out;
+  }
+
+  /* Depois do carregamento: a aurora aparece e as imagens são pedidas. */
+  .hero[data-motion="on"] .hero-aurora {
+    opacity: 1;
+  }
+
+  .hero[data-motion="on"] .hero-portrait-color {
+    display: block;
+  }
+
+  .hero[data-motion="on"] .hero-aurora-mono .hero-aurora-image {
+    background-image: url("/hero/aurora-mono.webp");
+  }
+
+  .hero[data-motion="on"] .hero-aurora-color .hero-aurora-image {
+    background-image: url("/hero/aurora-color-a.webp");
+  }
+
+  .hero[data-motion="on"] .hero-aurora-color-alt .hero-aurora-image {
+    background-image: url("/hero/aurora-color-b.webp");
+  }
+
+  /* Com hover fino: o foco B não existe; preto e branco até o ponteiro entrar. */
+  @media (hover: hover) and (pointer: fine) {
+    .hero {
+      --color-idle: 0;
+      --photo-color-idle: 0;
+    }
+
+    .hero-aurora-color-alt,
+    .hero-portrait-color-alt {
+      display: none !important;
+    }
+  }
+
+  /* Modo ponteiro: a aurora colorida inteira, recortada pela máscara que segue o ponteiro. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .hero[data-motion="on"] .hero-aurora-color .hero-aurora-image {
+      background-image: url("/hero/aurora-color.webp");
+    }
+
+    .hero-aurora-color {
+      -webkit-mask-image: radial-gradient(circle var(--reveal-r) at var(--mx, 70%) var(--my, 32%), #000 0%, rgb(0 0 0 / 0.75) 40%, transparent 100%);
+      mask-image: radial-gradient(circle var(--reveal-r) at var(--mx, 70%) var(--my, 32%), #000 0%, rgb(0 0 0 / 0.75) 40%, transparent 100%);
+    }
+
+    .hero[data-reveal="true"] .hero-aurora-color,
+    .hero[data-reveal="true"] .hero-portrait-color {
+      opacity: 1;
+      transition-duration: 0.6s;
+    }
+  }
+
+  /* Deriva contínua e lenta, nunca com movimento reduzido. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero[data-motion="on"] .hero-aurora-image {
+      will-change: transform;
+      animation: aurora-drift 24s ease-in-out infinite alternate;
+    }
+  }
+
+  /* Modo ambiente (sem hover): os focos A e B alternam devagar, em antifase. O B começa meio ciclo
+     adiantado (atraso negativo); não salta porque a aurora inteira entra com esmaecimento. */
+  @media (prefers-reduced-motion: no-preference) and (hover: none), (prefers-reduced-motion: no-preference) and (pointer: coarse) {
+    .hero[data-motion="on"] .hero-aurora-color {
+      animation: ambient-aurora 6s ease-in-out infinite alternate;
+    }
+
+    .hero[data-motion="on"] .hero-portrait-color {
+      animation: ambient-photo 6s ease-in-out infinite alternate;
+    }
+
+    .hero[data-motion="on"] .hero-aurora-color-alt,
+    .hero[data-motion="on"] .hero-portrait-color-alt {
+      animation-delay: -6s;
+    }
+  }
+
+  .hero[data-paused="true"] .hero-aurora-image,
+  .hero[data-paused="true"] .hero-aurora-color,
+  .hero[data-paused="true"] .hero-portrait-color {
+    animation-play-state: paused;
+  }
+
+  .hero-enter {
+    animation: hero-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms) both;
   }
 
   .ghost-word {
@@ -330,9 +519,15 @@
       color: LinkText;
     }
 
-    .hero-name {
-      mix-blend-mode: normal;
+    .hero-name,
+    .hero-name-outline {
       color: CanvasText;
+      -webkit-text-stroke: 0;
+    }
+
+    .hero-aurora,
+    .hero-portrait-color {
+      display: none !important;
     }
 
     .ghost-word {
@@ -358,5 +553,57 @@
     .project-card-image {
       transition-property: filter;
     }
+
+    /* Hero estático: nada se move, toque fixo e discreto de cor (só o foco A), conteúdo já visível. */
+    .hero-enter {
+      animation: none;
+    }
+
+    .hero {
+      --color-idle: 0.35;
+      --photo-color-idle: 0.3;
+    }
+
+    .hero-aurora-color-alt,
+    .hero-portrait-color-alt {
+      display: none !important;
+    }
+
+    .hero-aurora,
+    .hero-aurora-color,
+    .hero-portrait-color {
+      transition: none;
+    }
+  }
+}
+
+@keyframes ambient-aurora {
+  to {
+    opacity: 0.6;
+  }
+}
+
+@keyframes ambient-photo {
+  to {
+    opacity: 0.42;
+  }
+}
+
+@keyframes aurora-drift {
+  33% {
+    transform: translate3d(2.5%, -1.5%, 0) scale(1.03) rotate(0.6deg);
+  }
+  66% {
+    transform: translate3d(-2%, 2%, 0) scale(0.98) rotate(-0.4deg);
+  }
+  100% {
+    transform: translate3d(1.5%, 1%, 0) scale(1.04);
+  }
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
 }

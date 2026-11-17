@@ -173,21 +173,24 @@ test("com a fonte do sistema, o nome do hero cabe e mantém o tamanho (spec 0005
   }
 });
 
-test("hero leva ao Contato e mostra os links profissionais no desktop", async ({ page }) => {
+test("hero leva a Projetos e ao Contato e mostra os links profissionais (spec 0006)", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("#inicio");
   await expect(hero.getByText("Full Stack Developer")).toBeVisible();
-  await hero.getByRole("link", { name: "Vamos conversar" }).click();
+  await expect(hero.getByText(/Transformo ideias em aplicações web completas/)).toBeVisible();
+  await expect(hero.getByRole("link", { name: "Explorar projetos" })).toHaveAttribute("href", "#projects");
+  await hero.getByRole("link", { name: "Entrar em contato" }).click();
   await expect(page).toHaveURL(/#contact$/);
 
   const links = hero.getByRole("list", { name: "Links profissionais" });
-  if (isDesktop(page)) {
-    await expect(links.getByRole("link", { name: /GitHub/ })).toHaveAttribute("href", "https://github.com/SamiaLuvanice");
-    await expect(links.getByRole("link", { name: /LinkedIn/ })).toHaveAttribute("href", "https://www.linkedin.com/in/samialuvanice/");
-    await expect(links.getByRole("link", { name: /Currículo/ })).toHaveAttribute("href", "/curriculo.pdf");
-    await expect(links.getByRole("link", { name: /E-mail/ })).toHaveAttribute("href", /^mailto:samia\.luvanice\.dev@gmail\.com/);
-  } else {
-    await expect(links).toBeHidden();
+  await expect(links.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", "https://github.com/SamiaLuvanice");
+  await expect(links.getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", "https://www.linkedin.com/in/samialuvanice/");
+  await expect(links.getByRole("link", { name: "Currículo (PDF)" })).toHaveAttribute("href", "/curriculo.pdf");
+  await expect(links.getByRole("link", { name: "E-mail" })).toHaveAttribute("href", /^mailto:samia\.luvanice\.dev@gmail\.com/);
+  for (const link of await links.getByRole("link").all()) {
+    await link.scrollIntoViewIfNeeded();
+    const box = (await link.boundingBox())!;
+    expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(44);
   }
 });
 
@@ -236,7 +239,7 @@ test("imagens dos cards: P&B com ponteiro e cor no hover e no foco; coloridas em
 test("imagens fora da dobra são preguiçosas e não competem com o retrato do hero", async ({ page }) => {
   await page.goto("/");
   await loadAllSections(page);
-  const portrait = page.locator("#inicio img");
+  const portrait = page.getByRole("img", { name: /Retrato de Sâmia Luvanice/ });
   await expect(portrait).toHaveAttribute("fetchpriority", "high");
   expect(await portrait.getAttribute("loading")).not.toBe("lazy");
   const below = page.locator("#projects img, #expertise img");
@@ -250,7 +253,7 @@ test("imagens fora da dobra são preguiçosas e não competem com o retrato do h
   });
   await page.goto("/");
   await expect.poll(() => requests.length).toBeGreaterThan(0);
-  expect(requests[0]).toMatch(/\/hero\/portrait\.webp$/);
+  expect(requests[0]).toMatch(/\/hero\/portrait-2026\.webp$/);
 });
 
 test("expertise: primeiro item aberto, vários abertos e controle por teclado", async ({ page }) => {
@@ -378,10 +381,14 @@ test("no celular, as áreas de toque têm pelo menos 44 × 44 px", async ({ page
 test("retrato e screenshots têm texto alternativo; marcas d'água ficam ocultas", async ({ page }) => {
   await page.goto("/");
   await loadAllSections(page);
-  for (const image of await page.locator("img").all()) {
+  for (const image of await page.locator("img:not([aria-hidden='true'])").all()) {
     expect((await image.getAttribute("alt"))?.length ?? 0).toBeGreaterThan(10);
   }
-  for (const word of ["SÂMIA", "CONTATO"]) {
+  // A cópia colorida do retrato (spec 0006) é decorativa: alt vazio e oculta.
+  for (const image of await page.locator("img[aria-hidden='true']").all()) {
+    await expect(image).toHaveAttribute("alt", "");
+  }
+  for (const word of ["CONTATO"]) {
     await expect(page.getByText(word, { exact: true })).toHaveAttribute("aria-hidden", "true");
   }
 });
@@ -463,7 +470,7 @@ test("foco de teclado não fica inteiramente escondido sob a barra fixa (WCAG 2.
   // Chega a cada alvo pelo Tab, como faria quem navega pelo teclado.
   const footer = page.getByRole("contentinfo");
   const steps = [
-    { name: "Todos", before: page.locator("#inicio").getByRole("link", { name: "Vamos conversar" }), target: page.getByRole("button", { name: "Todos" }) },
+    { name: "Todos", before: page.locator("#inicio").getByRole("link", { name: "E-mail" }), target: page.getByRole("button", { name: "Todos" }) },
     { name: "Currículo", before: footer.getByRole("link", { name: /LinkedIn/ }), target: footer.getByRole("link", { name: /Currículo/ }) },
   ];
   for (const { name, before, target } of steps) {
@@ -484,4 +491,171 @@ test("em cores forçadas, as marcas d'água somem e a seção ativa segue marcad
   const active = page.getByRole("navigation", { name: "Navegação principal" }).getByRole("link", { name: "Expertise", exact: true });
   await expect(active).toHaveAttribute("aria-current", "true");
   await expect(active).toHaveCSS("text-decoration-line", "underline");
+});
+
+// ---- Spec 0006: Hero Liquid Aurora ----
+
+/** Estado da revelação: atributo, centro (px na seção), raio e opacidade das camadas de cor. */
+async function revealState(page: Page) {
+  return page.evaluate(() => {
+    const section = document.getElementById("inicio")!;
+    const style = getComputedStyle(section);
+    const probe = document.createElement("div");
+    probe.style.width = "var(--reveal-r)";
+    section.appendChild(probe);
+    const radius = probe.getBoundingClientRect().width;
+    probe.remove();
+    const box = section.getBoundingClientRect();
+    return {
+      reveal: section.dataset.reveal,
+      mx: parseFloat(style.getPropertyValue("--mx")),
+      my: parseFloat(style.getPropertyValue("--my")),
+      mxRaw: style.getPropertyValue("--mx").trim(),
+      radius,
+      heroHeight: box.height,
+      top: box.top,
+      left: box.left,
+      auroraOpacity: Number(getComputedStyle(document.querySelector(".hero-aurora-color")!).opacity),
+      altOpacity: Number(getComputedStyle(document.querySelector(".hero-aurora-color-alt")!).opacity),
+      photoOpacity: Number(getComputedStyle(document.querySelector(".hero-portrait-color")!).opacity),
+      portraitFilter: getComputedStyle(document.querySelector(".hero-portrait")!).filter,
+      running: document
+        .getAnimations()
+        .filter((animation) => {
+          const target = (animation.effect as KeyframeEffect | null)?.target;
+          return target instanceof Element && section.contains(target) && animation.playState === "running";
+        }).length,
+    };
+  });
+}
+
+test.describe("hero Liquid Aurora (spec 0006)", () => {
+  test("com mouse, a revelação segue o ponteiro e apaga ao sair", async ({ page }) => {
+    test.skip(!isDesktop(page), "precisa de hover e ponteiro fino");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    const idle = await revealState(page);
+    expect(idle.reveal).toBe("false");
+    expect(idle.auroraOpacity).toBe(0);
+    expect(idle.portraitFilter).toContain("grayscale(1)");
+
+    // A aurora entra depois do carregamento; a revelação só faz sentido com ela presente.
+    await expect(page.locator("#inicio")).toHaveAttribute("data-motion", "on");
+    await page.mouse.move(300, 400);
+    await page.mouse.move(820, 300, { steps: 8 });
+    await page.waitForTimeout(1000);
+    const active = await revealState(page);
+    expect(active.reveal).toBe("true");
+    expect(Math.hypot(active.mx - (820 - active.left), active.my - (300 - active.top))).toBeLessThanOrEqual(40);
+    expect(active.auroraOpacity).toBe(1);
+    expect(active.radius).toBeGreaterThan(0);
+    expect(active.radius).toBeLessThanOrEqual(active.heroHeight / 2);
+
+    // A barra fixa fica fora da seção: passar o ponteiro para ela é sair do hero.
+    await page.mouse.move(640, 10, { steps: 4 });
+    await page.waitForTimeout(1500);
+    const gone = await revealState(page);
+    expect(gone.reveal).toBe("false");
+    expect(gone.auroraOpacity).toBe(0);
+    expect(gone.photoOpacity).toBe(0);
+  });
+
+  test("com movimento reduzido, nada segue o ponteiro e nada se move", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#inicio")).toHaveAttribute("data-motion", "on");
+    await page.mouse.move(700, 300, { steps: 6 });
+    await page.waitForTimeout(400);
+    const state = await revealState(page);
+    expect(state.reveal).toBe("false");
+    expect(state.running).toBe(0);
+  });
+
+  test("sem hover (toque), o foco de cor ambiente passeia sozinho e é discreto", async ({ page }) => {
+    test.skip(isDesktop(page), "só em aparelho de toque");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    expect(await page.evaluate(() => matchMedia("(hover: none)").matches)).toBe(true);
+    await expect(page.locator("#inicio")).toHaveAttribute("data-motion", "on");
+    // Dois focos fixos (rosto e lateral) se alternam: a cor sai de um e aparece no outro.
+    await page.waitForTimeout(300);
+    const first = await revealState(page);
+    await page.waitForTimeout(3000);
+    const second = await revealState(page);
+    expect(second.auroraOpacity).toBeGreaterThan(first.auroraOpacity);
+    expect(second.altOpacity).toBeLessThan(first.altOpacity);
+    for (const state of [first, second]) {
+      expect(Math.max(state.auroraOpacity, state.altOpacity)).toBeGreaterThan(0);
+      expect(Math.max(state.auroraOpacity, state.altOpacity, state.photoOpacity)).toBeLessThan(1);
+    }
+  });
+
+  test("com o hero fora da tela, a aurora pausa", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    await expect(page.locator("#inicio")).toHaveAttribute("data-motion", "on");
+    await expect(page.locator("#inicio")).toHaveAttribute("data-paused", "false");
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await expect(page.locator("#inicio")).toHaveAttribute("data-paused", "true");
+    await expect.poll(async () => (await revealState(page)).running).toBe(0);
+  });
+
+  test("no celular, o nome não cobre o rosto e nada passa da largura da tela", async ({ page }) => {
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/");
+      await page.waitForFunction(() => [...document.fonts].some((face) => face.family.includes("Space Grotesk") && face.status === "loaded"));
+      const layout = await page.evaluate(() => {
+        const title = document.getElementById("hero-title")!.getBoundingClientRect();
+        const photo = document.querySelector(".hero-photo")!.getBoundingClientRect();
+        const texts = [...document.querySelectorAll("#inicio p, #inicio h1 span, #inicio a")].map((el) => el.getBoundingClientRect().right);
+        return { titleBottom: title.bottom, photoTop: photo.top, photoThird: photo.top + photo.height / 3, maxRight: Math.max(...texts), scroll: document.documentElement.scrollWidth };
+      });
+      // A caixa do nome não entra no terço superior da foto (onde está o rosto).
+      expect(layout.titleBottom, `${width}px`).toBeLessThanOrEqual(layout.photoTop);
+      expect(layout.maxRight, `${width}px`).toBeLessThanOrEqual(width);
+      expect(layout.scroll, `${width}px`).toBeLessThanOrEqual(width);
+    }
+  });
+
+  test("a aurora só é pedida depois do carregamento e não compete com o retrato", async ({ page }) => {
+    const images: { url: string; at: number }[] = [];
+    page.on("request", (request) => {
+      if (request.resourceType() === "image") images.push({ url: request.url(), at: Date.now() });
+    });
+    let loadedAt = 0;
+    page.on("load", () => (loadedAt = Date.now()));
+    await page.goto("/");
+    await expect(page.locator("#inicio")).toHaveAttribute("data-motion", "on");
+    await expect.poll(() => images.filter((image) => /aurora-/.test(image.url)).length).toBeGreaterThan(0);
+    const portrait = images.findIndex((image) => /\/hero\/portrait-2026\.webp$/.test(image.url));
+    const firstAurora = images.findIndex((image) => /aurora-/.test(image.url));
+    expect(portrait).toBeGreaterThanOrEqual(0);
+    expect(portrait).toBeLessThan(firstAurora);
+    for (const image of images.filter((entry) => /aurora-/.test(entry.url))) expect(image.at).toBeGreaterThanOrEqual(loadedAt);
+  });
+
+  test("em cores forçadas, aurora e cor da foto somem", async ({ page }) => {
+    await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
+    await page.goto("/");
+    // Depois do carregamento as camadas coloridas existem; só as cores forçadas as escondem.
+    await expect(page.locator("#inicio")).toHaveAttribute("data-motion", "on");
+    await expect(page.locator(".hero-aurora")).toBeHidden();
+    for (const copy of await page.locator(".hero-portrait-color").all()) await expect(copy).toBeHidden();
+    const name = await page.evaluate(() => {
+      const probe = document.createElement("span");
+      probe.style.color = "CanvasText";
+      document.body.appendChild(probe);
+      const system = getComputedStyle(probe).color;
+      probe.remove();
+      const lines = [...document.querySelectorAll("#hero-title span")].map((span) => {
+        const style = getComputedStyle(span);
+        return { color: style.color, stroke: style.getPropertyValue("-webkit-text-stroke-width") };
+      });
+      return { system, lines };
+    });
+    for (const line of name.lines) {
+      expect(line.color).toBe(name.system);
+      expect(line.stroke).toBe("0px");
+    }
+  });
 });
