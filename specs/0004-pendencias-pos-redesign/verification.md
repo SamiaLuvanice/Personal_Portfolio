@@ -35,10 +35,10 @@ Cada linha resume 3 execuções seguidas da `main` (`29b4810`) e da branch, na m
 | Critério | Estado | Evidência |
 |---|---|---|
 | Metadados de imagem grande; 1200 × 630, ≤ 300 KB, com alt; retrato, nome e cargo legíveis | Passou | E2E "prévia de link…" e imagem conferida |
-| Imagem de prévia 200 em produção; validador mostra a prévia | Pendente | Depois do merge |
-| Retrato e capturas com cache de ≥ 7 dias; `/assets/` imutável | Pendente | Regras no `vercel.json`. Conferir com `curl -I` em produção |
+| Imagem de prévia 200 em produção; validador mostra a prévia | Passou | `curl -I`: 200, `image/jpeg`, 48 694 bytes. O Post Inspector do LinkedIn mostra a imagem e o título "Sâmia Luvanice \| Full Stack Developer" (ver "Produção") |
+| Retrato e capturas com cache de ≥ 7 dias; `/assets/` imutável | Passou | `curl -I` em produção: `max-age=604800, stale-while-revalidate=86400` no retrato, numa captura e na prévia; `max-age=31536000, immutable` em `/assets/` |
 | Nenhuma requisição a fontes de terceiros; mesmas famílias | Passou | E2E "fontes vêm do próprio site…" (desktop e mobile) |
-| Lighthouse mobile ≥ 90 / ≥ 95, LCP ≤ 2,5 s, CLS ≤ 0,1 | Parcial | Local simulado: 0,95–0,97 / 1,0 / 2,25–2,57 s / 0,008. Uma das 3 execuções passou de 2,5 s; na `main`, nas mesmas condições, houve uma de 2,44 s. Medição de produção pendente |
+| Lighthouse mobile ≥ 90 / ≥ 95, LCP ≤ 2,5 s, CLS ≤ 0,1 | Passou | Produção, 6 execuções: 0,94–0,99 / 1,0 / 1,76–1,87 s / 0. Local simulado: 0,95–0,97 / 1,0 / 2,25–2,57 s / 0,008 (ver "Produção") |
 | E2E sem serviço de fontes de terceiros | Passou | Nenhum teste depende mais de `fonts.googleapis.com` |
 | Perguntas da 0003 decididas | Passou | `specs/0003-redesign-pagina-inicial/spec.md`, "Perguntas em aberto" |
 | LinkedIn abre o perfil correto | Passou | Aberto no Chrome da autora em 17/11/2026: perfil "Sâmia Luvanice · Full Stack Developer", URL pública `linkedin.com/in/samialuvanice` |
@@ -68,9 +68,33 @@ Nenhum achado bloqueante.
 
 Depois das correções, os portões passaram de novo: lint, typecheck, 23 testes unitários, build e E2E (59 passaram e 1 foi pulado, intencional).
 
+## Produção
+
+Medido em 17/11/2026, depois do merge do PR #11 (`f8e9cbc`), em https://samialuvanicedev.vercel.app/.
+
+| Verificação | Resultado |
+|---|---|
+| `curl -I /og-image.jpg` | 200, `image/jpeg`, 48 694 bytes, `Cache-Control: public, max-age=604800, stale-while-revalidate=86400` |
+| `curl -I /hero/portrait.webp` e `/projects/bestprice.webp` | 200, mesma regra de cache de 7 dias |
+| `curl -I /assets/index-*.js` | `Cache-Control: public, max-age=31536000, immutable` |
+| HTML publicado | metadados `og:image*`, `twitter:card=summary_large_image` e `twitter:image*` presentes; nenhuma referência a `fonts.googleapis`/`fonts.gstatic` |
+| Post Inspector do LinkedIn | a prévia mostra a imagem do hero e o título "Sâmia Luvanice \| Full Stack Developer" |
+| `npx lhci collect --url=https://samialuvanicedev.vercel.app/ --numberOfRuns=6` (mobile padrão) | tabela abaixo |
+
+| Execução | Performance | Acessibilidade | SEO | LCP | FCP | CLS |
+|---|---|---|---|---|---|---|
+| 1ª | 0,95 | 1,0 | 1,0 | 1,86 s | 1,59 s | 0 |
+| 2ª | 0,99 | 1,0 | 1,0 | 1,76 s | 1,63 s | 0 |
+| 3ª | 0,96 | 1,0 | 1,0 | 1,79 s | 1,62 s | 0 |
+| 4ª | 0,94 | 1,0 | 1,0 | 1,83 s | 1,66 s | 0 |
+| 5ª | 0,98 | 1,0 | 1,0 | 1,87 s | 1,70 s | 0 |
+| 6ª | 0,98 | 1,0 | 1,0 | 1,87 s | 1,65 s | 0 |
+
+Todas as 6 execuções atendem à meta. A primeira execução depois do deploy, que na 0003 deu 3,0 s, desta vez ficou em 1,86 s.
+
 ## Limites
 
-- **Ainda não medido em produção:** Lighthouse, cabeçalhos de cache e validador de prévia ficam para depois do merge, porque o preview da Vercel exige login.
+- **Preview da Vercel não verificado:** ele exige login. As medições de produção foram feitas depois do merge (ver "Produção").
 - **Troca de fonte visível:** com fontes depois do `load`, o texto aparece primeiro na fonte do sistema e troca depois (CLS medido 0,008). É o mesmo comportamento das fontes do Google. No celular (390 px), o nome do hero fica cortado na borda direita até a troca. A pendência é uma fonte de fallback com métricas ajustadas.
 - **`/assets/*` inexistente:** recebe o `index.html` pelo rewrite, com cache `immutable`. O problema é anterior a esta spec.
 - **`nginx.conf` (Docker):** continua sem cabeçalhos de cache.
