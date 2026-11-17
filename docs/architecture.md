@@ -25,7 +25,15 @@ flowchart LR
   Sora e Space Grotesk vêm do próprio domínio (`@fontsource-variable/sora` e
   `@fontsource-variable/space-grotesk`, importados em `src/fonts.ts`); `src/main.tsx` carrega esse
   módulo por import dinâmico depois do evento `load`, e o texto troca da fonte do sistema com
-  `font-display: swap`. Não há fontes do Google, `preconnect` nem `preload` de fontes.
+  `font-display: swap`. Não há fontes do Google, `preconnect` nem `preload` de fontes. Até a troca,
+  valem os fallbacks de `src/index.css`: `@font-face` com `local()` (Arial e compatíveis — Liberation
+  Sans, Helvetica — e Roboto, faces regular e bold) e `size-adjust`, `ascent-override`,
+  `descent-override` e `line-gap-override`. São três famílias: `Space Grotesk Fallback` (títulos),
+  `Sora Fallback` (corpo) e `Space Grotesk Hero Fallback` (classe `font-hero`: nome do hero e marca
+  d'água, ajustada pela linha mais longa, "LUVANICE"). Assim o texto ocupa praticamente o mesmo
+  espaço e o nome não passa da borda no celular; com a fonte carregada, nada muda. Se as fontes ou o
+  hero mudarem, os valores precisam ser medidos de novo, com o método de
+  `specs/0005-fallback-fonte-hero/plan.md` (`measureText` no Chromium).
 - **Sem backend:** o contato é um link `mailto:` com assunto e corpo prontos, montado por
   `src/lib/contact.ts`. O projeto não tem funções serverless nem variáveis de ambiente. A antiga
   API de contato (Resend) foi removida no PR #2 por não ser usada pela interface; a versão endurecida

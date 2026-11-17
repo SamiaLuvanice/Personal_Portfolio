@@ -48,3 +48,21 @@ confirma com `throttlingMethod=devtools` antes de concluir.
 tirar conclusão de desempenho de uma única medição simulada.
 
 **Referências:** `src/fonts.ts`, `src/main.tsx`, `specs/0004-pendencias-pos-redesign/plan.md`.
+
+## 2026-11-17 — Fallback de fonte de título borda a borda se ajusta pela linha mais longa
+
+**Contexto:** na spec 0005, o nome do hero ("SÂMIA LUVANICE", em maiúsculas e de borda a borda)
+passava da borda no celular enquanto a fonte do site não carregava. O primeiro `size-adjust`, pela
+média da frase inteira (91,44%), deixou "LUVANICE" 1,7% mais largo e ainda 4 px além da borda. Uma
+face `local()` só regular também fazia o navegador sintetizar o negrito, com outra largura. Com o
+ajuste final, o CLS local caiu de 0,008 para 0,001.
+
+**Princípio:** fallback de título que ocupa a largura toda se mede pela linha mais longa, com uma
+pequena folga, numa família própria (`Space Grotesk Hero Fallback`, classe `font-hero`), sem
+encolher os demais títulos. Cada família de fallback declara faces regular e bold com
+`font-weight`, apontando para o arquivo bold do sistema.
+
+**Anti-pattern:** ajustar pela média de uma frase ou de texto misto para um título de borda a borda;
+declarar `local()` sem descritor de peso e deixar o navegador gerar negrito sintético.
+
+**Referências:** `src/index.css`, `tailwind.config.ts`, `specs/0005-fallback-fonte-hero/plan.md`.
