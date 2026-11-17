@@ -122,6 +122,46 @@ test("fontes vêm do próprio site, sem serviço de terceiros (spec 0004)", asyn
   expect(families.title).toMatch(/^"?Space Grotesk/);
 });
 
+/** Largura e limites de cada linha do nome do hero, medidos pelo texto (os spans são block no celular). */
+async function heroNameLines(page: Page) {
+  return page.evaluate(() => {
+    const title = document.getElementById("hero-title")!;
+    const box = title.getBoundingClientRect();
+    return [...title.querySelectorAll("span")].map((span) => {
+      const range = document.createRange();
+      range.selectNodeContents(span);
+      const text = range.getBoundingClientRect();
+      return { left: text.left, right: text.right, width: text.width, min: Math.max(0, box.left), max: Math.min(window.innerWidth, box.right) };
+    });
+  });
+}
+
+test("com a fonte do sistema, o nome do hero cabe e mantém o tamanho (spec 0005)", async ({ page, browser }) => {
+  test.skip(!isDesktop(page), "as larguras são definidas no próprio teste");
+  for (const width of [320, 360, 390, 768, 1024, 1280]) {
+    const fallback = await browser.newPage({ viewport: { width, height: 900 }, baseURL: test.info().project.use.baseURL });
+    await fallback.route(/\.woff2$/, (route) => route.abort());
+    await fallback.goto("/");
+    await fallback.waitForLoadState("networkidle");
+    const withFallback = await heroNameLines(fallback);
+    await fallback.close();
+
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await page.waitForFunction(() =>
+      [...document.fonts].some((face) => face.family.includes("Space Grotesk") && face.status === "loaded"),
+    );
+    const loaded = await heroNameLines(page);
+
+    for (const line of withFallback) {
+      expect(line.left, `${width}px: linha começa fora do título`).toBeGreaterThanOrEqual(line.min - 0.5);
+      expect(line.right, `${width}px: linha passa da borda`).toBeLessThanOrEqual(line.max + 0.5);
+    }
+    const total = (lines: { width: number }[]) => lines.reduce((sum, line) => sum + line.width, 0);
+    expect(Math.abs(total(withFallback) / total(loaded) - 1), `${width}px: largura com fallback`).toBeLessThanOrEqual(0.05);
+  }
+});
+
 test("hero leva ao Contato e mostra os links profissionais no desktop", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("#inicio");

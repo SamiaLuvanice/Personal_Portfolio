@@ -15,8 +15,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Sora Variable', 'sans-serif'],
-        display: ['Space Grotesk Variable', 'sans-serif'],
+        sans: ['Sora Variable', 'Sora Fallback', 'Sora Fallback Roboto', 'sans-serif'],
+        display: ['Space Grotesk Variable', 'Space Grotesk Fallback', 'Space Grotesk Fallback Roboto', 'sans-serif'],
+        // Nome do hero e marca d'água (só maiúsculas): fallback próprio (spec 0005).
+        hero: ['Space Grotesk Variable', 'Space Grotesk Hero Fallback', 'Space Grotesk Hero Fallback Roboto', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -2,6 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fallbacks ajustados às métricas das fontes do site (spec 0005). As fontes carregam depois do
+   `load`; até lá o texto usa a fonte do sistema com estas correções, para ocupar o mesmo espaço.
+   Valores medidos no Chromium (largura de amostras de texto e métricas verticais); sem rede: só
+   `local()`. Arial, Liberation Sans e Helvetica têm métricas compatíveis; Roboto é a do Android.
+   Faces separadas por peso: sem elas, o bold vira negrito sintético, com outra largura. */
+@font-face {
+  font-family: "Space Grotesk Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Helvetica");
+  font-weight: 100 599;
+  size-adjust: 107.23%;
+  ascent-override: 91.4%;
+  descent-override: 27.05%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Space Grotesk Fallback";
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Helvetica Bold");
+  font-weight: 600 900;
+  size-adjust: 100.17%;
+  ascent-override: 97.83%;
+  descent-override: 28.95%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Space Grotesk Fallback Roboto";
+  src: local("Roboto"), local("Roboto-Regular");
+  font-weight: 100 599;
+  size-adjust: 108.87%;
+  ascent-override: 90.01%;
+  descent-override: 26.64%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Space Grotesk Fallback Roboto";
+  src: local("Roboto Bold"), local("Roboto-Bold");
+  font-weight: 600 900;
+  size-adjust: 107.14%;
+  ascent-override: 91.47%;
+  descent-override: 27.07%;
+  line-gap-override: 0%;
+}
+
+/* Nome do hero e marca d'água: só maiúsculas, mais largas no fallback que o texto misto. O nome vai
+   de borda a borda, então o ajuste segue "LUVANICE" (a linha mais longa), com 0,3% de folga. */
+@font-face {
+  font-family: "Space Grotesk Hero Fallback";
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Helvetica Bold");
+  font-weight: 600 900;
+  size-adjust: 89.7%;
+  ascent-override: 109.25%;
+  descent-override: 32.33%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Space Grotesk Hero Fallback Roboto";
+  src: local("Roboto Bold"), local("Roboto-Bold");
+  font-weight: 600 900;
+  size-adjust: 96.4%;
+  ascent-override: 101.66%;
+  descent-override: 30.08%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Sora Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Helvetica");
+  font-weight: 100 599;
+  size-adjust: 113.4%;
+  ascent-override: 85.54%;
+  descent-override: 25.57%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Sora Fallback";
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Helvetica Bold");
+  font-weight: 600 900;
+  size-adjust: 107.16%;
+  ascent-override: 90.52%;
+  descent-override: 27.06%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Sora Fallback Roboto";
+  src: local("Roboto"), local("Roboto-Regular");
+  font-weight: 100 599;
+  size-adjust: 113.46%;
+  ascent-override: 85.49%;
+  descent-override: 25.56%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Sora Fallback Roboto";
+  src: local("Roboto Bold"), local("Roboto-Bold");
+  font-weight: 600 900;
+  size-adjust: 114.1%;
+  ascent-override: 85.01%;
+  descent-override: 25.42%;
+  line-gap-override: 0%;
+}
+
 /* Esquema fixo da spec 0003: superfície clara por padrão e `.surface-dark` por seção.
    Os tokens shadcn são redefinidos por superfície, então os componentes de ui/ acompanham. */
 @layer base {
@@ -89,7 +196,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "Sora Variable", sans-serif;
+    font-family: "Sora Variable", "Sora Fallback", "Sora Fallback Roboto", sans-serif;
   }
 
   h1,
@@ -98,7 +205,7 @@
   h4,
   h5,
   h6 {
-    font-family: "Space Grotesk Variable", sans-serif;
+    font-family: "Space Grotesk Variable", "Space Grotesk Fallback", "Space Grotesk Fallback Roboto", sans-serif;
   }
 }
 
