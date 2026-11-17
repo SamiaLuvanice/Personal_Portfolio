@@ -3,7 +3,7 @@ numero: 0004
 titulo: Pendências do redesign — prévia de link, cache de imagens e fontes próprias
 tipo: melhoria
 prioridade: P2
-status: rascunho
+status: implementada
 toca: [interface, infraestrutura, conteudo]
 depende_de: ["0003"]
 ---
@@ -30,15 +30,15 @@ O texto continua com as mesmas famílias tipográficas, agora servidas pelo pró
 
 ## Critérios de aceite
 
-- [ ] A página publica metadados Open Graph e Twitter de imagem grande. A imagem absoluta tem 1200 × 630 px, até 300 KB, e um texto alternativo. Ela mostra o retrato, o nome e o cargo legíveis.
-- [ ] A URL da imagem de prévia responde 200 com tipo de imagem em produção. Um validador de prévia (ex.: o Post Inspector do LinkedIn ou um equivalente) mostra a imagem.
-- [ ] O retrato do hero e as capturas dos projetos respondem com validade de cache de pelo menos 7 dias. Os arquivos com hash do build mantêm o cache longo e imutável.
-- [ ] Ao carregar a página, nenhuma requisição vai para domínios de fontes de terceiros. Títulos e texto usam as mesmas famílias de antes.
-- [ ] O Lighthouse mobile mantém a meta da 0003: Performance ≥ 90, Acessibilidade ≥ 95, LCP ≤ 2,5 s e CLS ≤ 0,1.
-- [ ] Os testes ponta a ponta passam sem acesso a serviços de fontes de terceiros.
-- [ ] As perguntas em aberto da 0003 estão registradas como decididas: Lopes Tech mantida como está; BestPrice IA e StudyNice confirmados como autorais.
-- [ ] O link do LinkedIn exibido no site abre o perfil correto, conferido num navegador real.
-- [ ] Portões verdes.
+- [x] A página publica metadados Open Graph e Twitter de imagem grande. A imagem absoluta tem 1200 × 630 px, até 300 KB, e um texto alternativo. Ela mostra o retrato, o nome e o cargo legíveis.
+- [x] A URL da imagem de prévia responde 200 com tipo de imagem em produção. Um validador de prévia (ex.: o Post Inspector do LinkedIn ou um equivalente) mostra a imagem.
+- [x] O retrato do hero e as capturas dos projetos respondem com validade de cache de pelo menos 7 dias. Os arquivos com hash do build mantêm o cache longo e imutável.
+- [x] Ao carregar a página, nenhuma requisição vai para domínios de fontes de terceiros. Títulos e texto usam as mesmas famílias de antes.
+- [x] O Lighthouse mobile mantém a meta da 0003: Performance ≥ 90, Acessibilidade ≥ 95, LCP ≤ 2,5 s e CLS ≤ 0,1.
+- [x] Os testes ponta a ponta passam sem acesso a serviços de fontes de terceiros.
+- [x] As perguntas em aberto da 0003 estão registradas como decididas: Lopes Tech mantida como está; BestPrice IA e StudyNice confirmados como autorais.
+- [x] O link do LinkedIn exibido no site abre o perfil correto, conferido num navegador real.
+- [x] Portões verdes.
 
 ## Fora de escopo
 
