@@ -12,7 +12,7 @@ const HERO_LINKS = [
 /** Hero F: escuro monocromático, retrato P&B e nome com blend "difference" (spec 0003). */
 const Hero = () => (
   <section id="inicio" tabIndex={-1} aria-labelledby="hero-title" className="surface-dark relative focus:outline-none overflow-hidden px-5 pb-16 pt-5 md:px-10 md:pb-20 lg:px-10 lg:pb-10 lg:pt-[calc(var(--nav-top-height)+1.5rem)]">
-    <p aria-hidden="true" className="ghost-word absolute inset-x-0 top-16 text-center font-display font-bold leading-none [font-size:36vw] lg:top-[calc(var(--nav-top-height)-1rem)] lg:[font-size:min(29vw,26rem)]">
+    <p aria-hidden="true" className="ghost-word absolute inset-x-0 top-16 text-center font-hero font-bold leading-none [font-size:36vw] lg:top-[calc(var(--nav-top-height)-1rem)] lg:[font-size:min(29vw,26rem)]">
       SÂMIA
     </p>
 
@@ -39,7 +39,7 @@ const Hero = () => (
 
       <h1
         id="hero-title"
-        className="hero-name relative z-10 -mt-[1em] text-center font-display font-bold uppercase leading-[0.88] tracking-[-0.03em] [font-size:calc((100vw-2.5rem)/4.3)] md:-mt-[0.6em] md:whitespace-nowrap md:[font-size:calc((100vw-5rem)/7.7)] lg:col-span-3 lg:row-start-2 lg:-mt-[0.6em] lg:[font-size:min(calc((100vw-5rem)/7.7),10.5rem)]"
+        className="hero-name relative z-10 -mt-[1em] text-center font-hero font-bold uppercase leading-[0.88] tracking-[-0.03em] [font-size:calc((100vw-2.5rem)/4.3)] md:-mt-[0.6em] md:whitespace-nowrap md:[font-size:calc((100vw-5rem)/7.7)] lg:col-span-3 lg:row-start-2 lg:-mt-[0.6em] lg:[font-size:min(calc((100vw-5rem)/7.7),10.5rem)]"
       >
         <span className="block md:inline">Sâmia</span> <span className="block md:inline">Luvanice</span>
       </h1>

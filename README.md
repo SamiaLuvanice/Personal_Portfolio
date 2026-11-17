@@ -243,6 +243,7 @@ enquanto o chunk carrega.
 - Retrato do Hero em `public/hero/portrait.webp`, pré-carregado no `index.html` (imagem do LCP)
 - Imagens dos projetos em WebP, preguiçosas
 - Sora e Space Grotesk servidas pelo próprio domínio (`@fontsource-variable`, em `src/fonts.ts`), carregadas por import dinâmico depois do evento `load`, com `font-display: swap`
+- Até a troca, o texto usa fallbacks ajustados em `src/index.css` (`@font-face` com `local()` e `size-adjust`/overrides sobre Arial, Liberation Sans, Helvetica e Roboto, faces regular e bold): `Space Grotesk Fallback` nos títulos, `Sora Fallback` no corpo e `Space Grotesk Hero Fallback` (classe `font-hero`) no nome do hero e na marca d'água, ajustado por "LUVANICE". O texto ocupa quase o mesmo espaço e o nome não passa da borda no celular. Se as fontes ou o hero mudarem, meça os valores de novo (método em [specs/0005-fallback-fonte-hero/plan.md](specs/0005-fallback-fonte-hero/plan.md))
 - Retrato, capturas dos projetos e `og-image.jpg` com cache de 7 dias (`vercel.json`); imagem substituída ganha nome novo
 
 **Arquivo:** [src/pages/Index.tsx](src/pages/Index.tsx)
