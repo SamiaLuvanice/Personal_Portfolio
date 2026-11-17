@@ -31,7 +31,7 @@ Enquanto a fonte do site não carrega, o texto usa uma fonte do sistema ajustada
 - [x] Com as fontes do site bloqueadas, nas larguras de 320, 360, 390, 768, 1024 e 1280 px, nenhuma linha do nome do hero ultrapassa a largura do título nem a da tela.
 - [x] Com as fontes do site bloqueadas, a largura do nome fica a até 5% da largura com a fonte carregada, nas mesmas larguras de tela.
 - [x] Com a fonte carregada, a aparência não muda em relação à versão atual: famílias, tamanhos e quebras de linha do hero são os mesmos.
-- [ ] O Lighthouse mobile em produção mantém Performance ≥ 90, Acessibilidade ≥ 95, LCP ≤ 2,5 s e CLS ≤ 0,1.
+- [x] O Lighthouse mobile em produção mantém Performance ≥ 90, Acessibilidade ≥ 95, LCP ≤ 2,5 s e CLS ≤ 0,1.
 - [x] Portões verdes.
 
 ## Fora de escopo
