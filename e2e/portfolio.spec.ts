@@ -91,7 +91,8 @@ test("cards abrem cada projeto em nova aba e o filtro separa autorais de comerci
   await page.goto("/#projects");
   const list = page.getByRole("list", { name: "Projetos" });
   const hrefs = () => list.getByRole("link").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
-  expect(await hrefs()).toEqual([
+  // A seção monta sob demanda e o filtro re-renderiza: lê de novo até estabilizar.
+  await expect.poll(hrefs).toEqual([
     "https://bestprice-stage.pages.dev/",
     "https://studynice.vercel.app/",
     "https://www.soundhouse.com.br/",
@@ -100,12 +101,12 @@ test("cards abrem cada projeto em nova aba e o filtro separa autorais de comerci
   for (const link of await list.getByRole("link").all()) await expect(link).toHaveAttribute("target", "_blank");
 
   await page.getByRole("button", { name: "Autorais" }).click();
-  expect(await hrefs()).toEqual(["https://bestprice-stage.pages.dev/", "https://studynice.vercel.app/"]);
+  await expect.poll(hrefs).toEqual(["https://bestprice-stage.pages.dev/", "https://studynice.vercel.app/"]);
   await expect(page.getByRole("status").filter({ hasText: "projetos autorais" })).toHaveText("2 projetos autorais");
   await page.getByRole("button", { name: "Comerciais" }).click();
-  expect(await hrefs()).toEqual(["https://www.soundhouse.com.br/", "https://lopestech.abeesys.com/"]);
+  await expect.poll(hrefs).toEqual(["https://www.soundhouse.com.br/", "https://lopestech.abeesys.com/"]);
   await page.getByRole("button", { name: "Todos" }).click();
-  expect(await hrefs()).toHaveLength(4);
+  await expect.poll(hrefs).toHaveLength(4);
 
   await expect(page.getByRole("link", { name: /Mais no GitHub/ })).toHaveAttribute("href", "https://github.com/SamiaLuvanice");
 });
