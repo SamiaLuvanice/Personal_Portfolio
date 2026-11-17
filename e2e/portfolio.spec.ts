@@ -1,4 +1,5 @@
 /// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
 
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
@@ -67,6 +68,28 @@ test("metadados de SEO descrevem a Full Stack Developer", async ({ page }) => {
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /Full Stack Developer/);
   await expect(page.locator('meta[name="description"]')).not.toHaveAttribute("content", /certificad|em formação/i);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /^https:\/\//);
+});
+
+test("fontes vêm do próprio site, sem serviço de terceiros (spec 0004)", async ({ page }) => {
+  const external: string[] = [];
+  page.on("request", (req) => {
+    if (/fonts\.(googleapis|gstatic)\.com/.test(req.url())) external.push(req.url());
+  });
+  await page.goto("/");
+  await loadAllSections(page);
+  // As fontes entram depois do evento load; espera as duas faces carregarem.
+  await expect
+    .poll(() =>
+      page.evaluate(() => [...document.fonts].filter((face) => face.status === "loaded").map((face) => face.family.replace(/"/g, ""))),
+    )
+    .toEqual(expect.arrayContaining(["Sora Variable", "Space Grotesk Variable"]));
+  expect(external).toEqual([]);
+  const families = await page.evaluate(() => ({
+    body: getComputedStyle(document.body).fontFamily,
+    title: getComputedStyle(document.querySelector("h1")!).fontFamily,
+  }));
+  expect(families.body).toMatch(/^"?Sora/);
+  expect(families.title).toMatch(/^"?Space Grotesk/);
 });
 
 test("hero leva ao Contato e mostra os links profissionais no desktop", async ({ page }) => {
@@ -351,11 +374,10 @@ test("com movimento reduzido, abrir um item da Expertise não anima a altura", a
 test("foco de teclado não fica inteiramente escondido sob a barra fixa (WCAG 2.4.11)", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await page.goto("/");
-  // As fontes carregam sem bloquear; espera para medir o layout final.
+  // As fontes usam font-display: swap; espera a fonte de título carregar para medir o layout final.
   await page.waitForFunction(async () => {
-    const sheet = document.querySelector('link[rel="stylesheet"][href*="fonts.googleapis"]');
     await document.fonts.ready;
-    return Boolean(sheet) && document.fonts.status === "loaded" && document.fonts.check('700 16px "Space Grotesk"');
+    return [...document.fonts].some((face) => face.family.includes("Space Grotesk") && face.status === "loaded");
   });
   const nav = page.getByRole("navigation", { name: "Navegação principal" });
   // Chega a cada alvo pelo Tab, como faria quem navega pelo teclado.

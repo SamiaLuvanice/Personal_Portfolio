@@ -4,11 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Fontes sem bloquear a renderização; o retrato do hero é o LCP e é pré-carregado. -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" /></noscript>
+    <!-- O retrato do hero é o LCP e é pré-carregado; as fontes do próprio domínio carregam depois do load (spec 0004). -->
     <link rel="preload" as="image" href="/hero/portrait.webp" type="image/webp" fetchpriority="high" />
     <title>Sâmia Luvanice | Full Stack Developer</title>
     <meta
