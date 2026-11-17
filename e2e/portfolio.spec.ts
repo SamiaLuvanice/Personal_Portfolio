@@ -70,6 +70,26 @@ test("metadados de SEO descrevem a Full Stack Developer", async ({ page }) => {
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /^https:\/\//);
 });
 
+test("prévia de link usa imagem grande de 1200 × 630 com texto alternativo (spec 0004)", async ({ page, request }) => {
+  await page.goto("/");
+  const meta = (selector: string) =>
+    page.evaluate((target) => document.querySelector(target)?.getAttribute("content") ?? null, selector);
+  const image = await meta('meta[property="og:image"]');
+  expect(image).toMatch(/^https:\/\/samialuvanicedev\.vercel\.app\/og-image\.jpg$/);
+  expect(await meta('meta[property="og:image:width"]')).toBe("1200");
+  expect(await meta('meta[property="og:image:height"]')).toBe("630");
+  expect(await meta('meta[property="og:image:type"]')).toBe("image/jpeg");
+  expect(await meta('meta[property="og:image:alt"]')).toMatch(/Sâmia Luvanice.*Full Stack Developer/);
+  expect(await meta('meta[name="twitter:card"]')).toBe("summary_large_image");
+  expect(await meta('meta[name="twitter:image"]')).toBe(image);
+  expect(await meta('meta[name="twitter:image:alt"]')).toMatch(/Sâmia Luvanice/);
+
+  const response = await request.get("/og-image.jpg");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toBe("image/jpeg");
+  expect((await response.body()).length).toBeLessThanOrEqual(300 * 1024);
+});
+
 test("fontes vêm do próprio site, sem serviço de terceiros (spec 0004)", async ({ page }) => {
   const external: string[] = [];
   page.on("request", (req) => {
