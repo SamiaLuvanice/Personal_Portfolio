@@ -1,12 +1,13 @@
 // Testes do núcleo agnóstico do harness: node --test .agents/scripts/
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { cleanMessage, protectedBranchError, validateMessage } from "./commit-msg.mjs";
 import { findSecrets, findTerms } from "./diagnose.mjs";
-import { impactedDocs } from "./docs-impact.mjs";
+import { changedFiles, impactedDocs } from "./docs-impact.mjs";
 import { planGates } from "./gates.mjs";
 import { globToRegExp, parseYaml } from "./lib.mjs";
 import { convertAgentForOpencode, projectMcp, sync } from "./sync.mjs";
@@ -111,6 +112,29 @@ test("impactedDocs mapeia arquivos alterados e marca docs já tocados", () => {
     impacts.map((impact) => [impact.doc, impact.touched, impact.causes.length]),
     [["docs/architecture.md", false, 2], ["README.md", true, 1]],
   );
+});
+
+test("changedFiles preserva o nome do primeiro arquivo modificado do git status", () => {
+  const repo = mkdtempSync(join(tmpdir(), "docs-impact-"));
+  // Isola o repositório temporário de assinatura e hooks da config global; stderr aparece se falhar.
+  const run = (...args) =>
+    execFileSync("git", ["-c", "commit.gpgsign=false", "-c", "core.hooksPath=", ...args], {
+      cwd: repo,
+      stdio: ["ignore", "ignore", "pipe"],
+    });
+  try {
+    run("init", "-q");
+    run("config", "user.email", "teste@example.com");
+    run("config", "user.name", "Teste");
+    writeFileSync(join(repo, "README.md"), "a\n");
+    run("add", ".");
+    run("commit", "-q", "-m", "inicial");
+    writeFileSync(join(repo, "README.md"), "b\n");
+    writeFileSync(join(repo, "novo.md"), "c\n");
+    assert.deepEqual(changedFiles("HEAD", { cwd: repo }).sort(), ["README.md", "novo.md"]);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
 });
 
 test("findSecrets detecta formatos comuns sem acusar placeholders", () => {

@@ -29,11 +29,11 @@ export function impactedDocs(changedFiles, mapping) {
   return [...impacts.values()].sort((a, b) => a.doc.localeCompare(b.doc));
 }
 
-export function changedFiles(base) {
+export function changedFiles(base, { cwd } = {}) {
   const files = new Set();
-  const committed = git(["diff", "--name-only", `${base}...HEAD`], { allowFailure: true });
+  const committed = git(["diff", "--name-only", `${base}...HEAD`], { cwd, allowFailure: true });
   for (const line of (committed ?? "").split("\n")) if (line) files.add(line);
-  const status = git(["status", "--porcelain", "--untracked-files=all"]) ?? "";
+  const status = git(["status", "--porcelain", "--untracked-files=all"], { cwd, trim: false }) ?? "";
   for (const line of status.split("\n")) {
     if (!line.trim()) continue;
     const path = line.slice(3).split(" -> ").at(-1).replace(/^"|"$/g, "");

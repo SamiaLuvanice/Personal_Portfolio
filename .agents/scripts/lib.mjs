@@ -121,9 +121,11 @@ export function loadHarness(root = ROOT) {
   return parseYaml(readFileSync(path, "utf8"));
 }
 
-export function git(args, { cwd = ROOT, allowFailure = false } = {}) {
+/** Roda git e devolve a saída. Use `trim: false` quando o espaço inicial tem significado (ex.: `status --porcelain`). */
+export function git(args, { cwd = ROOT, allowFailure = false, trim = true } = {}) {
   try {
-    return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+    const output = execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    return trim ? output.trim() : output;
   } catch (error) {
     if (allowFailure) return null;
     throw error;
