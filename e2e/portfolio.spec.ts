@@ -143,13 +143,24 @@ test("com a fonte do sistema, o nome do hero cabe e mantém o tamanho (spec 0005
     await fallback.route(/\.woff2$/, (route) => route.abort());
     await fallback.goto("/");
     await fallback.waitForLoadState("networkidle");
+    // Confere o cenário: fonte do site bloqueada e fallback local do hero em uso.
+    const faces = await fallback.evaluate(async () => {
+      await document.fonts.ready;
+      return [...document.fonts].filter((face) => face.status === "loaded").map((face) => face.family.replace(/"/g, ""));
+    });
+    expect(faces, "a fonte do site deveria estar bloqueada").not.toContain("Space Grotesk Variable");
+    expect(
+      faces.some((family) => family.startsWith("Space Grotesk Hero Fallback")),
+      "nenhuma fonte local compatível (Arial, Liberation Sans, Helvetica ou Roboto)",
+    ).toBe(true);
     const withFallback = await heroNameLines(fallback);
     await fallback.close();
 
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
+    // Nome exato: as famílias de fallback também contêm "Space Grotesk".
     await page.waitForFunction(() =>
-      [...document.fonts].some((face) => face.family.includes("Space Grotesk") && face.status === "loaded"),
+      [...document.fonts].some((face) => face.family.replace(/"/g, "") === "Space Grotesk Variable" && face.status === "loaded"),
     );
     const loaded = await heroNameLines(page);
 
