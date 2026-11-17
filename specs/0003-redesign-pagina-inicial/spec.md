@@ -185,5 +185,5 @@ Não há animação de entrada ao rolar. As transições ficam restritas a passa
 - **Lopes Tech:** escopo, período e tecnologias ainda não foram confirmados. O card usa só a categoria "Comercial" e as tags da tabela. **Decidido em 17/11/2026 (spec 0004):** a autora mantém o card como está.
 - **Autoria:** suposição de que BestPrice IA e StudyNice foram desenvolvidos individualmente. A categoria exibida é "Autoral". **Confirmado em 17/11/2026 (spec 0004):** os dois foram feitos só pela autora.
 - **"2+ anos":** texto fixo, contado a partir de mai/2024 na Sound House. Revisar quando completar 3 anos.
-- **Currículo:** suposição de que o PDF atual está atualizado. **17/11/2026:** a autora vai enviar uma versão nova, que entra numa mudança separada.
+- **Currículo:** suposição de que o PDF atual está atualizado. **17/11/2026:** substituído pela versão nova enviada pela autora (PDF de 24/10/2026).
 - **Retrato:** um recorte com fundo transparente melhoraria o hero. Sem ele, a foto escura atual é usada com as bordas esfumadas.
