@@ -19,9 +19,13 @@ flowchart LR
   inferior de quatro colunas abaixo disso. A seção ativa recebe `aria-current`
   (`src/hooks/use-active-section.ts`). Os destinos de Projetos, Expertise, Experiência e Contato
   ficam em contêineres persistentes de `Index.tsx`, disponíveis enquanto o conteúdo dessas seções é
-  carregado sob demanda.
+  carregado sob demanda. Ao abrir `/#secao`, `Index.tsx` realinha a rolagem até o destino enquanto
+  as seções montam, por até 2 s ou até a pessoa rolar, tocar, teclar ou clicar; fragmento
+  malformado é ignorado.
 - **Imagens e fontes** — Imagens dos projetos em WebP (`public/projects/`), preguiçosas. O retrato
-  (`public/hero/portrait.webp`) é a imagem do LCP e é o único recurso pré-carregado no `index.html`.
+  (`public/hero/portrait-2026.webp`) é a imagem do LCP e é o único recurso pré-carregado no
+  `index.html`. A aurora do hero usa WebPs pequenos (`public/hero/aurora-*.webp`, gerados por
+  `node scripts/generate-hero-aurora.mjs`), pedidos só 1,5 s depois do evento `load`.
   Sora e Space Grotesk vêm do próprio domínio (`@fontsource-variable/sora` e
   `@fontsource-variable/space-grotesk`, importados em `src/fonts.ts`); `src/main.tsx` carrega esse
   módulo por import dinâmico depois do evento `load`, e o texto troca da fonte do sistema com
@@ -29,8 +33,8 @@ flowchart LR
   valem os fallbacks de `src/index.css`: `@font-face` com `local()` (Arial e compatíveis — Liberation
   Sans, Helvetica — e Roboto, faces regular e bold) e `size-adjust`, `ascent-override`,
   `descent-override` e `line-gap-override`. São três famílias: `Space Grotesk Fallback` (títulos),
-  `Sora Fallback` (corpo) e `Space Grotesk Hero Fallback` (classe `font-hero`: nome do hero e marca
-  d'água, ajustada pela linha mais longa, "LUVANICE"). Assim o texto ocupa praticamente o mesmo
+  `Sora Fallback` (corpo) e `Space Grotesk Hero Fallback` (classe `font-hero`: nome do hero, ajustada
+  pela linha mais longa, "LUVANICE"). Assim o texto ocupa praticamente o mesmo
   espaço e o nome não passa da borda no celular; com a fonte carregada, nada muda. Se as fontes ou o
   hero mudarem, os valores precisam ser medidos de novo, com o método de
   `specs/0005-fallback-fonte-hero/plan.md` (`measureText` no Chromium).
