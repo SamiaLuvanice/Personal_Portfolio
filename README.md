@@ -41,7 +41,7 @@ Portfólio pessoal moderno desenvolvido com React 18, TypeScript e Tailwind CSS,
 A ordem na página é Hero, Projetos, Expertise, Experiência e Contato, seguida do rodapé. As seções
 abaixo da dobra são carregadas sob demanda e o conteúdo fica em `src/content/portfolio.ts`.
 
-- **Hero** - Apresentação inicial com retrato e CTA
+- **Hero** - Nome em duas linhas, retrato, ações "Explorar projetos" e "Entrar em contato", links profissionais em ícones e aurora decorativa em P&B (`HeroAurora`): a cor aparece sob o ponteiro no desktop, num foco ambiente no toque e fica estática com movimento reduzido
 - **Projects** - Projetos com filtro (todos, autorais, comerciais) em cards (`ProjectCard`)
 - **Expertise** - Accordion (Radix) com vários itens abertos e prévia ilustrada (`ExpertisePreview`)
 - **Experience** - Experiência profissional
@@ -67,6 +67,7 @@ O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
 
 ### Hooks Customizados
 - **useActiveSection()** - Indica a seção visível para marcar o link ativo da navegação (`src/hooks/use-active-section.ts`)
+- **useAuroraPointer()** / **useHeroMotion()** - Revelação de cor pelo ponteiro e início/pausa do movimento da aurora do hero (`src/hooks/use-hero-aurora.ts`)
 - **useToast()** - Hook para disparar notificações toast
 
 ### Tipografia
@@ -86,7 +87,7 @@ O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
 ### Recursos de Design
 - Sistema de cores HSL configurável
 - Gradientes personalizados
-- Imagens em WebP (`public/projects/`, `public/hero/portrait.webp`)
+- Imagens em WebP (`public/projects/`, `public/hero/`)
 - Sombras suaves e glow effects
 - Transições smooth e bounce
 - Componentes responsivos
@@ -110,6 +111,7 @@ npm run dev            # http://localhost:8080
 | `npm run test:e2e` | Playwright + axe contra o build (instale antes: `npx playwright install chromium`) |
 | `npm run lighthouse` | Lighthouse CI sobre `dist/` (rode `npm run build` antes) |
 | `npm run check` | Todos os portões de `harness.yaml` |
+| `node scripts/generate-hero-aurora.mjs` | Gera as imagens da aurora do hero em `public/hero/aurora-*.webp` (usa o Chromium do Playwright; não precisa de build) |
 | `node scripts/generate-og-image.mjs` | Gera `public/og-image.jpg` (prévia de link, 1200 × 630) a partir do hero (rode `npm run build` antes) |
 
 ## Docker (alternativa local/self-host)
@@ -140,13 +142,14 @@ e2e/                     # Testes Playwright + axe
 docs/                    # Arquitetura, harness e aprendizados
 specs/                   # Especificações numeradas (fluxo /spec → /verify)
 public/
-├── hero/portrait.webp   # Retrato do Hero (pré-carregado no index.html)
+├── hero/               # portrait-2026.webp (retrato, pré-carregado no index.html) e aurora-*.webp
 ├── projects/            # Imagens dos projetos em WebP
 └── ...                  # Arquivos públicos (robots, sitemap, certificados, etc.)
 src/
 ├── components/
 │   ├── Navbar.tsx           # Barra superior (≥ 1024 px) ou inferior de quatro colunas, com seção ativa
-│   ├── Hero.tsx             # Seção hero inicial com apresentação e CTA
+│   ├── Hero.tsx             # Seção hero inicial com nome, retrato, ações e links
+│   ├── HeroAurora.tsx       # Aurora decorativa do hero (camadas P&B e coloridas)
 │   ├── AvailabilityBadge.tsx # Selo de disponibilidade
 │   ├── SectionTitle.tsx     # Título padrão das seções
 │   ├── Projects.tsx         # Seção de projetos com filtro
@@ -174,9 +177,11 @@ src/
 │   └── portfolio.ts         # Conteúdo da página (projetos, expertise, experiência, links, navegação)
 ├── hooks/
 │   ├── use-active-section.ts # Seção visível para a navegação
+│   ├── use-hero-aurora.ts   # Ponteiro e movimento da aurora do hero
 │   └── use-toast.ts         # Hook para disparo de notificações
 ├── lib/
 │   ├── active-section.ts    # Lógica pura da seção ativa
+│   ├── aurora.ts            # Regras puras da revelação de cor do hero
 │   ├── contact.ts           # Monta o link mailto: do contato
 │   ├── filter-projects.ts   # Filtro de projetos por categoria
 │   └── utils.ts             # Funções utilitárias (cn para merge de classes)
@@ -240,10 +245,11 @@ Cada seção tem um `Suspense` com um espaço reservado de altura mínima, para 
 enquanto o chunk carrega.
 
 ### Imagens e fontes
-- Retrato do Hero em `public/hero/portrait.webp`, pré-carregado no `index.html` (imagem do LCP)
+- Retrato do Hero em `public/hero/portrait-2026.webp`, pré-carregado no `index.html` (imagem do LCP)
+- Imagens da aurora (`public/hero/aurora-*.webp`) pedidas só 1,5 s depois do evento `load`, sem competir com o retrato
 - Imagens dos projetos em WebP, preguiçosas
 - Sora e Space Grotesk servidas pelo próprio domínio (`@fontsource-variable`, em `src/fonts.ts`), carregadas por import dinâmico depois do evento `load`, com `font-display: swap`
-- Até a troca, o texto usa fallbacks ajustados em `src/index.css` (`@font-face` com `local()` e `size-adjust`/overrides sobre Arial, Liberation Sans, Helvetica e Roboto, faces regular e bold): `Space Grotesk Fallback` nos títulos, `Sora Fallback` no corpo e `Space Grotesk Hero Fallback` (classe `font-hero`) no nome do hero e na marca d'água, ajustado por "LUVANICE". O texto ocupa quase o mesmo espaço e o nome não passa da borda no celular. Se as fontes ou o hero mudarem, meça os valores de novo (método em [specs/0005-fallback-fonte-hero/plan.md](specs/0005-fallback-fonte-hero/plan.md))
+- Até a troca, o texto usa fallbacks ajustados em `src/index.css` (`@font-face` com `local()` e `size-adjust`/overrides sobre Arial, Liberation Sans, Helvetica e Roboto, faces regular e bold): `Space Grotesk Fallback` nos títulos, `Sora Fallback` no corpo e `Space Grotesk Hero Fallback` (classe `font-hero`) no nome do hero, ajustado por "LUVANICE". O texto ocupa quase o mesmo espaço e o nome não passa da borda no celular. Se as fontes ou o hero mudarem, meça os valores de novo (método em [specs/0005-fallback-fonte-hero/plan.md](specs/0005-fallback-fonte-hero/plan.md))
 - Retrato, capturas dos projetos e `og-image.jpg` com cache de 7 dias (`vercel.json`); imagem substituída ganha nome novo
 
 **Arquivo:** [src/pages/Index.tsx](src/pages/Index.tsx)
