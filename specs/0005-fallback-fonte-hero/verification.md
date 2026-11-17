@@ -33,7 +33,7 @@ Medida pelo texto (`Range`). A fonte carregada foi identificada pelo nome exato 
 | Com as fontes bloqueadas, o nome cabe em 320–1280 px | Passou | E2E e tabela acima |
 | Largura a até 5% da largura com a fonte carregada | Passou | De 2,0% a 2,3% (tabela) |
 | Com a fonte carregada, a aparência não muda | Passou | Screenshots idênticos (ver Comandos) |
-| Lighthouse mobile em produção ≥ 90 / ≥ 95, LCP ≤ 2,5 s, CLS ≤ 0,1 | Pendente | Depois do merge |
+| Lighthouse mobile em produção ≥ 90 / ≥ 95, LCP ≤ 2,5 s, CLS ≤ 0,1 | Passou, com ressalva | Acessibilidade, LCP e CLS atendem nas 6 execuções. Performance ≥ 0,90 em 5 de 6: a 2ª deu 0,89, com cache da borda frio (ver "Produção") |
 | Portões verdes | Passou | Tabela de comandos |
 
 ## Revisão independente (`code-reviewer`)
@@ -48,8 +48,25 @@ Medida pelo texto (`Range`). A fonte carregada foi identificada pelo nome exato 
 | **S5:** nomes `local()` corretos | Acrescentados os nomes PostScript da Liberation Sans |
 | **S6:** spec sem versionamento e sem verificação | Este arquivo. A spec entra no commit de docs |
 
+## Produção
+
+Medido em 17/11/2026, depois do merge do PR #13 (`cb700dc`) e do #14, em https://samialuvanicedev.vercel.app/. O CSS publicado contém as faces `Space Grotesk Hero Fallback`.
+
+`npx lhci collect --url=https://samialuvanicedev.vercel.app/ --numberOfRuns=6` (mobile padrão):
+
+| Execução | Performance | Acessibilidade | LCP | CLS | Speed Index | Retrato (rede) |
+|---|---|---|---|---|---|---|
+| 1ª | 0,92 | 1,0 | 1,75 s | 0,001 | 6,50 s | 3 762 ms |
+| 2ª | 0,89 | 1,0 | 1,85 s | 0 | 6,06 s | 3 378 ms |
+| 3ª | 0,97 | 1,0 | 1,81 s | 0 | 1,80 s | 341 ms |
+| 4ª | 0,99 | 1,0 | 1,77 s | 0 | 1,59 s | 347 ms |
+| 5ª | 0,98 | 1,0 | 1,76 s | 0 | 1,77 s | 430 ms |
+| 6ª | 0,98 | 1,0 | 1,77 s | 0 | 1,80 s | 425 ms |
+
+Nas duas primeiras execuções, o retrato levou de 3,4 a 3,8 s para chegar, porque a borda da Vercel ainda não tinha a imagem em cache depois do deploy. Isso puxou o Speed Index para cerca de 6 s. Com o cache quente, a Performance fica entre 0,97 e 0,99. O LCP (≤ 1,85 s) e o CLS (≤ 0,001) atendem em todas as execuções.
+
 ## Limites
 
 - **Android não verificado:** a Roboto foi medida com o `.woff2` do Fontsource no Chromium de desktop. O nome `local("Roboto Bold")` não foi testado num Android real. No Android 12 ou mais novo, a Roboto do sistema é variável, e uma instância bold sem esse nome faria o hero cair no `sans-serif` sem ajuste, como antes desta spec.
 - **Outras fontes do sistema** (por exemplo DejaVu Sans) seguem sem ajuste.
-- **Lighthouse em produção:** pendente até o merge.
+- **Cache frio da borda:** logo depois de um deploy, as primeiras execuções podem ficar abaixo de 0,90 em Performance, como já acontecia na 0003.
