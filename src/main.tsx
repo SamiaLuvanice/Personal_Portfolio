@@ -10,6 +10,7 @@ createRoot(document.getElementById('root')!).render(
 )
 
 // Fontes depois do load: o texto aparece com a fonte do sistema e troca (font-display: swap).
-const loadFonts = () => void import('./fonts')
+// Se o chunk falhar (ex.: aba antiga após um deploy), fica a fonte do sistema, que é o fallback aceito.
+const loadFonts = () => void import('./fonts').catch(() => {})
 if (document.readyState === 'complete') loadFonts()
 else window.addEventListener('load', loadFonts, { once: true })
