@@ -21,6 +21,21 @@ Branch `feat/redesign-pagina-inicial`. Verificação local em Windows: Chromium 
 
 A primeira medição caiu em `/index.html`, que a SPA trata como 404, e foi descartada. As duas tabelas acima medem a home.
 
+### Lighthouse mobile em produção
+
+Medido após o merge do PR #8 (`228b9da`), em https://samialuvanicedev.vercel.app/. O preview do PR exigia login na Vercel e não pôde ser medido sem credenciais. Comando: `npx lhci collect --url=https://samialuvanicedev.vercel.app/`, configuração mobile padrão, 6 execuções.
+
+| Execução | Performance | Acessibilidade | Boas práticas | SEO | LCP | CLS | TBT |
+|---|---|---|---|---|---|---|---|
+| 1ª (cache frio) | 0,89 | 1,0 | 1,0 | 1,0 | 3,0 s | 0 | 0 ms |
+| 2ª a 6ª | **0,96–0,99** | **1,0** | 1,0 | 1,0 | **1,6–1,8 s** | 0–0,007 | 20–210 ms |
+
+- **Por que a 1ª ficou abaixo da meta:**
+  - O retrato levou 360 ms para baixar, contra 63–71 ms nas demais. A fase de carga do LCP foi de 1,1 s, contra 0,2 s.
+  - Foi a primeira requisição depois do deploy, antes de a imagem estar no cache da borda da Vercel. Nas seguintes, o cabeçalho veio como `X-Vercel-Cache: HIT`.
+- **Conclusão:** com cache da borda, o critério é atendido (Performance ≥ 90, Acessibilidade ≥ 95, LCP ≤ 2,5 s, CLS ≤ 0,1).
+- **Melhoria futura (fora desta spec):** os arquivos de `public/hero/` e `public/projects/` saem com `Cache-Control: public, max-age=0, must-revalidate`, porque `vercel.json` só dá cache longo a `/assets/`. Com isso, o navegador revalida a imagem a cada visita.
+
 ### `/verify` antes do commit
 
 - **Portões:** `node .agents/scripts/gates.mjs --skip-install` no estado final passou: lint, typecheck, 23 testes unitários, build e 55 E2E (1 pulado de propósito).
@@ -57,7 +72,7 @@ A primeira medição caiu em `/index.html`, que a SPA trata como 404, e foi desc
 | Retrato e screenshots com `alt`; marcas d'água ocultas | Passou | E2E |
 | Movimento reduzido sem deslocamentos animados | Passou | E2E: o accordion não anima com `reduce`. QA: âncora sem rolagem suave e card sem `transform` |
 | SEO: title, description e OG como Full Stack Developer | Passou | E2E dos metadados. Lighthouse SEO 1,0 |
-| Lighthouse mobile ≥ 90 / ≥ 95, LCP ≤ 2,5 s, CLS ≤ 0,1 | Passou localmente | Tabela acima. **Pendente no preview do PR** |
+| Lighthouse mobile ≥ 90 / ≥ 95, LCP ≤ 2,5 s, CLS ≤ 0,1 | Passou | Local: 0,99 / 1,0 / 2,0 s. Produção: 0,96–0,99 / 1,0 / 1,6–1,8 s em 5 de 6 execuções; a 1ª, com cache frio, deu 0,89 e 3,0 s (ver "Lighthouse mobile em produção") |
 | Imagens fora da dobra preguiçosas, sem competir com o retrato | Passou | E2E: retrato com `fetchpriority=high` e primeiro pedido de imagem; demais com `loading=lazy` |
 | Portões passam | Passou | Tabela de comandos |
 
@@ -82,7 +97,7 @@ A primeira medição caiu em `/index.html`, que a SPA trata como 404, e foi desc
 
 ## Limites
 
-- **Preview da Vercel não verificado**: falta repetir o Lighthouse mobile no preview do PR. O `lighthouserc.json` do CI continua com preset desktop e limites mais baixos (piso, não a meta da spec).
+- **Preview da Vercel não verificado:** ele exige login. A medição foi feita em produção, depois do merge. O `lighthouserc.json` do CI continua com preset desktop e limites mais baixos (piso, não a meta da spec).
 - **LinkedIn não confirmado** automaticamente (bloqueio anti-robô); conferir no navegador.
 - **Foco sob a barra inferior:** com `scroll-padding`, o item focado costuma ficar todo visível. Em cerca de 1 a cada 5 execuções, o Chrome ignora o padding e o item fica parcialmente visível (20 de 44 px em "Todos"). Isso atende ao WCAG 2.4.11 (AA, meta da spec), mas não ao 2.4.12 (AAA).
 - **Fontes do Google** carregam sem bloquear. Pode haver troca de fonte visível em rede lenta (CLS medido ≤ 0,008). Hospedar as fontes no próprio site fica como melhoria futura.

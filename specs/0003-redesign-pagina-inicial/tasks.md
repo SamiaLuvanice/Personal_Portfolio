@@ -14,4 +14,4 @@
   - Depois: Performance 0,98–0,99, Acessibilidade 1,0, LCP 2,1 s, CLS ≤ 0,009.
 - [x] T11. Revisão independente (`code-reviewer`) e QA (`qa`). Achados tratados e verificados; ver `verification.md`.
 - [x] T12. `docs-impact` listou `docs/architecture.md` e `README.md`. O agente `doc-sync-onboarding` atualizou os dois e o `docs/LEARNINGS.md`. `verification.md` registrado.
-- [ ] Pendente fora deste branch: Lighthouse mobile no preview da Vercel, depois de abrir o PR.
+- [x] Lighthouse mobile em produção, depois do merge do PR #8 (o preview exigia login): 0,96–0,99 e LCP 1,6–1,8 s com cache; a 1ª execução, com cache frio, deu 0,89. Registrado em `verification.md`.
