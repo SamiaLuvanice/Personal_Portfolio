@@ -88,12 +88,20 @@ test("prévia de link usa imagem grande de 1200 × 630 com texto alternativo (sp
   expect(response.status()).toBe(200);
   expect(response.headers()["content-type"]).toBe("image/jpeg");
   expect((await response.body()).length).toBeLessThanOrEqual(300 * 1024);
+  const size = await page.evaluate(async () => {
+    const image = new Image();
+    image.src = "/og-image.jpg";
+    await image.decode();
+    return [image.naturalWidth, image.naturalHeight];
+  });
+  expect(size).toEqual([1200, 630]);
 });
 
 test("fontes vêm do próprio site, sem serviço de terceiros (spec 0004)", async ({ page }) => {
-  const external: string[] = [];
+  // Qualquer requisição de fonte (ou da folha de estilo do serviço) precisa ser da mesma origem.
+  const fonts: string[] = [];
   page.on("request", (req) => {
-    if (/fonts\.(googleapis|gstatic)\.com/.test(req.url())) external.push(req.url());
+    if (req.resourceType() === "font" || /fonts\.(googleapis|gstatic)\.com/.test(req.url())) fonts.push(req.url());
   });
   await page.goto("/");
   await loadAllSections(page);
@@ -103,7 +111,9 @@ test("fontes vêm do próprio site, sem serviço de terceiros (spec 0004)", asyn
       page.evaluate(() => [...document.fonts].filter((face) => face.status === "loaded").map((face) => face.family.replace(/"/g, ""))),
     )
     .toEqual(expect.arrayContaining(["Sora Variable", "Space Grotesk Variable"]));
-  expect(external).toEqual([]);
+  const origin = new URL(page.url()).origin;
+  expect(fonts.length).toBeGreaterThan(0);
+  expect(fonts.filter((url) => new URL(url).origin !== origin)).toEqual([]);
   const families = await page.evaluate(() => ({
     body: getComputedStyle(document.body).fontFamily,
     title: getComputedStyle(document.querySelector("h1")!).fontFamily,
@@ -395,10 +405,9 @@ test("foco de teclado não fica inteiramente escondido sob a barra fixa (WCAG 2.
   await page.setViewportSize({ width: 320, height: 640 });
   await page.goto("/");
   // As fontes usam font-display: swap; espera a fonte de título carregar para medir o layout final.
-  await page.waitForFunction(async () => {
-    await document.fonts.ready;
-    return [...document.fonts].some((face) => face.family.includes("Space Grotesk") && face.status === "loaded");
-  });
+  await page.waitForFunction(() =>
+    [...document.fonts].some((face) => face.family.includes("Space Grotesk") && face.status === "loaded"),
+  );
   const nav = page.getByRole("navigation", { name: "Navegação principal" });
   // Chega a cada alvo pelo Tab, como faria quem navega pelo teclado.
   const footer = page.getByRole("contentinfo");
