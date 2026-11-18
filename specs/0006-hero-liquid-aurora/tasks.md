@@ -10,4 +10,4 @@
 - [x] T7 — Conferência visual em 320, 390, 768, 1024, 1280 e 1440 px contra o Figma.
 - [x] T8 — Portões verdes e Lighthouse local comparado com a `main`.
 - [x] T9 — Revisão independente (`code-reviewer`) e QA (`qa`); achados tratados.
-- [ ] T10 — Documentação sincronizada, PR com preview conferido; Lighthouse em produção após o merge.
+- [x] T10 — Documentação sincronizada, PR com preview conferido; Lighthouse em produção após o merge.
