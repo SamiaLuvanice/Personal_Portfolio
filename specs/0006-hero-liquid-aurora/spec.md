@@ -3,7 +3,7 @@ numero: 0006
 titulo: Hero Liquid Aurora — monocromático por padrão, cor pela interação
 tipo: feature
 prioridade: P1
-status: pronta
+status: implementada
 toca: [interface, conteudo]
 depende_de: ["0003", "0005"]
 ---

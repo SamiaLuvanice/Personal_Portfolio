@@ -26,7 +26,7 @@ Branch `feat/hero-liquid-aurora`, novembro de 2026, nesta máquina Windows.
 | Acessibilidade e contraste | Passou (após correções do QA) | axe sem violações sérias (E2E da home, desktop e mobile). Método do QA: cor computada do texto contra o pixel de fundo mais claro sob os glifos, numa captura com o texto transparente. **Revelação sobre o parágrafo, grade de 18 posições a 1440 px:** pior caso 5,82:1. **Foco ambiente no Pixel 7, 10,5 s:** pior caso 5,73:1. **Sem revelação, de 320 a 1440 px:** parágrafo ≥ 6,05:1 e "Full Stack Developer" ≥ 3,74:1 (texto grande). **Contorno de "SÂMIA":** 7,95–9,85:1. Histórico: a 1ª medição deu 3,42:1 com o cinza "muted". O QA achou 4,29–4,42:1 nos piores pontos e 1,43:1 entre 1024 e cerca de 1270 px, com a foto sob o texto. Correções: texto em `hsl(280 15% 88%)`, halo escuro suave nos textos da apresentação e foto posicionada com distância mínima do bloco de texto no desktop |
 | Cores forçadas | Passou | E2E: depois de `data-motion="on"`, aurora e cópias coloridas ocultas; as duas linhas do nome com a cor de `CanvasText` e contorno 0 |
 | Spec 0005 (nome com a fonte do sistema) | Passou | E2E existente da 0005, sem mudança |
-| Lighthouse mobile ≥ 90 / ≥ 95, LCP ≤ 2,5 s, CLS ≤ 0,1 | **Pendente (produção)** | Ver "Lighthouse" abaixo. Acessibilidade 100, Boas práticas 100, SEO 100 e CLS 0 em todas as execuções locais |
+| Lighthouse mobile ≥ 90 / ≥ 95, LCP ≤ 2,5 s, CLS ≤ 0,1 | Passou | PageSpeed Insights mobile em produção, 3 execuções em 18/11/2026: Performance 97 / 99 / 97 (mediana 97), Acessibilidade 100, LCP 1,7 s e CLS 0 nas três (ver "Produção"). O Lighthouse CLI local tinha dado Performance ≥ 0,90 em só 9 de 16 execuções |
 | Portões verdes | Passou | Acima |
 
 ## Lighthouse
@@ -84,7 +84,38 @@ Ficaram como considerações, sem ação:
 
 `src/pages/Index.tsx`: o realinhamento até a âncora esperava dois quadros fixos depois de carregar os chunks. Com o hero novo, o E2E "em cores forçadas… seção ativa" no Pixel 7 falhava 1 vez em 4, e passava 8 de 8 na `main`. Reproduzido: a rolagem parava na posição em que a Expertise estava enquanto Projetos ainda era um espaço reservado. Depois da correção, passou 54 de 54 com repetição.
 
+## Produção
+
+Medido em 17/11/2026, depois do merge dos PRs #16 e #17 (`90f110f`), em https://samialuvanicedev.vercel.app/. O HTML publicado pré-carrega `/hero/portrait-2026.webp` (32 438 bytes, `Cache-Control: max-age=604800`), e as `aurora-*.webp` respondem 200.
+
+**Lighthouse CLI, mobile padrão, 6 execuções.** O Chromium é o do Playwright; o `lighthouserc.json` do repositório usa o preset desktop.
+
+| Execução | Performance | Acessibilidade | Boas práticas | SEO | LCP | CLS | TBT |
+|---|---|---|---|---|---|---|---|
+| 1ª | 0,66 | 1,0 | 1,0 | 1,0 | 2,41 s | 0 | 1 841 ms |
+| 2ª | 0,75 | 1,0 | 1,0 | 1,0 | 2,26 s | 0 | 908 ms |
+| 3ª | 0,68 | 1,0 | 1,0 | 1,0 | 2,14 s | 0 | 1 962 ms |
+| 4ª | 0,94 | 1,0 | 1,0 | 1,0 | 2,09 s | 0 | 202 ms |
+| 5ª | 0,95 | 1,0 | 1,0 | 1,0 | 2,10 s | 0 | 168 ms |
+| 6ª | 0,93 | 1,0 | 1,0 | 1,0 | 2,26 s | 0 | 200 ms |
+
+**Mais 10 execuções, com trace salvo:**
+- Performance 0,94 / 0,90 / 0,87 / 0,94 / 0,90 / 0,72 / 0,76 / 0,89 e duas sem nota registrada (TBT 90 e 267 ms).
+- Nas execuções lentas, a tarefa longa da thread principal (300–370 ms observados) e a do compositor acontecem juntas, por volta de 1,25 s. Isso é cerca de 0,8 s depois do `load` e antes da entrada da aurora (`load` + 1,5 s ≈ 1,9 s). O processo de GPU (SwiftShader) tem tarefas de 200–560 ms desde o início da página. O momento coincide com a troca de fontes, que pela spec 0004 só carregam depois do `load`.
+- **Inferido, não provado:** a variação vem do ambiente desta máquina, que mostrou o mesmo padrão em duas faixas medindo a `main` antiga (0,63–0,94; ver "Lighthouse").
+
+**PageSpeed Insights, 17/11/2026:** a API anônima recusou as 3 tentativas com HTTP 429 (cota diária esgotada).
+
+**PageSpeed Insights, 18/11/2026 (Issue #19).** A API anônima ainda respondeu HTTP 429, então a medição foi feita pelo site https://pagespeed.web.dev/, aba Telemóvel (Moto G Power emulado, 4G lenta, Lighthouse 13.6.0, HeadlessChromium 157), 3 análises seguidas:
+
+| Execução | Relatório | Performance | Acessibilidade | Boas práticas | SEO | FCP | LCP | TBT | CLS | Speed Index |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1ª (10:11) | [`lo5s6o5wuf`](https://pagespeed.web.dev/analysis/https-samialuvanicedev-vercel-app/lo5s6o5wuf?form_factor=mobile) | 97 | 100 | 100 | 100 | 1,3 s | 1,7 s | 0 ms | 0 | 4,5 s |
+| 2ª (10:12) | [`2erc9a2d4t`](https://pagespeed.web.dev/analysis/https-samialuvanicedev-vercel-app/2erc9a2d4t?form_factor=mobile) | 99 | 100 | 100 | 100 | 1,2 s | 1,7 s | 0 ms | 0 | 3,1 s |
+| 3ª (10:13) | [`utrgedwr9f`](https://pagespeed.web.dev/analysis/https-samialuvanicedev-vercel-app/utrgedwr9f?form_factor=mobile) | 97 | 100 | 100 | 100 | 1,3 s | 1,7 s | 0 ms | 0 | 4,2 s |
+
+**Mediana de Performance: 97.** Sem tarefa longa (TBT 0 ms nas três). Isso reforça, sem provar, a inferência de que as execuções lentas do Lighthouse CLI vinham desta máquina. O Speed Index (3,1–4,5 s) fica na faixa laranja em duas execuções; não faz parte do critério e não foi investigado.
+
 ## Pendências
 
-- **Lighthouse mobile em produção** depois do merge (critério ainda aberto).
 - **`public/og-image.jpg`** ainda mostra o hero antigo. Regenerar exige nome novo por causa do cache; fica para uma tarefa à parte.
