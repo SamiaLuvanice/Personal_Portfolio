@@ -112,7 +112,7 @@ npm run dev            # http://localhost:8080
 | `npm run lighthouse` | Lighthouse CI sobre `dist/` (rode `npm run build` antes) |
 | `npm run check` | Todos os portões de `harness.yaml` |
 | `node scripts/generate-hero-aurora.mjs` | Gera as imagens da aurora do hero em `public/hero/aurora-*.webp` (usa o Chromium do Playwright; não precisa de build) |
-| `node scripts/generate-og-image.mjs` | Gera `public/og-image.jpg` (prévia de link, 1200 × 630) a partir do hero (rode `npm run build` antes) |
+| `node scripts/generate-og-image.mjs` | Gera a prévia de link (`public/og-image-<versão>.jpg`, 1200 × 630) a partir do hero, com movimento reduzido (rode `npm run build` antes) |
 
 ## Docker (alternativa local/self-host)
 
@@ -250,7 +250,7 @@ enquanto o chunk carrega.
 - Imagens dos projetos em WebP, preguiçosas
 - Sora e Space Grotesk servidas pelo próprio domínio (`@fontsource-variable`, em `src/fonts.ts`), carregadas por import dinâmico depois do evento `load`, com `font-display: swap`
 - Até a troca, o texto usa fallbacks ajustados em `src/index.css` (`@font-face` com `local()` e `size-adjust`/overrides sobre Arial, Liberation Sans, Helvetica e Roboto, faces regular e bold): `Space Grotesk Fallback` nos títulos, `Sora Fallback` no corpo e `Space Grotesk Hero Fallback` (classe `font-hero`) no nome do hero, ajustado por "LUVANICE". O texto ocupa quase o mesmo espaço e o nome não passa da borda no celular. Se as fontes ou o hero mudarem, meça os valores de novo (método em [specs/0005-fallback-fonte-hero/plan.md](specs/0005-fallback-fonte-hero/plan.md))
-- Retrato, capturas dos projetos e `og-image.jpg` com cache de 7 dias (`vercel.json`); imagem substituída ganha nome novo
+- Retrato, capturas dos projetos e `og-image-<versão>.jpg` com cache de 7 dias (`vercel.json`); imagem substituída ganha nome novo
 
 **Arquivo:** [src/pages/Index.tsx](src/pages/Index.tsx)
 

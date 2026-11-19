@@ -51,7 +51,7 @@ flowchart LR
 |---|---|
 | Build | `npm run build` → `dist/` (`vercel.json`) |
 | Fallback da SPA | rewrite de todas as rotas para `/index.html` (arquivos estáticos têm precedência) |
-| Cabeçalhos | `nosniff`, `Referrer-Policy`, `X-Frame-Options: DENY`, `Permissions-Policy`, HSTS; cache imutável em `/assets/*`; 7 dias (`max-age=604800, stale-while-revalidate=86400`) em `/hero/*`, `/projects/*` e `/og-image.jpg` |
+| Cabeçalhos | `nosniff`, `Referrer-Policy`, `X-Frame-Options: DENY`, `Permissions-Policy`, HSTS; cache imutável em `/assets/*`; 7 dias (`max-age=604800, stale-while-revalidate=86400`) em `/hero/*`, `/projects/*` e `/og-image-*.jpg` |
 | Preview | um por PR (integração Git da Vercel) |
 | Produção | merge em `main` → https://samialuvanicedev.vercel.app |
 | Node | 22.x (`engines` e `.nvmrc`) |
@@ -72,8 +72,10 @@ cache do `vercel.json`.
 Metadados em `index.html` (title, description, canonical, Open Graph, Twitter), `public/robots.txt` com
 `Sitemap:` e `public/sitemap.xml` com a URL de produção.
 
-Prévia de link: `public/og-image.jpg` (1200 × 630, JPEG) é gerada do hero do build por
-`node scripts/generate-og-image.mjs` (rode depois de `npm run build`). O `index.html` declara
+Prévia de link: `public/og-image-2026.jpg` (1200 × 630, JPEG) é gerada do hero do build por
+`node scripts/generate-og-image.mjs` (rode depois de `npm run build`). A captura usa movimento
+reduzido, então a aurora sai no estado estático. Como a imagem tem cache de 7 dias, cada nova
+versão ganha nome novo (`OG_IMAGE` no script) e as referências são atualizadas. O `index.html` declara
 `og:image` com largura, altura, tipo e texto alternativo, `twitter:card` `summary_large_image` e
 `twitter:image` com texto alternativo.
 

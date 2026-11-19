@@ -75,7 +75,9 @@ test("prévia de link usa imagem grande de 1200 × 630 com texto alternativo (sp
   const meta = (selector: string) =>
     page.evaluate((target) => document.querySelector(target)?.getAttribute("content") ?? null, selector);
   const image = await meta('meta[property="og:image"]');
-  expect(image).toMatch(/^https:\/\/samialuvanicedev\.vercel\.app\/og-image\.jpg$/);
+  // Nome versionado (og-image-<versão>.jpg): a imagem tem cache de 7 dias e ganha nome novo ao mudar.
+  expect(image).toMatch(/^https:\/\/samialuvanicedev\.vercel\.app\/og-image-[\w-]+\.jpg$/);
+  const imagePath = new URL(image!).pathname;
   expect(await meta('meta[property="og:image:width"]')).toBe("1200");
   expect(await meta('meta[property="og:image:height"]')).toBe("630");
   expect(await meta('meta[property="og:image:type"]')).toBe("image/jpeg");
@@ -84,16 +86,16 @@ test("prévia de link usa imagem grande de 1200 × 630 com texto alternativo (sp
   expect(await meta('meta[name="twitter:image"]')).toBe(image);
   expect(await meta('meta[name="twitter:image:alt"]')).toMatch(/Sâmia Luvanice/);
 
-  const response = await request.get("/og-image.jpg");
+  const response = await request.get(imagePath);
   expect(response.status()).toBe(200);
   expect(response.headers()["content-type"]).toBe("image/jpeg");
   expect((await response.body()).length).toBeLessThanOrEqual(300 * 1024);
-  const size = await page.evaluate(async () => {
+  const size = await page.evaluate(async (src) => {
     const image = new Image();
-    image.src = "/og-image.jpg";
+    image.src = src;
     await image.decode();
     return [image.naturalWidth, image.naturalHeight];
-  });
+  }, imagePath);
   expect(size).toEqual([1200, 630]);
 });
 
