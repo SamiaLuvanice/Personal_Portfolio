@@ -494,17 +494,64 @@
     pointer-events: none;
   }
 
-  /* Cards: P&B só onde há ponteiro; a cor volta no hover e no foco. */
+  /* Cards: P&B só onde há ponteiro; a cor volta no hover e no foco, com zoom, seta girando e o
+     nome rolando letra a letra (só transform, escalonado por --i). */
+  .project-card-arrow,
+  .roll-letter-track {
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .roll-letter-track {
+    transition-delay: calc(var(--i, 0) * 35ms);
+  }
+
+  .project-card-open {
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .project-card {
+    transition: box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .project-card:focus-visible .project-card-open {
+    background-color: hsl(var(--primary));
+  }
+
+  .project-card:focus-visible .project-card-arrow {
+    transform: rotate(-45deg);
+  }
+
+  .project-card:focus-visible .roll-letter-track {
+    transform: translateY(-50%);
+  }
+
   @media (hover: hover) and (pointer: fine) {
     .project-card-image {
       filter: grayscale(1);
-      transition: filter 0.32s cubic-bezier(0.4, 0, 0.2, 1), transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .project-card:hover .project-card-image,
     .project-card:focus-visible .project-card-image {
       filter: none;
-      transform: scale(1.03);
+      transform: scale(1.08);
+    }
+
+    /* Só onde há hover de verdade: no toque, o card não fica "grudado" laranja ao voltar da aba. */
+    .project-card:hover {
+      box-shadow: 0 20px 48px -24px hsl(240 20% 10% / 0.45);
+    }
+
+    .project-card:hover .project-card-open {
+      background-color: hsl(var(--primary));
+    }
+
+    .project-card:hover .project-card-arrow {
+      transform: rotate(-45deg);
+    }
+
+    .project-card:hover .roll-letter-track {
+      transform: translateY(-50%);
     }
   }
 
@@ -552,6 +599,13 @@
 
     .project-card-image {
       transition-property: filter;
+    }
+
+    .project-card:hover .roll-letter-track,
+    .project-card:focus-visible .roll-letter-track,
+    .project-card:hover .project-card-arrow,
+    .project-card:focus-visible .project-card-arrow {
+      transform: none;
     }
 
     /* Hero estático: nada se move, toque fixo e discreto de cor (só o foco A), conteúdo já visível. */

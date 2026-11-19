@@ -10,6 +10,8 @@ describe("conteúdo do portfólio", () => {
       expect(new URL(project.url).protocol).toBe("https:");
       expect(project.tags).toHaveLength(2);
       expect(project.image.alt.length).toBeGreaterThan(10);
+      // O card anima o nome e mostra o complemento depois do travessão.
+      expect(project.title).toMatch(new RegExp(`^${project.name} — \\S`));
     }
   });
 
