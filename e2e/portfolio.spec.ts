@@ -238,6 +238,28 @@ test("imagens dos cards: P&B com ponteiro e cor no hover e no foco; coloridas em
   }
 });
 
+test("com movimento, o hover e o foco do card dão zoom, giram a seta e rolam o nome", async ({ page }) => {
+  test.skip(!isDesktop(page), "efeito de hover só existe com ponteiro fino");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/#projects");
+  const card = page.getByRole("link", { name: /StudyNice/ });
+  const image = card.getByRole("img");
+  const arrow = card.locator(".project-card-arrow");
+  const letter = card.locator(".roll-letter-track").first();
+  await image.scrollIntoViewIfNeeded();
+  await expect(image).toHaveCSS("transform", "none");
+
+  await card.hover();
+  await expect(image).not.toHaveCSS("transform", "none");
+  await expect(arrow).not.toHaveCSS("transform", "none");
+  await expect.poll(() => letter.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42)).toBeLessThan(0);
+
+  await page.mouse.move(0, 0);
+  await card.focus();
+  await expect(arrow).not.toHaveCSS("transform", "none");
+  await expect.poll(() => letter.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42)).toBeLessThan(0);
+});
+
 test("imagens fora da dobra são preguiçosas e não competem com o retrato do hero", async ({ page }) => {
   await page.goto("/");
   await loadAllSections(page);

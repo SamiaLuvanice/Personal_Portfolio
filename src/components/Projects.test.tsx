@@ -53,6 +53,18 @@ describe("Projetos", () => {
     expect(card).toHaveAccessibleName(expect.stringContaining("(abre em nova aba)"));
   });
 
+  it("anima o nome letra a letra sem soletrá-lo para o leitor de tela", () => {
+    render(<Projects />);
+    const card = screen.getByRole("link", { name: /StudyNice/ });
+    const heading = within(card).getByRole("heading", { level: 3 });
+    expect(heading).toHaveAccessibleName("StudyNice — Hábitos de estudo");
+
+    const rolling = heading.querySelector("[aria-hidden='true']");
+    expect(rolling).not.toBeNull();
+    expect(rolling!.querySelectorAll(".roll-letter")).toHaveLength("StudyNice".length);
+    expect(within(card).getByText("Hábitos de estudo")).toHaveAttribute("aria-hidden", "true");
+  });
+
   it("oferece o link para os repositórios no GitHub", () => {
     render(<Projects />);
     expect(screen.getByRole("link", { name: /Mais no GitHub/ })).toHaveAttribute("href", "https://github.com/SamiaLuvanice");
