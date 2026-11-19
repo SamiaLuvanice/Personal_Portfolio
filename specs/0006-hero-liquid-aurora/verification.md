@@ -118,4 +118,4 @@ Medido em 17/11/2026, depois do merge dos PRs #16 e #17 (`90f110f`), em https://
 
 ## Pendências
 
-- **`public/og-image.jpg`** ainda mostra o hero antigo. Regenerar exige nome novo por causa do cache; fica para uma tarefa à parte.
+- ~~**`public/og-image.jpg`** ainda mostra o hero antigo.~~ Resolvido na Issue #20: a prévia foi regenerada do hero Liquid Aurora como `public/og-image-2026.jpg`.
