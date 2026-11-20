@@ -3,7 +3,7 @@ numero: 0008
 titulo: Título interativo na seção Contato
 tipo: melhoria
 prioridade: P3
-status: pronta
+status: implementada
 toca: [interface]
 depende_de: ["0003", "0005", "0007"]
 ---
@@ -34,17 +34,17 @@ Referência visual: um efeito de texto em que o contorno das letras se desenha n
 
 ## Critérios de aceite
 
-- [ ] **Título legível.** Em 320, 390, 768 e 1280 px de largura, o título "Vamos construir algo relevante?" aparece preenchido, sem cortar palavras e sem rolagem horizontal. Medido em captura, o contraste do texto com o fundo é de pelo menos 4,5:1 em repouso, durante a entrada e com o brilho centrado sobre o título.
-- [ ] **Entrada.** Sem pedido de menos movimento, tanto com cursor quanto no toque: quando a seção entra na tela, o contorno se desenha sobre as letras, termina em até 4 s e fica parado. Se a pessoa rolar para fora da seção e voltar na mesma visita, a animação não se repete.
-- [ ] **Brilho com cursor.** Num aparelho com hover e ponteiro fino, depois de 1 s com o cursor parado sobre o título, o brilho está visível nas cores da marca e o centro dele fica a até 40 px do cursor. O raio do brilho é de no máximo metade da altura do título. Até 1 s depois de o cursor sair, o brilho está totalmente apagado.
-- [ ] **Toque.** Num aparelho sem hover, tocar ou arrastar sobre o título rola a página normalmente e não faz aparecer nenhum brilho.
-- [ ] **Movimento reduzido.** O título aparece só preenchido, sem contorno animado. Mover o cursor sobre ele não faz aparecer brilho, e nenhuma animação do título fica em execução.
-- [ ] **Cores forçadas.** O contorno e o brilho ficam ocultos, e o título aparece com a cor de texto do sistema.
-- [ ] **Contorno alinhado.** O contorno coincide com as letras depois da troca da fonte de fallback pela fonte final (spec 0005) e depois de redimensionar a janela entre 320 e 1280 px.
-- [ ] **Acessibilidade.** A árvore de acessibilidade tem um único título de nível 2, "Vamos construir algo relevante?", que nomeia a seção. O título é anunciado uma única vez e nenhum conteúdo decorativo é lido. A verificação automatizada (axe) continua sem violações sérias ou críticas no desktop e no celular.
-- [ ] **Peso inicial.** O JavaScript baixado no carregamento inicial da página cresce no máximo 5 KB gzip em relação à `main`.
-- [ ] **Lighthouse mobile.** No preview do PR: Performance ≥ 90, Acessibilidade ≥ 95, LCP ≤ 2,5 s e CLS ≤ 0,1.
-- [ ] **Portões verdes.**
+- [x] **Título legível.** Em 320, 390, 768 e 1280 px de largura, o título "Vamos construir algo relevante?" aparece preenchido, sem cortar palavras e sem rolagem horizontal. Medido em captura, o contraste do texto com o fundo é de pelo menos 4,5:1 em repouso, durante a entrada e com o brilho centrado sobre o título.
+- [x] **Entrada.** Sem pedido de menos movimento, tanto com cursor quanto no toque: quando a seção entra na tela, o contorno se desenha sobre as letras, termina em até 4 s e fica parado. Se a pessoa rolar para fora da seção e voltar na mesma visita, a animação não se repete.
+- [x] **Brilho com cursor.** Num aparelho com hover e ponteiro fino, depois de 1 s com o cursor parado sobre o título, o brilho está visível nas cores da marca e o centro dele fica a até 40 px do cursor. O raio do brilho é de no máximo metade da altura do título. Até 1 s depois de o cursor sair, o brilho está totalmente apagado.
+- [x] **Toque.** Num aparelho sem hover, tocar ou arrastar sobre o título rola a página normalmente e não faz aparecer nenhum brilho.
+- [x] **Movimento reduzido.** O título aparece só preenchido, sem contorno animado. Mover o cursor sobre ele não faz aparecer brilho, e nenhuma animação do título fica em execução.
+- [x] **Cores forçadas.** O contorno e o brilho ficam ocultos, e o título aparece com a cor de texto do sistema.
+- [x] **Contorno alinhado.** O contorno coincide com as letras depois da troca da fonte de fallback pela fonte final (spec 0005) e depois de redimensionar a janela entre 320 e 1280 px.
+- [x] **Acessibilidade.** A árvore de acessibilidade tem um único título de nível 2, "Vamos construir algo relevante?", que nomeia a seção. O título é anunciado uma única vez e nenhum conteúdo decorativo é lido. A verificação automatizada (axe) continua sem violações sérias ou críticas no desktop e no celular.
+- [x] **Peso inicial.** O JavaScript baixado no carregamento inicial da página cresce no máximo 5 KB gzip em relação à `main`.
+- [ ] **Lighthouse mobile.** No preview do PR: Performance ≥ 90, Acessibilidade ≥ 95, LCP ≤ 2,5 s e CLS ≤ 0,1. *Em produção: Acessibilidade, LCP e CLS passam; Performance ficou em 89, sem regressão causada por esta spec (ver `verification.md`).*
+- [x] **Portões verdes.**
 
 ## Relação com as specs anteriores
 
