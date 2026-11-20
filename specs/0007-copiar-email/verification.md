@@ -41,3 +41,17 @@ Capturas da seção em 390 e 1280 px: o endereço e "Copiar" ficam numa linha, a
 ## Documentação
 
 `node .agents/scripts/docs-impact.mjs` listou o `README.md`. O agente `doc-sync-onboarding` atualizou a descrição do Contact, a árvore de componentes e a seção "Contato". `docs/architecture.md` continua correto: o contato segue por `mailto:`.
+
+## QA no fluxo real
+
+Agente `qa`, com o Vite local e o Chromium headless. Todos os pontos passaram:
+
+- **Só teclado:** o foco visível é um anel ciano de 2 px. Enter e Espaço copiam, o botão volta a "Copiar" em cerca de 2 s e o foco continua no botão.
+- **Cópia sem a API ou sem permissão:** o aviso aparece e o endereço fica selecionado.
+- **Larguras de 320, 390, 768 e 1280 px:** nenhuma tem rolagem horizontal, e o botão mede ≥ 44 × 44 px. Em 320 px, o "Copiar" desce para a linha de baixo, como esperado. Toque real a 320 e 390 px.
+- **Contraste:** 7,22:1 no texto e no aviso, e 8,46:1 no hover.
+- **Movimento reduzido e cores forçadas, nos temas claro e escuro:** o foco continua visível e a cópia funciona.
+
+**Achado corrigido:** depois de um toque no celular, o hover ficava preso, com o texto sublinhado. Agora o hover só vale em dispositivos com mouse (`@media (hover: hover)`).
+
+**Limites:** testado só no Chromium. Firefox, Safari e um leitor de tela real não foram testados. O anúncio foi conferido pelo conteúdo da região `status`.
