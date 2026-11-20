@@ -45,7 +45,7 @@ abaixo da dobra são carregadas sob demanda e o conteúdo fica em `src/content/p
 - **Projects** - Projetos com filtro (todos, autorais, comerciais) em cards (`ProjectCard`)
 - **Expertise** - Accordion (Radix) com vários itens abertos e prévia ilustrada (`ExpertisePreview`)
 - **Experience** - Experiência profissional
-- **Contact** - Botão "Iniciar conversa" (`mailto:` com assunto pronto) e endereço de e-mail em texto com botão "Copiar" (`CopyEmailButton`), que confirma a cópia e, se ela falhar, seleciona o endereço
+- **Contact** - Título interativo (`ContactTitle`): um contorno cinza se desenha numa varredura quando ele entra na tela (uma vez) e, no desktop, um brilho nas cores da marca segue o ponteiro pela borda das letras; no toque há só a entrada, e com movimento reduzido ou cores forçadas o título fica só preenchido. Botão "Iniciar conversa" (`mailto:` com assunto pronto) e endereço de e-mail em texto com botão "Copiar" (`CopyEmailButton`), que confirma a cópia e, se ela falhar, seleciona o endereço
 - **SectionTitle** / **AvailabilityBadge** - Título de seção e selo de disponibilidade
 
 #### Navegação
@@ -68,6 +68,7 @@ O projeto inclui 25+ componentes Shadcn/UI baseados em Radix UI:
 ### Hooks Customizados
 - **useActiveSection()** - Indica a seção visível para marcar o link ativo da navegação (`src/hooks/use-active-section.ts`)
 - **useAuroraPointer()** / **useHeroMotion()** - Revelação de cor pelo ponteiro e início/pausa do movimento da aurora do hero (`src/hooks/use-hero-aurora.ts`)
+- **useDrawOnce()** / **usePointerGlow()** - Contorno desenhado na entrada e brilho que segue o ponteiro no título do contato (`src/hooks/use-title-effects.ts`)
 - **useToast()** - Hook para disparar notificações toast
 
 ### Tipografia
@@ -158,6 +159,7 @@ src/
 │   ├── ExpertisePreview.tsx # Prévia ilustrada de cada área
 │   ├── Experience.tsx       # Experiência profissional
 │   ├── Contact.tsx          # Contato: mailto e e-mail copiável
+│   ├── ContactTitle.tsx     # Título do contato com contorno e brilho
 │   ├── CopyEmailButton.tsx  # Endereço de e-mail com botão de copiar
 │   ├── Footer.tsx           # Rodapé com links sociais e rápidos
 │   ├── ErrorBoundary.tsx    # Fallback para erros de renderização
@@ -179,6 +181,7 @@ src/
 ├── hooks/
 │   ├── use-active-section.ts # Seção visível para a navegação
 │   ├── use-hero-aurora.ts   # Ponteiro e movimento da aurora do hero
+│   ├── use-title-effects.ts # Contorno e brilho do título do contato
 │   └── use-toast.ts         # Hook para disparo de notificações
 ├── lib/
 │   ├── active-section.ts    # Lógica pura da seção ativa
