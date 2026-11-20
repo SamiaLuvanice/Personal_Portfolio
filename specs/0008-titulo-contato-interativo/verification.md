@@ -27,8 +27,29 @@ Branch `feat/titulo-contato-interativo`, 20/11/2026, nesta máquina Windows.
 | Contorno alinhado depois da troca de fonte e ao redimensionar | Passou | E2E: retângulos de cada linha (por `Range`) iguais entre o texto e o contorno em 320/390/768/1280 px, com as fontes carregadas. QA: 0 px de diferença ao redimensionar sem recarregar e ao trocar a fonte para Arial e serif na página. A troca real com a rede lenta não foi reproduzida; as cópias herdam a fonte do `h2` |
 | Um único `h2` lido uma vez, decoração não lida, axe sem violações sérias | Passou | E2E nos dois projetos com o efeito visível (contorno desenhado e, no desktop, brilho aceso). Teste de unidade do nome acessível. QA: árvore de acessibilidade sem as cópias |
 | JS inicial cresce no máximo 5 KB gzip | Passou | `vite build` local: `index` com 66,15 KB gzip na `main` e 66,16 KB no branch (+0,01 KB). O efeito fica no chunk preguiçoso do Contato, que foi de 1,61 KB para 2,20 KB |
-| Lighthouse mobile no preview do PR | **Pendente** | Depende do preview da Vercel, que só existe depois do PR |
+| Lighthouse mobile (Performance ≥ 90, Acessibilidade ≥ 95, LCP ≤ 2,5 s, CLS ≤ 0,1) | **Parcial: Performance 89** | Produção (`07dbdb5`), 3 execuções mobile: Performance 89, 90 e 89; Acessibilidade 100; LCP 2,12–2,19 s; CLS 0; TBT 328–344 ms. Ver "Lighthouse" abaixo: a diferença não vem desta spec |
 | Portões verdes | Passou | Acima |
+
+## Lighthouse
+
+**Produção.** `npx lighthouse https://samialuvanicedev.vercel.app/` (mobile, padrão), em 20/11/2026, com a produção já servindo `07dbdb5`. Mediana:
+
+- Performance 89, logo abaixo do limite de 90;
+- Acessibilidade 100;
+- LCP 2,17 s e CLS 0.
+
+O que custa pontos é o TBT (cerca de 340 ms).
+
+**Comparação para isolar o efeito da spec.** As URLs de cada deploy da Vercel exigem login, e as execuções nelas mediram a página de login; foram descartadas. Em vez disso, `vite preview` serviu lado a lado o build de `main` (`07dbdb5`) e o de antes do PR (`0fde6b5`), com 5 execuções intercaladas de cada:
+
+| Build | Performance | Mediana | LCP | TBT |
+| --- | --- | --- | --- | --- |
+| Antes (`0fde6b5`) | 96, 92, 96, 95, 95 | **95** | 2,50–2,58 s | 26–209 ms |
+| Depois (`07dbdb5`) | 96, 92, 91, 96, 94 | **94** | 2,49–2,80 s | 21–210 ms |
+
+Empate dentro do ruído desta máquina, com o JS inicial praticamente igual (+0,01 KB gzip). Os 89 de produção vêm do TBT, que já existia antes desta spec; não foi possível medir a produção anterior para confirmar diretamente.
+
+**Pendência fora desta spec:** investigar o TBT de cerca de 340 ms em produção para voltar a Performance ≥ 90.
 
 ## Revisão independente
 
