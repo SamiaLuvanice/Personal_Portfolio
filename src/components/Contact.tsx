@@ -1,4 +1,5 @@
 import AvailabilityBadge from "@/components/AvailabilityBadge";
+import CopyEmailButton from "@/components/CopyEmailButton";
 import { SOCIAL_LINKS } from "@/content/portfolio";
 import { ArrowUpRight } from "lucide-react";
 
@@ -21,9 +22,7 @@ const Contact = () => (
         Iniciar conversa
         <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
       </a>
-      <a href={SOCIAL_LINKS.email} className="inline-flex min-h-11 items-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline md:text-base [overflow-wrap:anywhere]">
-        {SOCIAL_LINKS.emailAddress}
-      </a>
+      <CopyEmailButton email={SOCIAL_LINKS.emailAddress} />
     </div>
   </section>
 );
