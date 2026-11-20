@@ -45,7 +45,7 @@ abaixo da dobra são carregadas sob demanda e o conteúdo fica em `src/content/p
 - **Projects** - Projetos com filtro (todos, autorais, comerciais) em cards (`ProjectCard`)
 - **Expertise** - Accordion (Radix) com vários itens abertos e prévia ilustrada (`ExpertisePreview`)
 - **Experience** - Experiência profissional
-- **Contact** - E-mail (`mailto:` com assunto pronto) e redes sociais
+- **Contact** - Botão "Iniciar conversa" (`mailto:` com assunto pronto) e endereço de e-mail em texto com botão "Copiar" (`CopyEmailButton`), que confirma a cópia e, se ela falhar, seleciona o endereço
 - **SectionTitle** / **AvailabilityBadge** - Título de seção e selo de disponibilidade
 
 #### Navegação
@@ -157,7 +157,8 @@ src/
 │   ├── Expertise.tsx        # Accordion de áreas de atuação
 │   ├── ExpertisePreview.tsx # Prévia ilustrada de cada área
 │   ├── Experience.tsx       # Experiência profissional
-│   ├── Contact.tsx          # Contato por e-mail e redes sociais
+│   ├── Contact.tsx          # Contato: mailto e e-mail copiável
+│   ├── CopyEmailButton.tsx  # Endereço de e-mail com botão de copiar
 │   ├── Footer.tsx           # Rodapé com links sociais e rápidos
 │   ├── ErrorBoundary.tsx    # Fallback para erros de renderização
 │   └── ui/                  # 25+ Componentes UI reutilizáveis (Shadcn/Radix)
@@ -197,7 +198,7 @@ src/
 ## ⚙️ Configuração
 
 ### Contato
-Não há backend: a seção de contato usa um link `mailto:` montado por `src/lib/contact.ts` (testado com Vitest). O projeto não precisa de variáveis de ambiente.
+Não há backend: a seção de contato usa um link `mailto:` montado por `src/lib/contact.ts` (testado com Vitest) e oferece o endereço para copiar, para quem não tem programa de e-mail configurado. O projeto não precisa de variáveis de ambiente.
 
 #### Deployment na Vercel
 
