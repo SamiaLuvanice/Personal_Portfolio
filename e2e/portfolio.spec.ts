@@ -704,3 +704,225 @@ test.describe("hero Liquid Aurora (spec 0006)", () => {
     }
   });
 });
+
+// ---- Spec 0008: título interativo do Contato ----
+
+/** Estado do título: entrada, brilho (centro em px no título, raio e opacidade) e alinhamento. */
+async function contactTitleState(page: Page) {
+  return page.evaluate(() => {
+    const title = document.getElementById("contact-title")!;
+    const outline = title.querySelector<HTMLElement>(".contact-title-outline")!;
+    const glow = title.querySelector<HTMLElement>(".contact-title-glow")!;
+    const lineRects = (node: Node) => {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      return [...range.getClientRects()].map((rect) => [rect.left, rect.top, rect.width].map(Math.round));
+    };
+    const box = title.getBoundingClientRect();
+    return {
+      drawn: title.dataset.drawn,
+      glow: title.dataset.glow,
+      gx: parseFloat(title.style.getPropertyValue("--gx")),
+      gy: parseFloat(title.style.getPropertyValue("--gy")),
+      left: box.left,
+      top: box.top,
+      height: box.height,
+      glowOpacity: Number(getComputedStyle(glow).opacity),
+      outlineClip: getComputedStyle(outline).clipPath,
+      outlineDisplay: getComputedStyle(outline).display,
+      glowDisplay: getComputedStyle(glow).display,
+      textLines: lineRects(title.firstChild!),
+      outlineLines: lineRects(outline),
+      running: title.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running").length,
+    };
+  });
+}
+
+/** A seção Contato é carregada sob demanda: espera o título existir antes de centralizá-lo. */
+/**
+ * Pixels saturados (cor da marca) numa captura da tela, separados pela distância a um ponto
+ * da página: até `radius` ("near") e além dele ("far"). O preenchimento, o contorno e o fundo são
+ * neutros, então só o brilho produz pixels saturados no título.
+ */
+async function brandPixels(page: Page, clip: { x: number; y: number; width: number; height: number }, center: { x: number; y: number }, radius: number) {
+  const png = (await page.screenshot({ clip })).toString("base64");
+  return page.evaluate(
+    async ({ png, clip, center, radius }) => {
+      const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${png}`)).blob());
+      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+      const context = canvas.getContext("2d")!;
+      context.drawImage(bitmap, 0, 0);
+      const { data } = context.getImageData(0, 0, bitmap.width, bitmap.height);
+      const scale = bitmap.width / clip.width;
+      let near = 0;
+      let far = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
+        if (Math.max(r, g, b) - Math.min(r, g, b) < 90) continue;
+        const pixel = i / 4;
+        const x = clip.x + (pixel % bitmap.width) / scale;
+        const y = clip.y + Math.floor(pixel / bitmap.width) / scale;
+        if (Math.hypot(x - center.x, y - center.y) <= radius) near++;
+        else far++;
+      }
+      return { near, far };
+    },
+    { png, clip, center, radius },
+  );
+}
+
+async function scrollToContactTitle(page: Page) {
+  await page.locator("#contact-title").waitFor({ state: "attached" });
+  await page.evaluate(() => document.getElementById("contact-title")!.scrollIntoView({ block: "center" }));
+}
+
+test.describe("título interativo do Contato (spec 0008)", () => {
+  test("é um único h2 lido uma vez, sem violações de acessibilidade com o efeito visível", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/#contact");
+    await scrollToContactTitle(page);
+    const contact = page.locator("#contact");
+    await expect(contact.getByRole("heading")).toHaveCount(1);
+    await expect(contact.getByRole("heading", { level: 2 })).toHaveAccessibleName("Vamos construir algo relevante?");
+    await expect(contact.getByRole("region", { name: "Vamos construir algo relevante?" })).toHaveCount(1);
+    // Contorno desenhado e, no desktop, brilho aceso: o axe avalia o estado que a maioria vê.
+    await expect(page.locator("#contact-title")).toHaveAttribute("data-drawn", "true");
+    await expect.poll(async () => (await contactTitleState(page)).outlineClip, { timeout: 4000 }).toBe("inset(0px 0% 0px 0px)");
+    if (isDesktop(page)) {
+      const box = (await page.locator("#contact-title").boundingBox())!;
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 4 });
+      await expect(page.locator("#contact-title")).toHaveAttribute("data-glow", "true");
+    }
+    expect(await seriousViolations(page)).toEqual([]);
+  });
+
+  test("o contorno se desenha ao entrar na tela, termina em até 4 s e não se repete", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    // "Só ao entrar na tela" é coberto no teste de unidade: aqui, carregar as seções já as mostra no celular.
+    await page.goto("/");
+    await scrollToContactTitle(page);
+    await expect(page.locator("#contact-title")).toHaveAttribute("data-drawn", "true");
+    await expect.poll(async () => (await contactTitleState(page)).outlineClip, { timeout: 4000 }).toBe("inset(0px 0% 0px 0px)");
+    expect((await contactTitleState(page)).running).toBe(0);
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(300);
+    await scrollToContactTitle(page);
+    await page.waitForTimeout(300);
+    const again = await contactTitleState(page);
+    expect(again.outlineClip).toBe("inset(0px 0% 0px 0px)");
+    expect(again.running).toBe(0);
+  });
+
+  test("com mouse, o brilho segue o ponteiro e apaga ao sair", async ({ page }) => {
+    test.skip(!isDesktop(page), "precisa de hover e ponteiro fino");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/#contact");
+    await scrollToContactTitle(page);
+    await expect.poll(async () => (await contactTitleState(page)).outlineClip, { timeout: 4000 }).toBe("inset(0px 0% 0px 0px)");
+    const idle = await contactTitleState(page);
+    const clip = { x: idle.left, y: idle.top, width: (await page.locator("#contact-title").boundingBox())!.width, height: idle.height };
+    const x = idle.left + 300;
+    const y = idle.top + idle.height / 3;
+    const halfHeight = idle.height / 2;
+    expect(idle.glowOpacity).toBe(0);
+    expect(await brandPixels(page, clip, { x, y }, halfHeight)).toEqual({ near: 0, far: 0 });
+
+    await page.mouse.move(x - 120, y + 10);
+    await page.mouse.move(x, y, { steps: 8 });
+    await page.waitForTimeout(1000);
+    const active = await contactTitleState(page);
+    expect(active.glow).toBe("true");
+    expect(active.glowOpacity).toBe(1);
+    expect(Math.hypot(active.gx - (x - active.left), active.gy - (y - active.top))).toBeLessThanOrEqual(40);
+    // O brilho é pintado de fato nas cores da marca perto do cursor, e nada colorido passa de
+    // metade da altura do título (o raio máximo do critério).
+    const lit = await brandPixels(page, clip, { x, y }, halfHeight);
+    expect(lit.near).toBeGreaterThan(50);
+    expect(lit.far).toBe(0);
+
+    await page.mouse.move(x, active.top + active.height + 80, { steps: 4 });
+    await page.waitForTimeout(1000);
+    const gone = await contactTitleState(page);
+    expect(gone.glow).toBe("false");
+    expect(gone.glowOpacity).toBe(0);
+    expect(await brandPixels(page, clip, { x, y }, halfHeight)).toEqual({ near: 0, far: 0 });
+  });
+
+  test("no toque, a página rola e nenhum brilho aparece", async ({ page }) => {
+    test.skip(isDesktop(page), "só em aparelho de toque");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/#contact");
+    await scrollToContactTitle(page);
+    const before = await page.evaluate(() => window.scrollY);
+    const box = (await page.locator("#contact-title").boundingBox())!;
+    await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+    // Arrastar sobre o título rola a página (o título não bloqueia o toque).
+    const session = await page.context().newCDPSession(page);
+    await session.send("Input.synthesizeScrollGesture", {
+      x: Math.round(box.x + box.width / 2),
+      y: Math.round(box.y + box.height / 2),
+      yDistance: -200,
+      gestureSourceType: "touch",
+    });
+    await expect.poll(() => page.evaluate(() => window.scrollY)).not.toBe(before);
+    const state = await contactTitleState(page);
+    expect(state.glow).not.toBe("true");
+    expect(state.glowOpacity).toBe(0);
+  });
+
+  test("com movimento reduzido, o título fica só preenchido e nada se move", async ({ page }) => {
+    await page.goto("/#contact");
+    await scrollToContactTitle(page);
+    if (isDesktop(page)) {
+      const box = (await page.locator("#contact-title").boundingBox())!;
+      await page.mouse.move(box.x + 200, box.y + 40, { steps: 6 });
+      await page.waitForTimeout(400);
+    }
+    const state = await contactTitleState(page);
+    expect(state.outlineDisplay).toBe("none");
+    expect(state.glowDisplay).toBe("none");
+    expect(state.glow).not.toBe("true");
+    expect(state.running).toBe(0);
+  });
+
+  test("em cores forçadas, o contorno e o brilho somem e o título usa a cor do sistema", async ({ page }) => {
+    await page.emulateMedia({ forcedColors: "active", reducedMotion: "no-preference" });
+    await page.goto("/#contact");
+    await scrollToContactTitle(page);
+    await expect(page.locator("#contact-title")).toHaveAttribute("data-drawn", "true");
+    await expect(page.locator(".contact-title-outline")).toBeHidden();
+    await expect(page.locator(".contact-title-glow")).toBeHidden();
+    const colors = await page.evaluate(() => {
+      const probe = document.createElement("span");
+      probe.style.color = "CanvasText";
+      document.body.appendChild(probe);
+      const system = getComputedStyle(probe).color;
+      probe.remove();
+      return { system, title: getComputedStyle(document.getElementById("contact-title")!).color };
+    });
+    expect(colors.title).toBe(colors.system);
+  });
+
+  test("o contorno coincide com as letras e o contraste do texto se mantém em cada largura", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/#contact");
+    await page.waitForFunction(() => document.fonts.status === "loaded");
+    for (const width of [320, 390, 768, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      await scrollToContactTitle(page);
+      await page.waitForTimeout(150);
+      const state = await contactTitleState(page);
+      expect(state.outlineLines, `${width}px`).toEqual(state.textLines);
+      const layout = await page.evaluate(() => {
+        const title = document.getElementById("contact-title")!;
+        const colors = [title, ...title.querySelectorAll("span")].map((el) => getComputedStyle(el).color);
+        return { colors, scroll: document.documentElement.scrollWidth, right: title.getBoundingClientRect().right };
+      });
+      // As cópias pintam o preenchimento com a mesma cor do título: o contraste do texto não muda.
+      expect(new Set(layout.colors).size, `${width}px`).toBe(1);
+      expect(layout.scroll, `${width}px`).toBeLessThanOrEqual(width);
+      expect(layout.right, `${width}px`).toBeLessThanOrEqual(width);
+    }
+  });
+});

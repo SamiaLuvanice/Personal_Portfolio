@@ -494,6 +494,53 @@
     pointer-events: none;
   }
 
+  /* Título do Contato (spec 0008): cópias do texto sobre o h2, com a mesma quebra de linha. O
+     preenchimento das cópias repete a cor do título e o traço fica atrás dele (paint-order), então
+     só a borda externa das letras muda — o contraste do texto continua o de hoje. */
+  .contact-title-outline,
+  .contact-title-glow {
+    position: absolute;
+    inset: 0;
+    color: inherit;
+    paint-order: stroke fill;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Contorno da entrada: varre da esquerda para a direita uma vez e fica (só com movimento). */
+  .contact-title-outline {
+    -webkit-text-stroke: max(3px, 0.045em) hsl(var(--muted-foreground) / 0.55);
+    clip-path: inset(0 100% 0 0);
+  }
+
+  /* Brilho: degradê da marca no traço, recortado pelo texto, centrado no ponteiro. */
+  .contact-title-glow {
+    -webkit-text-stroke: max(3px, 0.07em) transparent;
+    background-image: radial-gradient(
+      circle 0.9em at var(--gx, 50%) var(--gy, 50%),
+      hsl(var(--primary-glow)) 0%,
+      hsl(var(--primary)) 30%,
+      hsl(var(--accent)) 62%,
+      hsl(var(--ring) / 0.8) 82%,
+      transparent 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    opacity: 0;
+    transition: opacity 0.45s ease-out;
+  }
+
+  .contact-title[data-glow="true"] .contact-title-glow {
+    opacity: 1;
+    transition-duration: 0.25s;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .contact-title[data-drawn="true"] .contact-title-outline {
+      animation: contact-title-draw 2.4s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    }
+  }
+
   /* Cards: P&B só onde há ponteiro; a cor volta no hover e no foco, com zoom, seta girando e o
      nome rolando letra a letra (só transform, escalonado por --i). */
   .project-card-arrow,
@@ -577,7 +624,9 @@
       display: none !important;
     }
 
-    .ghost-word {
+    .ghost-word,
+    .contact-title-outline,
+    .contact-title-glow {
       display: none;
     }
 
@@ -599,6 +648,12 @@
 
     .project-card-image {
       transition-property: filter;
+    }
+
+    /* Título do Contato só preenchido, como antes da spec 0008. */
+    .contact-title-outline,
+    .contact-title-glow {
+      display: none;
     }
 
     .project-card:hover .roll-letter-track,
@@ -659,5 +714,11 @@
   from {
     opacity: 0;
     transform: translateY(12px);
+  }
+}
+
+@keyframes contact-title-draw {
+  to {
+    clip-path: inset(0 0 0 0);
   }
 }
