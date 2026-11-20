@@ -310,11 +310,32 @@ test("experiência lista só Sound House (atual) e Governo do Estado do Ceará",
   await expect(page.locator("#experience")).not.toContainText("Lopes Tech");
 });
 
-test("contato abre e-mail para o endereço exibido", async ({ page }) => {
+test("Iniciar conversa abre o e-mail preenchido e o endereço aparece como texto", async ({ page }) => {
   await page.goto("/#contact");
   const contact = page.locator("#contact");
-  await expect(contact.getByRole("link", { name: "Iniciar conversa" })).toHaveAttribute("href", /^mailto:samia\.luvanice\.dev@gmail\.com\?subject=.+/);
-  await expect(contact.getByRole("link", { name: "samia.luvanice.dev@gmail.com" })).toBeVisible();
+  await expect(contact.getByRole("link", { name: "Iniciar conversa" })).toHaveAttribute("href", /^mailto:samia\.luvanice\.dev@gmail\.com\?subject=.+&body=.+/);
+  await expect(contact.getByText("samia.luvanice.dev@gmail.com", { exact: true })).toBeVisible();
+});
+
+test("contato copia o e-mail e confirma (spec 0007)", async ({ page, context }) => {
+  await page.goto("/#contact");
+  const contact = page.locator("#contact");
+  const copy = contact.getByRole("button", { name: "Copiar e-mail" });
+  const box = (await copy.boundingBox())!;
+  expect(box.width).toBeGreaterThanOrEqual(44);
+  expect(box.height).toBeGreaterThanOrEqual(44);
+
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  if (isDesktop(page)) {
+    await copy.focus();
+    await page.keyboard.press("Enter");
+  } else {
+    await copy.tap();
+  }
+  await expect(copy).toHaveText("Copiado");
+  await expect(contact.getByRole("status")).toHaveText("E-mail copiado");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("samia.luvanice.dev@gmail.com");
+  await expect(copy).toHaveText("Copiar", { timeout: 4000 });
 });
 
 test("barra no topo (desktop) ou embaixo (celular), visível durante a rolagem", async ({ page }) => {
