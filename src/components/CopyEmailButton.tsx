@@ -58,7 +58,7 @@ const CopyEmailButton = ({ email }: { email: string }) => {
           type="button"
           aria-label="Copiar e-mail"
           onClick={copy}
-          className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full px-3 font-medium underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--surface-dark))]"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full px-3 font-medium underline-offset-4 transition-colors [@media(hover:hover)]:hover:text-foreground [@media(hover:hover)]:hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--surface-dark))]"
         >
           {copied ? <Check aria-hidden="true" className="h-4 w-4" /> : <Copy aria-hidden="true" className="h-4 w-4" />}
           {copied ? "Copiado" : "Copiar"}
