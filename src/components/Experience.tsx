@@ -6,7 +6,7 @@ const Experience = () => (
   <section aria-labelledby="experience-title" className="surface-light surface-muted px-5 py-14 md:px-10 md:py-20 lg:px-20 lg:py-24">
     <div className="mx-auto flex max-w-[80rem] flex-col gap-6 md:gap-8">
       <SectionTitle id="experience-title">EXPERIÊNCIA</SectionTitle>
-      <p className="text-center text-base text-muted-foreground md:text-lg">2+ anos em desenvolvimento full stack</p>
+      <p className="text-center text-base text-muted-foreground md:text-lg">Mais de 10 anos de experiência em tecnologia</p>
       <ul className="border-t border-foreground/15">
         {EXPERIENCE.map((entry) => (
           <li key={entry.company} className="flex items-center justify-between gap-4 border-b border-foreground/15 py-5 md:px-2 md:py-7">
