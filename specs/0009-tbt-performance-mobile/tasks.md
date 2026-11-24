@@ -10,5 +10,5 @@
 - [x] T8 — Portões verdes (`node .agents/scripts/gates.mjs`), incluindo E2E sem mudar expectativas.
 - [x] T9 — Medidas lado a lado: maior tarefa longa (5 cargas, CPU 4x), Lighthouse (9 execuções), peso do JS inicial, capturas em 390 e 1280 px, seções completas em até 3 s.
 - [x] T10 — Revisão independente (`code-reviewer`); achados tratados.
-- [x] T11 — Documentação (`docs-impact`) e `verification.md`. PR aberto.
-- [ ] T12 — Depois do merge: Lighthouse mobile na produção (3 execuções) registrado na verificação.
+- [x] T11 — Documentação (`docs-impact`), `verification.md` e PR #28 (merge em `999b0fb`).
+- [x] T12 — Depois do merge: Lighthouse mobile na produção (3 execuções) registrado na verificação.
