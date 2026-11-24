@@ -1,18 +1,11 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
+// Uma página só: a Vercel reescreve qualquer caminho para o index.html, e aqui basta separar a
+// raiz do 404. Um roteador custaria script no carregamento inicial sem navegação para atender.
 const App = () => (
-  <ErrorBoundary>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  </ErrorBoundary>
+  <ErrorBoundary>{window.location.pathname === "/" ? <Index /> : <NotFound />}</ErrorBoundary>
 );
 
 export default App;

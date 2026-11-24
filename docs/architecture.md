@@ -11,17 +11,23 @@ flowchart LR
 
 - **SPA estática** (`src/`): uma página (`/`) com Hero (`#inicio`), Projetos (`#projects`),
   Expertise (`#expertise`), Experiência (`#experience`) e Contato (`#contact`), seguidos do rodapé
-  (`Footer.tsx`, único `contentinfo`), além de `NotFound` para as demais rotas. Sem tema
-  alternável: o esquema de cores é fixo por seção (`:root` claro e `.surface-dark` em
-  `src/index.css`). Sem GSAP nem Framer Motion. O conteúdo fica em `src/content/portfolio.ts`; a
-  lógica pura em `src/lib/filter-projects.ts` e `src/lib/active-section.ts`.
+  (`Footer.tsx`, único `contentinfo`), além de `NotFound` para as demais rotas. Não há biblioteca
+  de roteamento: `src/App.tsx` escolhe entre `Index` e `NotFound` por `window.location.pathname`, e
+  a Vercel reescreve todo caminho para o `index.html`. Sem tema alternável: o esquema de cores é
+  fixo por seção (`:root` claro e `.surface-dark` em `src/index.css`). Sem GSAP nem Framer Motion.
+  O conteúdo fica em `src/content/portfolio.ts`; a lógica pura em `src/lib/filter-projects.ts` e
+  `src/lib/active-section.ts`.
 - **Navegação** — Links nativos de fragmento: barra superior fixa a partir de 1024 px e barra
   inferior de quatro colunas abaixo disso. A seção ativa recebe `aria-current`
   (`src/hooks/use-active-section.ts`). Os destinos de Projetos, Expertise, Experiência e Contato
   ficam em contêineres persistentes de `Index.tsx`, disponíveis enquanto o conteúdo dessas seções é
-  carregado sob demanda. Ao abrir `/#secao`, `Index.tsx` realinha a rolagem até o destino enquanto
-  as seções montam, por até 2 s ou até a pessoa rolar, tocar, teclar ou clicar; fragmento
-  malformado é ignorado.
+  carregado sob demanda. Os chunks dessas seções são baixados juntos na montagem, mas elas montam uma
+  por vez, cada uma depois de um momento ocioso (`requestIdleCallback` com timeout de 300 ms, ou
+  `setTimeout`), em transição (spec 0009). Com âncora no endereço, ou ao seguir uma âncora antes de
+  todas montarem, montam todas de uma vez; também ao recarregar ou voltar no histórico, para o
+  navegador restaurar a posição da rolagem. Nos casos de âncora, `Index.tsx` realinha a rolagem até o
+  destino enquanto as seções montam, por até 2 s ou até a pessoa rolar, tocar, teclar ou clicar;
+  fragmento malformado é ignorado.
 - **Imagens e fontes** — Imagens dos projetos em WebP (`public/projects/`), preguiçosas. O retrato
   (`public/hero/portrait-2026.webp`) é a imagem do LCP e é o único recurso pré-carregado no
   `index.html`. A aurora do hero usa WebPs pequenos (`public/hero/aurora-*.webp`, gerados por

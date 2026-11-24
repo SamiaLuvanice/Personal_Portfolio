@@ -23,7 +23,7 @@ Portfólio pessoal moderno desenvolvido com React 18, TypeScript e Tailwind CSS,
 - **Lucide React** - Ícones SVG limpos e consistentes
 
 ### Roteamento
-- **React Router DOM v6** - Roteamento para SPAs
+- **Sem biblioteca de roteamento** - `src/App.tsx` mostra `Index` em `/` e `NotFound` em qualquer outro caminho (`window.location.pathname`); a Vercel reescreve tudo para o `index.html`
 - **date-fns** - Manipulação de datas com locale pt-BR
 
 ### Development & Qualidade
@@ -192,7 +192,7 @@ src/
 ├── pages/
 │   ├── Index.tsx            # Página principal; seções abaixo da dobra sob demanda
 │   └── NotFound.tsx         # Página 404 customizada
-├── App.tsx                  # Componente raiz com ErrorBoundary e routing
+├── App.tsx                  # Componente raiz com ErrorBoundary; `/` ou 404 pelo caminho
 ├── App.css                  # Estilos específicos do App
 ├── index.css                # Estilos globais e CSS variables (HSL)
 └── main.tsx                 # Entry point da aplicação
@@ -248,6 +248,13 @@ O projeto usa `React.lazy()` para carregar sob demanda as seções abaixo da dob
 Cada seção tem um `Suspense` com um espaço reservado de altura mínima, para a página não pular
 enquanto o chunk carrega.
 
+Os quatro chunks são baixados juntos na montagem, mas as seções montam uma por vez, cada uma depois
+de um momento ocioso (`requestIdleCallback` com timeout de 300 ms, ou `setTimeout` onde ele não
+existe) e dentro de uma transição, para não criar uma tarefa longa logo depois da primeira tela.
+Com uma âncora no endereço, ou ao seguir uma âncora antes de todas montarem, as restantes montam de
+uma vez e a rolagem acompanha o destino. Ao recarregar ou voltar no histórico, todas montam de uma vez
+para o navegador restaurar a posição da rolagem.
+
 ### Imagens e fontes
 - Retrato do Hero em `public/hero/portrait-2026.webp`, pré-carregado no `index.html` (imagem do LCP)
 - Imagens da aurora (`public/hero/aurora-*.webp`) pedidas só 1,5 s depois do evento `load`, sem competir com o retrato
@@ -265,7 +272,7 @@ enquanto o chunk carrega.
 ✅ Tailwind CSS  
 ✅ Componentes UI (Radix + Shadcn)  
 ✅ Ícones (Lucide React)  
-✅ Roteamento (React Router v6)  
+✅ Roteamento mínimo sem biblioteca (`/` e 404)  
 ✅ Linting e análise de código  
 ✅ **Code splitting** (React.lazy + Suspense)  
 

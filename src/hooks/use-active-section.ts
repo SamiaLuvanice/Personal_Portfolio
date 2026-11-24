@@ -35,7 +35,9 @@ export function useActiveSection(ids: string[]): string | null {
     const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
     resizeObserver?.observe(document.body);
 
-    measure();
+    // Primeira medida no próximo quadro: medir já, na montagem, forçaria o layout dentro da mesma
+    // tarefa da renderização inicial (spec 0009).
+    schedule();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
