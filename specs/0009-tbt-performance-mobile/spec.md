@@ -66,7 +66,7 @@ do navegador e os robôs de busca encontram o mesmo texto de hoje. Quem chega po
   feitas depois que a página assenta, não mostram diferença visível em relação à `main`.
 - [x] **Página inexistente.** Um endereço que não existe (ex.: `/nao-existe`) continua mostrando a
   página "Página não encontrada" com o link de volta ao início.
-- [ ] **Meta em produção.** Depois do merge e do deploy (o preview da Vercel exige login, ver
+- [x] **Meta em produção.** Depois do merge e do deploy (o preview da Vercel exige login, ver
   0008), o Lighthouse mobile na produção dá Performance ≥ 90 na mediana de 3 execuções seguidas.
   Nessas execuções, Acessibilidade continua 100, a mediana do LCP fica em até 2,5 s e o CLS em até
   0,1. Vale uma rodada, com no máximo uma repetição, e todas as execuções ficam registradas. Se a

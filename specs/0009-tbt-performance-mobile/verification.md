@@ -18,7 +18,7 @@ A máquina estava com carga de fundo (Docker e outras sessões). Por isso toda c
 | Peso inicial (≤ +0,5 KB gzip) | Passou | `index-*.js` caiu de **66,16 KB** para **54,17 KB** gzip (−11,99 KB). O `tailwind-merge` foi para o chunk compartilhado das seções, que é baixado depois da primeira tela (de 0,24 para 7,00 KB gzip) |
 | Nada muda para quem visita | Passou | Todos os E2E existentes verdes, sem mudar expectativas: 91 passaram e 7 foram pulados por dispositivo, como antes. Capturas de página inteira em 390 e 1280 px, depois de rolar e assentar, com movimento reduzido: **0 pixels diferentes** em relação à `main` |
 | Página inexistente | Passou | `App.test.tsx`: `/nao-existe` mostra "404" e "Página não encontrada." com o link "Voltar ao início" para `/` |
-| Meta em produção | **Pendente** | Só dá para verificar depois do merge e do deploy. Ver "Produção" abaixo |
+| Meta em produção | Passou | Produção depois do merge, 3 execuções: Performance 96, 98 e 98 (mediana **98**); Acessibilidade 100; LCP com mediana de 1,87 s; CLS 0. Ver "Produção" abaixo |
 | Portões verdes | Passou | `node .agents/scripts/gates.mjs --skip-install` depois da última mudança de código: lint, typecheck, build e E2E com 91 passados e 7 pulados. Os 60 testes de unidade (12 arquivos) passaram em 6 execuções seguidas (ver "Falha intermitente") |
 
 ## Diagnóstico
@@ -118,7 +118,24 @@ Checks do PR, todos verdes: Quality, E2E + acessibilidade, Lighthouse, Harness, 
 
 ## Produção
 
-Pendente até o merge. O protocolo está na spec: uma rodada de 3 execuções mobile padrão, com no máximo uma repetição, e todas as execuções registradas aqui. Se a mediana ficar abaixo de 90 com os critérios lado a lado aprovados, o critério fica parcial.
+Medida depois do merge do PR #28 (`999b0fb`), em 24/11/2026. A produção já servia o bundle novo (`index-GE_9VQzw.js`, o mesmo do preview). Rodada única, sem repetição:
+`npx lighthouse https://samialuvanicedev.vercel.app/` (mobile, configurações padrão), 3 execuções seguidas.
+
+| Execução | Performance | Acessibilidade | TBT | LCP | CLS | `benchmarkIndex` |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 96 | 100 | 14 ms | 1,64 s | 0 | 417 |
+| 2 | 98 | 100 | 0 ms | 2,15 s | 0 | 2002 |
+| 3 | 98 | 100 | 41 ms | 1,87 s | 0 | 2146 |
+| **Mediana** | **98** | **100** | **14 ms** | **1,87 s** | **0** | |
+
+Comparação com a produção anterior (`b2d3fb4`), medida no mesmo dia, antes da mudança:
+
+- Performance: 87, 96 e 98 antes, 96, 98 e 98 depois.
+- TBT: 416, 139 e 53 ms antes, 14, 0 e 41 ms depois.
+
+**Critério atendido:** Performance ≥ 90 na mediana, Acessibilidade 100, LCP ≤ 2,5 s e CLS ≤ 0,1.
+
+Limite: na primeira execução o `benchmarkIndex` foi 417, com a máquina sob carga, e mesmo assim deu 96. Como já se via na issue #26, a nota em produção oscila com a carga da máquina que mede.
 
 ## Limites
 
