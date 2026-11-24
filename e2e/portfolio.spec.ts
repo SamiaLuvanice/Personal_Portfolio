@@ -196,6 +196,33 @@ test("hero leva a Projetos e ao Contato e mostra os links profissionais (spec 00
   }
 });
 
+// ---- Spec 0009: seções escalonadas ----
+
+test("sem interação, as seções abaixo da dobra ficam completas em até 3 s após o carregamento (spec 0009)", async ({ page }) => {
+  await page.goto("/", { waitUntil: "load" });
+  for (const id of ["projects-title", "expertise-title", "experience-title", "contact-title"]) {
+    await expect(page.locator(`#${id}`)).toHaveCount(1, { timeout: 3000 });
+  }
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+});
+
+test("seguir uma âncora antes de todas as seções aparecerem leva à seção pedida (spec 0009)", async ({ page }) => {
+  // Momento ocioso que nunca chega: as seções seguintes só montam pela âncora.
+  await page.addInitScript(() => {
+    window.requestIdleCallback = () => 0;
+    window.cancelIdleCallback = () => {};
+  });
+  await page.goto("/");
+  await expect(page.locator("#projects-title")).toHaveCount(1);
+  await expect(page.locator("#contact-title")).toHaveCount(0);
+
+  await page.getByRole("navigation", { name: "Navegação principal" }).getByRole("link", { name: "Contato" }).click();
+  await expect(page).toHaveURL(/#contact$/);
+  await expect(page.locator("#contact-title")).toBeInViewport();
+  await page.waitForTimeout(500); // as seções de cima terminam de montar e mudam a altura da página
+  await expect(page.locator("#contact-title")).toBeInViewport();
+});
+
 test("cards abrem cada projeto em nova aba e o filtro separa autorais de comerciais", async ({ page }) => {
   await page.goto("/#projects");
   const list = page.getByRole("list", { name: "Projetos" });
