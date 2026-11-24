@@ -82,6 +82,20 @@ Na penúltima rodada dos portões, a etapa de teste saiu com falha mesmo com a c
 - Causa provável: o teste "uma por vez" espera até 5 s, que é o mesmo limite padrão de um teste no Vitest, e a máquina estava sob carga.
 - Correção: `testTimeout` de 15 s em `Index.test.tsx`.
 
+## E2E instáveis que já existiam
+
+Na rodada final dos portões, com o estado commitado, dois E2E falharam e depois passaram isolados (15 de 15 com `--repeat-each=5`):
+
+- **"no toque, a página rola e nenhum brilho aparece" (mobile, spec 0008).**
+  - A falha se repetiu em outra rodada completa: 90 passados, 1 falho.
+  - A cópia da `main` (`b2d3fb4`), com a suíte completa nesta máquina, **falha no mesmo teste** (86 passados, 1 falho). Não é regressão desta branch.
+  - Sintoma: o `scrollY` fica em 3907, no fim da página, e o gesto para baixo não tem para onde rolar.
+- **"imagens fora da dobra são preguiçosas…" (desktop).**
+  - Falhou uma vez: a primeira imagem registrada foi `aurora-mono.webp`.
+  - O listener de requisições é registrado antes do segundo `goto`, e a aurora da carga anterior é pedida 1,5 s depois do `load`. Corrida do próprio teste.
+
+O CI roda com `retries: 1`. Ficam como pendência para uma correção própria dos testes, fora desta spec.
+
 ## Documentação
 
 `node .agents/scripts/docs-impact.mjs` apontou `README.md` e `docs/architecture.md`. O agente `doc-sync-onboarding` atualizou:
