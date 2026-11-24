@@ -105,6 +105,17 @@ O CI roda com `retries: 1`. Ficam como pendência para uma correção própria d
 - o code splitting com montagem escalonada;
 - os itens "SPA estática" e "Navegação" da arquitetura.
 
+## Preview da Vercel (PR #28)
+
+Conferido no Chrome local, com a sessão da Vercel autenticada, em 24/11/2026:
+
+- hero e as quatro seções presentes 3 s após a abertura, sem interação;
+- console sem erros;
+-  mostra o 404 com "Página não encontrada.";
+-  termina com o título de Contato na tela.
+
+Checks do PR, todos verdes: Quality, E2E + acessibilidade, Lighthouse, Harness, Secrets, Commit policy e Vercel.
+
 ## Produção
 
 Pendente até o merge. O protocolo está na spec: uma rodada de 3 execuções mobile padrão, com no máximo uma repetição, e todas as execuções registradas aqui. Se a mediana ficar abaixo de 90 com os critérios lado a lado aprovados, o critério fica parcial.
