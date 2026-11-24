@@ -111,8 +111,8 @@ Conferido no Chrome local, com a sessão da Vercel autenticada, em 24/11/2026:
 
 - hero e as quatro seções presentes 3 s após a abertura, sem interação;
 - console sem erros;
--  mostra o 404 com "Página não encontrada.";
--  termina com o título de Contato na tela.
+- `/nao-existe` mostra o 404 com "Página não encontrada.";
+- `/#contact` termina com o título de Contato na tela.
 
 Checks do PR, todos verdes: Quality, E2E + acessibilidade, Lighthouse, Harness, Secrets, Commit policy e Vercel.
 
