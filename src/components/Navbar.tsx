@@ -12,7 +12,7 @@ const Navbar = () => {
   return (
     <nav aria-label="Navegação principal" className="site-nav">
       <div className="site-nav-surface flex items-center rounded-full p-1 sm:p-1.5 lg:justify-between lg:rounded-none lg:px-10 lg:py-4">
-        <AvailabilityBadge className="hidden lg:inline-flex" />
+        <AvailabilityBadge display="hidden lg:inline-flex" />
         <ul className="grid w-full grid-cols-4 lg:flex lg:w-auto lg:items-center lg:gap-8">
           {NAV_ITEMS.map((item) => (
             <li key={item.id} className="min-w-0">
