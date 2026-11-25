@@ -297,14 +297,22 @@ test("imagens fora da dobra são preguiçosas e não competem com o retrato do h
   expect(await below.count()).toBeGreaterThan(0);
   for (const image of await below.all()) await expect(image).toHaveAttribute("loading", "lazy");
 
-  // O retrato é o primeiro recurso de imagem pedido na abertura.
-  const requests: string[] = [];
-  page.on("request", (request) => {
-    if (request.resourceType() === "image") requests.push(request.url());
-  });
-  await page.goto("/");
-  await expect.poll(() => requests.length).toBeGreaterThan(0);
-  expect(requests[0]).toMatch(/\/hero\/portrait-2026\.webp$/);
+  // O retrato é o primeiro recurso de imagem pedido na abertura. Numa aba nova: na mesma aba, a
+  // carga anterior continua pedindo imagens (preguiçosas e a aurora, 1,5 s após o load) e elas
+  // entrariam na lista antes do retrato.
+  const fresh = await page.context().newPage();
+  try {
+    await fresh.emulateMedia({ reducedMotion: "reduce" }); // mesma condição do beforeEach
+    const requests: string[] = [];
+    fresh.on("request", (request) => {
+      if (request.resourceType() === "image") requests.push(request.url());
+    });
+    await fresh.goto("/");
+    await expect.poll(() => requests.length).toBeGreaterThan(0);
+    expect(requests[0]).toMatch(/\/hero\/portrait-2026\.webp$/);
+  } finally {
+    await fresh.close();
+  }
 });
 
 test("expertise: primeiro item aberto, vários abertos e controle por teclado", async ({ page }) => {
@@ -803,6 +811,42 @@ async function scrollToContactTitle(page: Page) {
   await page.evaluate(() => document.getElementById("contact-title")!.scrollIntoView({ block: "center" }));
 }
 
+/** Espera a rolagem ficar parada por 300 ms (fim de uma rolagem suave ou de um realinhamento). */
+async function waitForScrollToSettle(page: Page) {
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        let last = window.scrollY;
+        let stableSince = performance.now();
+        const check = () => {
+          if (window.scrollY !== last) {
+            last = window.scrollY;
+            stableSince = performance.now();
+          }
+          if (performance.now() - stableSince >= 300) resolve();
+          else requestAnimationFrame(check);
+        };
+        requestAnimationFrame(check);
+      }),
+  );
+}
+
+/** Arrasto com eventos de toque reais (início, movimentos e fim), como um dedo na tela. */
+async function touchDrag(page: Page, x: number, fromY: number, toY: number) {
+  const session = await page.context().newCDPSession(page);
+  try {
+    await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y: fromY }] });
+    const steps = 10;
+    for (let step = 1; step <= steps; step++) {
+      const y = fromY + ((toY - fromY) * step) / steps;
+      await session.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y }] });
+    }
+    await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  } finally {
+    await session.detach();
+  }
+}
+
 test.describe("título interativo do Contato (spec 0008)", () => {
   test("é um único h2 lido uma vez, sem violações de acessibilidade com o efeito visível", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -881,18 +925,35 @@ test.describe("título interativo do Contato (spec 0008)", () => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/#contact");
     await scrollToContactTitle(page);
-    const before = await page.evaluate(() => window.scrollY);
+    await waitForScrollToSettle(page); // o scrollIntoView é suave: medir no meio dele daria um "antes" falso
     const box = (await page.locator("#contact-title").boundingBox())!;
-    await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
-    // Arrastar sobre o título rola a página (o título não bloqueia o toque).
-    const session = await page.context().newCDPSession(page);
-    await session.send("Input.synthesizeScrollGesture", {
-      x: Math.round(box.x + box.width / 2),
-      y: Math.round(box.y + box.height / 2),
-      yDistance: -200,
-      gestureSourceType: "touch",
+    const x = Math.round(box.x + box.width / 2);
+    const y = Math.round(box.y + box.height / 2);
+    // O ponto tocado precisa ser o próprio título, não uma camada por cima dele.
+    expect(
+      await page.evaluate(
+        ([px, py]) => !!document.elementFromPoint(px, py)?.closest("#contact-title"),
+        [x, y] as const,
+      ),
+    ).toBe(true);
+    // Registra se o brilho chega a ligar em qualquer momento do toque, não só no estado final.
+    await page.evaluate(() => {
+      const title = document.getElementById("contact-title")!;
+      const w = window as unknown as { __glowSeen: boolean };
+      w.__glowSeen = title.dataset.glow === "true";
+      new MutationObserver(() => {
+        if (title.dataset.glow === "true") w.__glowSeen = true;
+      }).observe(title, { attributes: true, attributeFilter: ["data-glow"] });
     });
-    await expect.poll(() => page.evaluate(() => window.scrollY)).not.toBe(before);
+    await page.touchscreen.tap(x, y);
+    await waitForScrollToSettle(page); // se o toque mover a página, o "antes" não pode cair no meio
+    const before = await page.evaluate(() => window.scrollY);
+    // Arrastar o dedo para baixo sobre o título rola a página para cima (o título não bloqueia o
+    // toque). Para cima sempre há espaço: o título fica perto do fim da página. Usa
+    // Input.dispatchTouchEvent: o Input.synthesizeScrollGesture não rola a página neste ambiente.
+    await touchDrag(page, x, y, y + 200);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(before - 50);
+    expect(await page.evaluate(() => (window as unknown as { __glowSeen: boolean }).__glowSeen)).toBe(false);
     const state = await contactTitleState(page);
     expect(state.glow).not.toBe("true");
     expect(state.glowOpacity).toBe(0);
