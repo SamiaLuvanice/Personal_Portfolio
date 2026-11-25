@@ -96,6 +96,13 @@ Na rodada final dos portões, com o estado commitado, dois E2E falharam e depois
 
 O CI roda com `retries: 1`. Ficam como pendência para uma correção própria dos testes, fora desta spec.
 
+**Atualização (25/11/2026):** corrigidos na branch `fix/e2e-instaveis`:
+
+- **Imagens:** a ordem das requisições é medida numa aba nova.
+- **Toque:** o teste espera a rolagem suave assentar e arrasta para cima com `Input.dispatchTouchEvent`. Também confere que o brilho não liga em nenhum momento do gesto.
+
+`--repeat-each=10` nos dois testes: 30 passados, 10 pulados (o toque só roda no projeto mobile). Comando e mutante estão no PR.
+
 ## Documentação
 
 `node .agents/scripts/docs-impact.mjs` apontou `README.md` e `docs/architecture.md`. O agente `doc-sync-onboarding` atualizou:
